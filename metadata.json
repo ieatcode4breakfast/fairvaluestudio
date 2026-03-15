@@ -1,0 +1,5 @@
+{
+  "name": "FairValue Studio",
+  "description": "A multi-scenario valuation tool featuring basic DCF calculation and advanced, multi-phase growth forecasting.",
+  "requestFramePermissions": []
+}
