@@ -1,19 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
 @import "tailwindcss";
 
-body { font-family: 'Inter', sans-serif; }
-
-button, [role="button"], a, select {
-  cursor: pointer;
+body { 
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
 }
-button:disabled, input:disabled, select:disabled {
-  cursor: not-allowed;
-}
-
-.animate-in { animation: fadeSlideIn 0.3s ease forwards; }
-@keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.tab-tooltip { display: none; }
-.tab-add-btn:hover .tab-tooltip { display: block; }
