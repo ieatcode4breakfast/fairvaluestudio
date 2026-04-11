@@ -10,8 +10,8 @@ import { ScenarioComparisonTable } from './components/ScenarioComparisonTable';
 import { Calculator, PlusIcon, DownloadIcon, UploadIcon, InfoIcon, Check, Copy, RotateCcw } from './components/Icons';
 import { MAX_SCENARIOS, TRANSIENT_KEYS } from './utils/constants';
 import { genId } from './utils/genId';
-import { login, signup, getUserValuations, getScenarios } from './mocks/api';
-import { User, ValuationMetadata } from './mocks/db';
+import { login, logout, getCurrentUser, signup, getUserValuations, getScenarios, createValuation, updateValuation, deleteValuation, renameValuation, updateLastActiveValuation, supabase } from './api';
+import { User, ValuationMetadata } from './types';
 
 const LOCAL_STORAGE_KEY = 'fairvalue_scenarios';
 
@@ -78,11 +78,127 @@ export default function App() {
   const [userValuations, setUserValuations] = useState<ValuationMetadata[]>([]);
   const [loadedValuationId, setLoadedValuationId] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [showSavingModal, setShowSavingModal] = useState(false);
   const [showSaveSuccessModal, setShowSaveSuccessModal] = useState(false);
   const [saveSuccessName, setSaveSuccessName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const tabsContainerRef = useRef<HTMLDivElement>(null); // <-- Add this line
+  const tabsContainerRef = useRef<HTMLDivElement>(null);
+
+  // New features state
+  const [lastSavedState, setLastSavedState] = useState<string>(() => JSON.stringify([createDefaultScenario()]));
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [editValuationName, setEditValuationName] = useState('');
+  const [showSaveAsModal, setShowSaveAsModal] = useState(false);
+  const [showNewValuationModal, setShowNewValuationModal] = useState(false);
+  const [newValuationName, setNewValuationName] = useState('My First Valuation');
+  const [hasFetchedValuations, setHasFetchedValuations] = useState(false);
+  const [saveAsName, setSaveAsName] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const ignoreNextSaveRef = useRef(false);
+  const loadedValuationRef = useRef<string | null>(null);
+
+  const currentCleaned = useMemo(() => {
+    return JSON.stringify(scenarios.map(sc => {
+      const copy: any = { ...sc };
+      TRANSIENT_KEYS.forEach(k => delete copy[k]);
+      return copy;
+    }));
+  }, [scenarios]);
+
+  const isDirty = currentCleaned !== lastSavedState;
+
+  // Sync loadedValuationId to backend for user persistence
+  useEffect(() => {
+    if (loadedValuationRef.current !== loadedValuationId && currentUser) {
+      updateLastActiveValuation(currentUser.id, loadedValuationId);
+    }
+    loadedValuationRef.current = loadedValuationId;
+  }, [loadedValuationId, currentUser]);
+
+
+
+  // Realtime subscription effect
+  useEffect(() => {
+    if (!loadedValuationId) return;
+
+    const channel = supabase.channel(`public:valuations:id=eq.${loadedValuationId}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'valuations', filter: `id=eq.${loadedValuationId}` },
+        async () => {
+          try {
+            // We just received an update ping. Let's fetch the actual scenarios from the DB
+            // to see if another device pushed new data.
+            const loadedScenarios = await getScenarios(loadedValuationId);
+
+            if (loadedScenarios && loadedScenarios.length > 0) {
+              const capped = loadedScenarios.slice(0, MAX_SCENARIOS);
+              const mappedOut = capped.map(item => {
+                const base = createDefaultScenario();
+                return {
+                  ...base,
+                  ...item,
+                  splitYears: Array.isArray(item.splitYears) ? [...item.splitYears] : base.splitYears,
+                  metricGrowthRates: Array.isArray(item.metricGrowthRates) ? [...item.metricGrowthRates] : base.metricGrowthRates,
+                  metricGrowthRatesTotal: Array.isArray(item.metricGrowthRatesTotal) ? [...item.metricGrowthRatesTotal] : base.metricGrowthRatesTotal,
+                  revenueGrowthRates: Array.isArray(item.revenueGrowthRates) ? [...item.revenueGrowthRates] : base.revenueGrowthRates,
+                  finalMargins: Array.isArray(item.finalMargins) ? [...item.finalMargins] : base.finalMargins,
+                  sharesGrowthRates: Array.isArray(item.sharesGrowthRates) ? [...item.sharesGrowthRates] : base.sharesGrowthRates,
+                  hoverYear: null,
+                  draggingIndex: null,
+                  showResetConfirm: false,
+                  showYearlyBreakdown: false,
+                };
+              }) as Scenario[];
+
+              const incomingCleaned = JSON.stringify(mappedOut.map(sc => {
+                const copy: any = { ...sc };
+                TRANSIENT_KEYS.forEach(k => delete copy[k]);
+                return copy;
+              }));
+
+              // Only apply if the incoming parsed data is structurally different
+              if (incomingCleaned !== currentCleaned) {
+                ignoreNextSaveRef.current = true;
+                setScenarios(mappedOut);
+                setLastSavedState(incomingCleaned);
+              }
+            }
+          } catch (error) {
+            console.error("Failed to sync realtime changes", error);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loadedValuationId, currentCleaned]);
+
+  // Auto-save effect
+  useEffect(() => {
+    if (!isDirty || !loadedValuationId || !currentUser) return;
+    if (ignoreNextSaveRef.current) {
+      ignoreNextSaveRef.current = false;
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSaving(true);
+      try {
+        const valName = userValuations.find(v => v.id === loadedValuationId)?.valuationName || 'valuation';
+        const cleaned = JSON.parse(currentCleaned);
+        await updateValuation(loadedValuationId, valName, cleaned);
+        setLastSavedState(currentCleaned);
+      } catch (e) {
+        console.error("Auto-save failed:", e);
+      } finally {
+        setIsSaving(false);
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [isDirty, currentCleaned, loadedValuationId, currentUser, userValuations]);
 
   // Auto-close signup success modal after 2 seconds
   useEffect(() => {
@@ -95,11 +211,26 @@ export default function App() {
   // Load user valuations when user logs in
   useEffect(() => {
     if (currentUser) {
-      getUserValuations(currentUser.id).then(setUserValuations).catch(console.error);
+      getUserValuations(currentUser.id).then(vals => {
+        setUserValuations(vals);
+        setHasFetchedValuations(true);
+      }).catch(err => {
+        console.error(err);
+        setHasFetchedValuations(true);
+      });
     } else {
       setUserValuations([]);
+      setHasFetchedValuations(false);
     }
   }, [currentUser]);
+
+  // Force new valuation modal if empty
+  useEffect(() => {
+    if (currentUser && hasFetchedValuations && userValuations.length === 0 && !loadedValuationId) {
+      setNewValuationName('My First Valuation');
+      setShowNewValuationModal(true);
+    }
+  }, [currentUser, hasFetchedValuations, userValuations.length, loadedValuationId]);
 
   const updateScenario = useCallback((id: number, changes: Partial<Scenario>) => {
     setScenarios(prev => prev.map(sc => {
@@ -140,7 +271,7 @@ export default function App() {
   const executeDownload = useCallback(() => {
     let filename = downloadFilename.trim();
     if (filename === '') {
-      filename = `dcf-scenarios-${new Date().toISOString().slice(0,10)}`;
+      filename = `dcf-scenarios-${new Date().toISOString().slice(0, 10)}`;
     }
     if (!filename.toLowerCase().endsWith('.json')) {
       filename += '.json';
@@ -153,9 +284,9 @@ export default function App() {
     });
     const json = JSON.stringify(cleaned, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
     a.download = filename;
     document.body.appendChild(a);
     a.click();
@@ -221,8 +352,8 @@ export default function App() {
   );
 
   const activeScenario = scenarios.find(sc => sc.id === activeScenarioId) || scenarios[0];
-  const activeIndex    = scenarios.findIndex(sc => sc.id === activeScenarioId);
-  const activeResults  = allResults[activeIndex] || allResults[0];
+  const activeIndex = scenarios.findIndex(sc => sc.id === activeScenarioId);
+  const activeResults = allResults[activeIndex] || allResults[0];
 
   // --- Drag and Drop Handlers ---
   const handleDragStart = (e: React.DragEvent<HTMLButtonElement>, index: number) => {
@@ -234,7 +365,7 @@ export default function App() {
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    
+
     if (e.dataTransfer) {
       e.dataTransfer.dropEffect = "move";
     }
@@ -283,11 +414,11 @@ export default function App() {
     setScenarios(newScenarios);
     setDraggedTabIndex(null);
     setDragOverIndex(null);
-    
+
     // Show success feedback on the moved tab
     setDropSuccessIndex(dragOverIndex);
     setTimeout(() => setDropSuccessIndex(null), 800);
-    
+
     // Show reorder confirmation toast
     setShowReorderToast(true);
     setTimeout(() => setShowReorderToast(false), 2000);
@@ -300,66 +431,9 @@ export default function App() {
     setShowReorderToast(false);
   };
 
-  const handleLogin = useCallback(async () => {
-    try {
-      const user = await login(loginEmail, loginPassword);
-      if (user) {
-        setCurrentUser(user);
-        setShowLoginModal(false);
-        setLoginEmail('');
-        setLoginPassword('');
-        setLoginError('');
-      } else {
-        setLoginError('Invalid email or password');
-      }
-    } catch (error) {
-      setLoginError('Login failed: ' + (error as Error).message);
-    }
-  }, [loginEmail, loginPassword]);
-
-  const handleSignup = useCallback(async () => {
-    if (signupPassword !== signupConfirmPassword) {
-      setSignupError('Passwords do not match');
-      return;
-    }
-    try {
-      const user = await signup(signupEmail, signupPassword, signupUsername);
-      setCurrentUser(user);
-      setShowLoginModal(false);
-      setSignupEmail('');
-      setSignupUsername('');
-      setSignupPassword('');
-      setSignupConfirmPassword('');
-      setSignupError('');
-      setActiveTab('login');
-      setShowSignupSuccessModal(true);
-    } catch (error) {
-      setSignupError('Signup failed: ' + (error as Error).message);
-    }
-  }, [signupEmail, signupUsername, signupPassword, signupConfirmPassword]);
-
-  const handleLogout = useCallback(() => {
-    setCurrentUser(null);
-    setLoadedValuationId(null);
-  }, []);
-
   const handleLoadValuation = useCallback(async (valuationId: string) => {
     try {
-      let loadedScenarios: Scenario[];
-
-      // First check if there are saved changes in localStorage
-      if (currentUser) {
-        const key = `valuation_${currentUser.id}_${valuationId}`;
-        const saved = localStorage.getItem(key);
-        if (saved) {
-          loadedScenarios = JSON.parse(saved);
-        } else {
-          // Load from the mock data
-          loadedScenarios = await getScenarios(valuationId);
-        }
-      } else {
-        loadedScenarios = await getScenarios(valuationId);
-      }
+      const loadedScenarios = await getScenarios(valuationId);
 
       const capped = loadedScenarios.slice(0, MAX_SCENARIOS);
       const loaded = capped.map(item => {
@@ -383,16 +457,118 @@ export default function App() {
       setScenarios(loaded);
       setActiveScenarioId(loaded[0].id);
       setLoadedValuationId(valuationId);
+
+      const cleaned = loaded.map(sc => {
+        const copy: any = { ...sc };
+        TRANSIENT_KEYS.forEach(k => delete copy[k]);
+        return copy;
+      });
+      setLastSavedState(JSON.stringify(cleaned));
     } catch (error) {
       console.error('Failed to load valuation:', error);
     }
-  }, [currentUser]);
+  }, []);
 
-  const handleSaveValuation = useCallback(async () => {
-    if (!currentUser || !loadedValuationId) return;
+  const handleCreateNewValuation = async (useSample: boolean = false) => {
+    if (!currentUser || !newValuationName.trim()) return;
+    setIsSaving(true);
+    try {
+      const newScenarios = useSample ? getSampleScenarios() : [createDefaultScenario()];
+      const newId = await createValuation(currentUser.id, newValuationName.trim(), newScenarios);
 
-    const valuationName = userValuations.find((val) => val.id === loadedValuationId)?.valuationName || 'valuation';
-    setShowSavingModal(true);
+      setUserValuations(prev => [...prev, { id: newId, valuationName: newValuationName.trim() }]);
+      setShowNewValuationModal(false);
+      handleLoadValuation(newId);
+    } catch (e) {
+      console.error('Failed to create new valuation', e);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCreateSampleValuation = async () => {
+    if (!currentUser) return;
+    setIsSaving(true);
+    try {
+      const newScenarios = getSampleScenarios();
+      const newId = await createValuation(currentUser.id, "Sample Valuation", newScenarios);
+
+      setUserValuations(prev => [...prev, { id: newId, valuationName: "Sample Valuation" }]);
+      handleLoadValuation(newId);
+    } catch (e) {
+      console.error('Failed to create sample valuation', e);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Restore persistent login 
+  useEffect(() => {
+    getCurrentUser().then(user => {
+      if (user) {
+        setCurrentUser(user);
+        // If they had a last active valuation, load it
+        if (user.lastActiveValuationId) {
+          handleLoadValuation(user.lastActiveValuationId);
+        }
+      }
+    }).catch(err => console.error("Failed to load session", err));
+  }, [handleLoadValuation]);
+
+  const handleLogin = useCallback(async () => {
+    try {
+      const user = await login(loginEmail, loginPassword);
+      if (user) {
+        setCurrentUser(user);
+        if (user.lastActiveValuationId) {
+          handleLoadValuation(user.lastActiveValuationId);
+        }
+        setShowLoginModal(false);
+        setLoginEmail('');
+        setLoginPassword('');
+        setLoginError('');
+      } else {
+        setLoginError('Invalid email or password');
+      }
+    } catch (error) {
+      setLoginError('Login failed: ' + (error as Error).message);
+    }
+  }, [loginEmail, loginPassword, handleLoadValuation]);
+
+  const handleSignup = useCallback(async () => {
+    if (signupPassword !== signupConfirmPassword) {
+      setSignupError('Passwords do not match');
+      return;
+    }
+    try {
+      const user = await signup(signupEmail, signupPassword, signupUsername);
+      setCurrentUser(user);
+      setShowLoginModal(false);
+      setSignupEmail('');
+      setSignupUsername('');
+      setSignupPassword('');
+      setSignupConfirmPassword('');
+      setSignupError('');
+      setActiveTab('login');
+      setShowSignupSuccessModal(true);
+    } catch (error) {
+      setSignupError('Signup failed: ' + (error as Error).message);
+    }
+  }, [signupEmail, signupUsername, signupPassword, signupConfirmPassword]);
+
+  const handleLogout = useCallback(async () => {
+    await logout();
+    setCurrentUser(null);
+    setLoadedValuationId(null);
+  }, []);
+
+
+
+  const handleSaveAsNew = useCallback(async () => {
+    if (!currentUser || !saveAsName.trim()) return;
+
+    setIsSaving(true);
+    setShowSaveAsModal(false);
 
     try {
       const cleaned = scenarios.map(sc => {
@@ -400,46 +576,83 @@ export default function App() {
         TRANSIENT_KEYS.forEach(k => delete copy[k]);
         return copy;
       });
-      const key = `valuation_${currentUser.id}_${loadedValuationId}`;
-      localStorage.setItem(key, JSON.stringify(cleaned));
-      setSaveSuccessName(valuationName);
+      const newId = await createValuation(currentUser.id, saveAsName.trim(), cleaned);
+
+      setLastSavedState(JSON.stringify(cleaned));
+      setLoadedValuationId(newId);
+
+      const updatedValuations = await getUserValuations(currentUser.id);
+      setUserValuations(updatedValuations);
+
+      setSaveSuccessName(saveAsName.trim());
+      setSaveAsName('');
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
-      console.error('Failed to save valuation:', error);
+      console.error('Failed to save valuation as new:', error);
       await new Promise((resolve) => setTimeout(resolve, 1000));
     } finally {
-      setShowSavingModal(false);
+      setIsSaving(false);
       setShowSaveSuccessModal(true);
       window.setTimeout(() => setShowSaveSuccessModal(false), 2000);
     }
-  }, [scenarios, currentUser, loadedValuationId, userValuations]);
+  }, [scenarios, currentUser, saveAsName]);
 
-  const handleDeleteValuation = useCallback(() => {
+  const handleRenameValuation = async () => {
+    if (!loadedValuationId || !editValuationName.trim()) {
+      setIsRenaming(false);
+      return;
+    }
+    try {
+      await renameValuation(loadedValuationId, editValuationName.trim());
+      setUserValuations(prev => prev.map(v => v.id === loadedValuationId ? { ...v, valuationName: editValuationName.trim() } : v));
+      setIsRenaming(false);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCloseValuation = () => {
+    const defaultScenario = createDefaultScenario();
+    setScenarios([defaultScenario]);
+    setActiveScenarioId(defaultScenario.id);
+    setLoadedValuationId(null);
+    setLastSavedState(JSON.stringify([defaultScenario]));
+  };
+
+  const handleDeleteValuation = useCallback(async () => {
     if (!currentUser || !loadedValuationId) return;
 
     try {
-      const key = `valuation_${currentUser.id}_${loadedValuationId}`;
-      localStorage.removeItem(key);
+      await deleteValuation(loadedValuationId);
       setUserValuations(prev => prev.filter(val => val.id !== loadedValuationId));
-      const defaultScenario = createDefaultScenario();
-      setScenarios([defaultScenario]);
-      setActiveScenarioId(defaultScenario.id);
-      setLoadedValuationId(null);
+      handleCloseValuation();
       setShowDeleteModal(false);
     } catch (error) {
       console.error('Failed to delete valuation:', error);
     }
   }, [currentUser, loadedValuationId]);
 
+  const duplicateScenario = useCallback((id: number) => {
+    const srcIndex = scenarios.findIndex(sc => sc.id === id);
+    if (srcIndex === -1 || scenarios.length >= MAX_SCENARIOS) return;
+    const newSc = cloneScenario(scenarios[srcIndex]);
+    newSc.id = genId();
+    newSc.scenarioName = `${newSc.scenarioName || 'Untitled'} (Copy)`;
+    const copyScenarios = [...scenarios];
+    copyScenarios.splice(srcIndex + 1, 0, newSc);
+    setScenarios(copyScenarios);
+    setActiveScenarioId(newSc.id);
+  }, [scenarios]);
+
   return (
-    <div 
+    <div
       onDragOver={handleDragOver}
       onDrop={handleDrop}
-      className="min-h-screen bg-[#f5f5f5] text-slate-900 p-4 md:p-8" 
+      className="min-h-screen bg-[#f5f5f5] text-slate-900 p-4 md:p-8"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
-      <div className={`max-w-7xl mx-auto space-y-6 ${showSavingModal || showSaveSuccessModal ? 'pointer-events-none select-none' : ''}`}>
+      <div className={`max-w-7xl mx-auto space-y-6 ${showSaveSuccessModal ? 'pointer-events-none select-none' : ''}`}>
 
         <header className="mb-6">
           <div className="flex items-center justify-between gap-4 mb-6">
@@ -487,10 +700,17 @@ export default function App() {
             </ul>
             <div className="flex items-center gap-3 mt-4">
               <button
-                onClick={() => setShowSampleModal(true)}
-                className="px-4 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-sm font-medium transition-colors border border-indigo-200"
+                onClick={() => {
+                  if (currentUser) {
+                    handleCreateSampleValuation();
+                  } else {
+                    setShowSampleModal(true);
+                  }
+                }}
+                disabled={isSaving}
+                className="px-4 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-sm font-medium transition-colors border border-indigo-200 disabled:opacity-50"
               >
-                Load Sample Valuation
+                {isSaving ? 'Saving...' : 'Load Sample Valuation'}
               </button>
               <button
                 onClick={() => setShowResetAllModal(true)}
@@ -504,44 +724,67 @@ export default function App() {
         </header>
 
         {/* Load Valuation Dropdown */}
-        {currentUser && userValuations.length > 0 && (
+        {currentUser && (
           <div className="flex flex-wrap items-end gap-4 mb-4">
             <div className="flex flex-col gap-2 px-1 min-w-[280px]">
-              <label className="text-sm font-semibold text-slate-700">Load Valuation</label>
-              <select
-                value={loadedValuationId ?? ''}
-                onChange={(e) => {
-                  if (e.target.value) {
-                    handleLoadValuation(e.target.value);
-                  }
-                }}
-                className="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors shadow-sm"
-              >
-                <option value="" disabled>Select a valuation...</option>
-                {userValuations.map((val) => (
-                  <option key={val.id} value={val.id}>
-                    {val.valuationName}
-                  </option>
-                ))}
-              </select>
+              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                Load Valuation
+                {loadedValuationId && (
+                  <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full font-medium">
+                    {isSaving ? 'Saving...' : 'Saved'}
+                  </span>
+                )}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <select
+                  value={loadedValuationId ?? 'NEW'}
+                  onChange={(e) => {
+                    if (e.target.value === 'NEW') {
+                      setNewValuationName('New Valuation');
+                      setShowNewValuationModal(true);
+                      // Explicitly reset the select value by not updating loadedValuationId
+                    } else if (e.target.value) {
+                      handleLoadValuation(e.target.value);
+                    }
+                  }}
+                  className="flex-1 w-full min-w-[200px] px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors shadow-sm"
+                >
+                  <option value="NEW" className="font-semibold text-indigo-600">✨ New valuation...</option>
+                  {userValuations.length > 0 && <option disabled>──────────</option>}
+                  {userValuations.map((val) => (
+                    <option key={val.id} value={val.id}>
+                      {val.valuationName}
+                    </option>
+                  ))}
+                </select>
+                {loadedValuationId && (
+                  <button
+                    onClick={() => { setEditValuationName(userValuations.find(v => v.id === loadedValuationId)?.valuationName || ''); setIsRenaming(true); }}
+                    className="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:text-indigo-600 hover:border-indigo-200 transition-colors shadow-sm"
+                    title="Rename Valuation"
+                  >
+                    Rename
+                  </button>
+                )}
+              </div>
             </div>
 
-            {loadedValuationId && (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleSaveValuation}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors shadow-sm"
-                >
-                  Save Valuation
-                </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowSaveAsModal(true)}
+                className="px-4 py-2 bg-white text-indigo-600 border border-indigo-200 rounded-lg text-sm font-medium hover:bg-indigo-50 transition-colors shadow-sm"
+              >
+                Save As New
+              </button>
+              {loadedValuationId && (
                 <button
                   onClick={() => setShowDeleteModal(true)}
                   className="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors border border-red-200"
                 >
-                  Delete Valuation
+                  Delete
                 </button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 
@@ -551,9 +794,9 @@ export default function App() {
           {/* Left: scenario tabs + add button */}
           <div className="flex flex-col gap-2">
             <div className="text-sm font-semibold text-slate-700 px-1">Scenarios</div>
-            <div 
+            <div
               ref={tabsContainerRef}
-              className="flex items-center gap-2 overflow-x-auto overflow-y-hidden pb-1 min-w-0 [&::-webkit-scrollbar]:hidden" 
+              className="flex items-center gap-2 overflow-x-auto overflow-y-hidden pb-1 min-w-0 [&::-webkit-scrollbar]:hidden"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {scenarios.map((sc, index) => {
@@ -561,7 +804,7 @@ export default function App() {
                 const isDragged = draggedTabIndex === index;
                 const isDropSuccess = dropSuccessIndex === index;
                 const tooltipText = sc.scenarioName ? sc.scenarioName : "Untitled";
-                
+
                 // This logic calculates the shifting animation
                 let shiftClass = "";
                 if (draggedTabIndex !== null && dragOverIndex !== null && !isDragged) {
@@ -578,11 +821,10 @@ export default function App() {
                     onDragStart={(e) => handleDragStart(e, index)}
                     onDragEnd={handleDragEnd}
                     onClick={() => setActiveScenarioId(sc.id)}
-                    className={`flex items-center justify-center w-10 h-10 flex-shrink-0 rounded-xl text-sm font-medium transition-all duration-200 border cursor-grab active:cursor-grabbing ${shiftClass} ${
-                      isActive
-                        ? 'bg-white text-indigo-600 border-indigo-200 shadow-sm'
-                        : 'bg-slate-200/60 text-slate-500 border-transparent hover:bg-white hover:text-slate-700 hover:border-slate-200'
-                    } ${isDragged ? 'opacity-20 scale-75 border-dashed border-indigo-300' : 'opacity-100'} ${isDropSuccess ? 'bg-green-100 border-green-300 text-green-700 shadow-md scale-110' : ''}`}
+                    className={`flex items-center justify-center w-10 h-10 flex-shrink-0 rounded-xl text-sm font-medium transition-all duration-200 border cursor-grab active:cursor-grabbing ${shiftClass} ${isActive
+                      ? 'bg-white text-indigo-600 border-indigo-200 shadow-sm'
+                      : 'bg-slate-200/60 text-slate-500 border-transparent hover:bg-white hover:text-slate-700 hover:border-slate-200'
+                      } ${isDragged ? 'opacity-20 scale-75 border-dashed border-indigo-300' : 'opacity-100'} ${isDropSuccess ? 'bg-green-100 border-green-300 text-green-700 shadow-md scale-110' : ''}`}
                   >
                     {index + 1}
                   </button>
@@ -590,15 +832,28 @@ export default function App() {
               })}
 
               {scenarios.length < MAX_SCENARIOS && (
-                <div className="relative tab-add-btn flex-shrink-0">
-                  <button
-                    onClick={addScenario}
-                    className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-200/60 hover:bg-white hover:border-slate-200 border border-transparent text-slate-400 hover:text-indigo-600 transition-all"
-                  >
-                    <PlusIcon className="w-4 h-4" />
-                  </button>
-                  <div className="tab-tooltip absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none">
-                    Add Scenario
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="relative tab-add-btn">
+                    <button
+                      onClick={addScenario}
+                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-200/60 hover:bg-white hover:border-slate-200 border border-transparent text-slate-400 hover:text-indigo-600 transition-all"
+                    >
+                      <PlusIcon className="w-4 h-4" />
+                    </button>
+                    <div className="tab-tooltip absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none">
+                      Add Scenario
+                    </div>
+                  </div>
+                  <div className="relative tab-add-btn">
+                    <button
+                      onClick={() => duplicateScenario(activeScenarioId)}
+                      className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-200/60 hover:bg-white hover:border-slate-200 border border-transparent text-slate-400 hover:text-indigo-600 transition-all"
+                    >
+                      <Copy className="w-4 h-4" />
+                    </button>
+                    <div className="tab-tooltip absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none">
+                      Duplicate Scenario
+                    </div>
                   </div>
                 </div>
               )}
@@ -609,7 +864,7 @@ export default function App() {
           <div className="flex items-center gap-2 flex-shrink-0 mb-1">
             <button
               onClick={() => {
-                setDownloadFilename(`dcf-scenarios-${new Date().toISOString().slice(0,10)}`);
+                setDownloadFilename(`dcf-scenarios-${new Date().toISOString().slice(0, 10)}`);
                 setShowDownloadModal(true);
               }}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all"
@@ -719,11 +974,11 @@ export default function App() {
             </p>
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowUploadModal(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
-              <button 
+              <button
                 onClick={() => {
                   setShowUploadModal(false);
                   fileInputRef.current?.click();
-                }} 
+                }}
                 className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm"
               >
                 Proceed
@@ -742,7 +997,7 @@ export default function App() {
             </p>
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowSampleModal(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
-              <button 
+              <button
                 onClick={() => {
                   setShowSampleModal(false);
                   const samples = getSampleScenarios();
@@ -766,7 +1021,7 @@ export default function App() {
                   }) as Scenario[];
                   setScenarios(loaded);
                   setActiveScenarioId(loaded[0].id);
-                }} 
+                }}
                 className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
               >
                 Proceed
@@ -785,13 +1040,13 @@ export default function App() {
             </p>
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowResetAllModal(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
-              <button 
+              <button
                 onClick={() => {
                   setShowResetAllModal(false);
                   const newSc = createDefaultScenario();
                   setScenarios([newSc]);
                   setActiveScenarioId(newSc.id);
-                }} 
+                }}
                 className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm"
               >
                 Yes, Reset All
@@ -811,18 +1066,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Saving Modal */}
-      {showSavingModal && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/75 p-4 backdrop-blur-sm pointer-events-auto cursor-wait">
-          <div className="bg-white rounded-3xl shadow-xl w-full max-w-sm p-8 text-center pointer-events-auto">
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-indigo-50">
-              <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
-            </div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Saving...</h3>
-            <p className="text-sm text-slate-500">Please wait while your valuation is saved.</p>
-          </div>
-        </div>
-      )}
+
 
       {/* Save Success Modal */}
       {showSaveSuccessModal && (
@@ -843,7 +1087,7 @@ export default function App() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Delete Valuation?</h3>
             <p className="text-sm text-slate-500 mb-6">
-              This will remove any saved changes for this valuation. The current scenario data will remain loaded in the editor, but your saved valuation state will be deleted.
+              This action cannot be reversed.
             </p>
             <div className="flex justify-end gap-3">
               <button
@@ -870,17 +1114,15 @@ export default function App() {
             <div className="flex border-b border-slate-200 mb-4">
               <button
                 onClick={() => { setActiveTab('login'); setLoginError(''); setSignupError(''); }}
-                className={`flex-1 py-2 text-sm font-medium transition-colors ${
-                  activeTab === 'login' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'
-                }`}
+                className={`flex-1 py-2 text-sm font-medium transition-colors ${activeTab === 'login' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'
+                  }`}
               >
                 Log in
               </button>
               <button
                 onClick={() => { setActiveTab('signup'); setLoginError(''); setSignupError(''); }}
-                className={`flex-1 py-2 text-sm font-medium transition-colors ${
-                  activeTab === 'signup' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'
-                }`}
+                className={`flex-1 py-2 text-sm font-medium transition-colors ${activeTab === 'signup' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'
+                  }`}
               >
                 Sign up
               </button>
@@ -991,6 +1233,117 @@ export default function App() {
               </div>
               <h3 className="text-lg font-medium text-slate-900 mb-2">Success!</h3>
               <p className="text-sm text-slate-600">Your account has been created.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Save As New Modal */}
+      {showSaveAsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+            <h3 className="text-lg font-medium text-slate-900 mb-2">Save As New Valuation</h3>
+            <p className="text-sm text-slate-500 mb-4">Enter a name for the new valuation:</p>
+            <input
+              type="text"
+              value={saveAsName}
+              onChange={(e) => setSaveAsName(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm mb-6"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSaveAsNew();
+                if (e.key === 'Escape') setShowSaveAsModal(false);
+              }}
+            />
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setShowSaveAsModal(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
+              <button onClick={handleSaveAsNew} className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Save</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* New Valuation Modal */}
+      {showNewValuationModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 animate-in fade-in zoom-in-95 duration-200">
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">Create New Valuation</h3>
+            {userValuations.length === 0 && (
+              <p className="text-sm text-slate-500 mb-4">You have no saved valuations, enter the name for your first valuation:</p>
+            )}
+            <input
+              type="text"
+              value={newValuationName}
+              onChange={e => setNewValuationName(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm mb-6"
+              placeholder="e.g. My Next Pick"
+              autoFocus
+              onKeyDown={e => {
+                if (e.key === 'Enter' && newValuationName.trim() && !isSaving) {
+                  handleCreateNewValuation(false);
+                }
+              }}
+            />
+            <div className="flex flex-col gap-3">
+              {userValuations.length === 0 ? (
+                <>
+                  <button
+                    onClick={() => handleCreateNewValuation(true)}
+                    disabled={!newValuationName.trim() || isSaving}
+                    className="w-full px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50"
+                  >
+                    {isSaving ? 'Creating...' : 'Load Sample Valuation'}
+                  </button>
+                  <button
+                    onClick={() => handleCreateNewValuation(false)}
+                    disabled={!newValuationName.trim() || isSaving}
+                    className="w-full px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50"
+                  >
+                    Create Blank
+                  </button>
+                </>
+              ) : (
+                <div className="flex justify-end gap-3 mt-2">
+                  <button
+                    onClick={() => setShowNewValuationModal(false)}
+                    className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleCreateNewValuation(false)}
+                    disabled={!newValuationName.trim() || isSaving}
+                    className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50"
+                  >
+                    {isSaving ? 'Creating...' : 'Create'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rename Modal */}
+      {isRenaming && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+            <h3 className="text-lg font-medium text-slate-900 mb-2">Rename Valuation</h3>
+            <p className="text-sm text-slate-500 mb-4">Enter the new name for your valuation:</p>
+            <input
+              type="text"
+              value={editValuationName}
+              onChange={(e) => setEditValuationName(e.target.value)}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm mb-6"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleRenameValuation();
+                if (e.key === 'Escape') setIsRenaming(false);
+              }}
+            />
+            <div className="flex justify-end gap-3">
+              <button onClick={() => setIsRenaming(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
+              <button onClick={handleRenameValuation} className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Rename</button>
             </div>
           </div>
         </div>

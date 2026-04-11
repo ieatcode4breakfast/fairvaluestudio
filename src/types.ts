@@ -58,3 +58,15 @@ export interface Results {
   yearlyDetails: { year: number; cf: number; pv: number }[];
   effectiveMultiple: number;
 }
+
+export interface User {
+  id: string;
+  username: string;
+  lastActiveValuationId?: string;
+}
+
+export interface ValuationMetadata {
+  id: string;
+  valuationName: string;
+}
+
