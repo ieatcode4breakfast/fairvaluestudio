@@ -729,14 +729,25 @@ export default function App() {
     if (!currentUser || !loadedValuationId) return;
 
     try {
+      const deletedIndex = userValuations.findIndex(v => v.id === loadedValuationId);
+
       await deleteValuation(loadedValuationId);
-      setUserValuations(prev => prev.filter(val => val.id !== loadedValuationId));
-      handleCloseValuation();
+      const remaining = userValuations.filter(val => val.id !== loadedValuationId);
+      setUserValuations(remaining);
       setShowDeleteModal(false);
+
+      if (remaining.length > 0) {
+        // Load the one above, falling back to the new first if it was at the top
+        const nextIndex = Math.max(0, deletedIndex - 1);
+        handleLoadValuation(remaining[nextIndex].id);
+      } else {
+        // No valuations left — reset to blank (force-new modal will fire)
+        handleCloseValuation();
+      }
     } catch (error) {
       console.error('Failed to delete valuation:', error);
     }
-  }, [currentUser, loadedValuationId]);
+  }, [currentUser, loadedValuationId, userValuations, handleLoadValuation]);
 
   const duplicateScenario = useCallback((id: number) => {
     const srcIndex = scenarios.findIndex(sc => sc.id === id);
