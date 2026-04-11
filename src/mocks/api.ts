@@ -1,18 +1,37 @@
-import { USER_REGISTRY, User, ValuationMetadata, validateUsername, addUser } from './db';
+import { supabase } from '../lib/supabase';
 import { Scenario } from '../types';
 
 /**
- * Mock API functions for the application.
+ * API functions using Supabase.
  */
 
 /**
- * Authenticates a user with username and password.
- * @param username - The username to authenticate.
+ * Authenticates a user with email and password.
+ * @param email - The email to authenticate.
  * @param password - The password to authenticate.
- * @returns The user object if authentication succeeds, null otherwise.
+ * @returns The user object with id and username if authentication succeeds, null otherwise.
  */
-export const login = (username: string, password: string): User | null => {
-  return USER_REGISTRY.find(user => user.username === username && user.password === password) || null;
+export const login = async (email: string, password: string): Promise<{ id: string; username: string } | null> => {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    console.error('Login error:', error.message);
+    return null;
+  }
+  if (!data.user) return null;
+
+  // Fetch username from public.users
+  const { data: userData, error: userError } = await supabase
+    .from('users')
+    .select('username')
+    .eq('id', data.user.id)
+    .single();
+
+  if (userError) {
+    console.error('Error fetching username:', userError.message);
+    return null;
+  }
+
+  return { id: data.user.id, username: userData.username };
 };
 
 /**
@@ -20,44 +39,67 @@ export const login = (username: string, password: string): User | null => {
  * @param userId - The ID of the user.
  * @returns An array of valuation metadata.
  */
-export const getUserValuations = (userId: string): ValuationMetadata[] => {
-  const user = USER_REGISTRY.find(u => u.id === userId);
-  return user ? user.valuations : [];
+export const getUserValuations = async (userId: string): Promise<{ id: string; valuationName: string }[]> => {
+  const { data, error } = await supabase
+    .from('valuations')
+    .select('id, valuation_name')
+    .eq('user_id', userId);
+
+  if (error) {
+    console.error('Error fetching valuations:', error.message);
+    return [];
+  }
+
+  return data.map((v: any) => ({ id: v.id, valuationName: v.valuation_name }));
 };
 
 /**
- * Retrieves the scenarios for a given valuation ID by loading the corresponding JSON file.
- * @param valuationId - The ID of the valuation (e.g., 'valuation_1').
+ * Retrieves the scenarios for a given valuation ID.
+ * @param valuationId - The ID of the valuation.
  * @returns A promise that resolves to an array of scenarios.
  */
 export const getScenarios = async (valuationId: string): Promise<Scenario[]> => {
-  try {
-    const module = await import(`./data/${valuationId}.json`);
-    return module.default;
-  } catch (error) {
-    console.error(`Failed to load scenarios for valuation ${valuationId}`, error);
+  const { data, error } = await supabase
+    .from('scenarios')
+    .select('parameters')
+    .eq('valuation_id', valuationId);
+
+  if (error) {
+    console.error('Error fetching scenarios:', error.message);
     return [];
   }
+
+  return data.map((s: any) => s.parameters as Scenario);
 };
 
 /**
- * Validates a username.
- * @param username - The username to validate.
- * @returns An error message if invalid, null if valid.
- */
-export { validateUsername };
-
-/**
- * Signs up a new user.
- * @param username - The username.
+ * Signs up a new user with email and password, and creates a user profile.
+ * @param email - The email.
  * @param password - The password.
- * @param confirmPassword - The password confirmation.
- * @returns The new user object.
+ * @param username - The username.
+ * @returns The user object.
  * @throws Error if validation fails.
  */
-export const signup = (username: string, password: string, confirmPassword: string): User => {
-  if (password !== confirmPassword) {
-    throw new Error('Passwords do not match');
+export const signup = async (email: string, password: string, username: string): Promise<{ id: string; username: string }> => {
+  // First, sign up with Supabase Auth
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  if (error) {
+    throw new Error(error.message);
   }
-  return addUser(username, password);
+  if (!data.user) {
+    throw new Error('Signup failed');
+  }
+
+  // Insert into public.users
+  const { error: insertError } = await supabase
+    .from('users')
+    .insert({ id: data.user.id, username });
+
+  if (insertError) {
+    console.error('Error creating user profile:', insertError.message);
+    // Optionally, delete the auth user if profile creation fails
+    throw new Error('Failed to create user profile');
+  }
+
+  return { id: data.user.id, username };
 };
