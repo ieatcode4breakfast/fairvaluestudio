@@ -50,6 +50,8 @@ function loadInitialScenarios(): Scenario[] {
 export default function App() {
   const [scenarios, setScenarios] = useState<Scenario[]>(loadInitialScenarios);
   const [activeScenarioId, setActiveScenarioId] = useState<number>(() => scenarios[0].id);
+  const [draggedTabIndex, setDraggedTabIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [showDownloadModal, setShowDownloadModal] = useState(false);
@@ -192,6 +194,43 @@ export default function App() {
   const activeIndex    = scenarios.findIndex(sc => sc.id === activeScenarioId);
   const activeResults  = allResults[activeIndex] || allResults[0];
 
+  // --- Drag and Drop Handlers ---
+  const handleDragStart = (e: React.DragEvent<HTMLButtonElement>, index: number) => {
+    setDraggedTabIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLButtonElement>, index: number) => {
+    e.preventDefault();
+    if (index !== dragOverIndex) {
+      setDragOverIndex(index);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLButtonElement>, targetIndex: number) => {
+    e.preventDefault();
+    if (draggedTabIndex === null || draggedTabIndex === targetIndex) {
+      setDragOverIndex(null);
+      setDraggedTabIndex(null);
+      return;
+    }
+
+    const newScenarios = [...scenarios];
+    const draggedItem = newScenarios[draggedTabIndex];
+    newScenarios.splice(draggedTabIndex, 1);
+    newScenarios.splice(targetIndex, 0, draggedItem);
+
+    setScenarios(newScenarios);
+    setDraggedTabIndex(null);
+    setDragOverIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedTabIndex(null);
+    setDragOverIndex(null);
+  };
+  // ------------------------------
+
   return (
     <div className="min-h-screen bg-[#f5f5f5] text-slate-900 p-4 md:p-8" style={{ fontFamily: "'Inter', sans-serif" }}>
       <div className="max-w-7xl mx-auto space-y-6">
@@ -245,20 +284,37 @@ export default function App() {
             <div className="flex items-center gap-2 overflow-x-auto overflow-y-hidden pb-1 min-w-0 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
               {scenarios.map((sc, index) => {
                 const isActive = sc.id === activeScenarioId;
+                const isDragged = draggedTabIndex === index;
+                const tooltipText = sc.scenarioName ? sc.scenarioName : "Untitled";
+                
+                // This logic calculates the shifting animation
+                let shiftClass = "";
+                if (draggedTabIndex !== null && dragOverIndex !== null && !isDragged) {
+                  if (index >= dragOverIndex && index < draggedTabIndex) shiftClass = "translate-x-4";
+                  if (index <= dragOverIndex && index > draggedTabIndex) shiftClass = "-translate-x-4";
+                }
+
                 return (
                   <button
                     key={sc.id}
+                    title={tooltipText}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, index)}
+                    onDragOver={(e) => handleDragOver(e, index)}
+                    onDrop={(e) => handleDrop(e, index)}
+                    onDragEnd={handleDragEnd}
                     onClick={() => setActiveScenarioId(sc.id)}
-                    className={`flex items-center justify-center w-10 h-10 flex-shrink-0 rounded-xl text-sm font-medium transition-all border ${
+                    className={`flex items-center justify-center w-10 h-10 flex-shrink-0 rounded-xl text-sm font-medium transition-all duration-200 border cursor-grab active:cursor-grabbing ${shiftClass} ${
                       isActive
                         ? 'bg-white text-indigo-600 border-indigo-200 shadow-sm'
                         : 'bg-slate-200/60 text-slate-500 border-transparent hover:bg-white hover:text-slate-700 hover:border-slate-200'
-                    }`}
+                    } ${isDragged ? 'opacity-20 scale-75 border-dashed border-indigo-300' : 'opacity-100'}`}
                   >
                     {index + 1}
                   </button>
                 );
               })}
+              
               {scenarios.length < MAX_SCENARIOS && (
                 <div className="relative tab-add-btn flex-shrink-0">
                   <button
