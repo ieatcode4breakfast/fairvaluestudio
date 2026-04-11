@@ -52,6 +52,8 @@ export default function App() {
   const [activeScenarioId, setActiveScenarioId] = useState<number>(() => scenarios[0].id);
   const [draggedTabIndex, setDraggedTabIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [dropSuccessIndex, setDropSuccessIndex] = useState<number | null>(null);
+  const [showReorderToast, setShowReorderToast] = useState(false);
   const [copied, setCopied] = useState(false);
   const [uploadError, setUploadError] = useState('');
   const [showDownloadModal, setShowDownloadModal] = useState(false);
@@ -254,11 +256,21 @@ export default function App() {
     setScenarios(newScenarios);
     setDraggedTabIndex(null);
     setDragOverIndex(null);
+    
+    // Show success feedback on the moved tab
+    setDropSuccessIndex(dragOverIndex);
+    setTimeout(() => setDropSuccessIndex(null), 800);
+    
+    // Show reorder confirmation toast
+    setShowReorderToast(true);
+    setTimeout(() => setShowReorderToast(false), 2000);
   };
 
   const handleDragEnd = () => {
     setDraggedTabIndex(null);
     setDragOverIndex(null);
+    setDropSuccessIndex(null);
+    setShowReorderToast(false);
   };
   // ------------------------------
 
@@ -325,6 +337,7 @@ export default function App() {
               {scenarios.map((sc, index) => {
                 const isActive = sc.id === activeScenarioId;
                 const isDragged = draggedTabIndex === index;
+                const isDropSuccess = dropSuccessIndex === index;
                 const tooltipText = sc.scenarioName ? sc.scenarioName : "Untitled";
                 
                 // This logic calculates the shifting animation
@@ -347,7 +360,7 @@ export default function App() {
                       isActive
                         ? 'bg-white text-indigo-600 border-indigo-200 shadow-sm'
                         : 'bg-slate-200/60 text-slate-500 border-transparent hover:bg-white hover:text-slate-700 hover:border-slate-200'
-                    } ${isDragged ? 'opacity-20 scale-75 border-dashed border-indigo-300' : 'opacity-100'}`}
+                    } ${isDragged ? 'opacity-20 scale-75 border-dashed border-indigo-300' : 'opacity-100'} ${isDropSuccess ? 'bg-green-100 border-green-300 text-green-700 shadow-md scale-110' : ''}`}
                   >
                     {index + 1}
                   </button>
@@ -562,6 +575,16 @@ export default function App() {
                 Yes, Reset All
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reorder Success Toast */}
+      {showReorderToast && (
+        <div className="fixed bottom-4 right-4 z-50 animate-in slide-in-from-bottom-2 fade-in duration-300">
+          <div className="bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-2 text-sm font-medium">
+            <Check className="w-4 h-4" />
+            Scenario reordered
           </div>
         </div>
       )}
