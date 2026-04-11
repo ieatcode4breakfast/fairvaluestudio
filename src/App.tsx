@@ -60,6 +60,7 @@ export default function App() {
   const [showSampleModal, setShowSampleModal] = useState(false);
   const [showResetAllModal, setShowResetAllModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const tabsContainerRef = useRef<HTMLDivElement>(null); // <-- Add this line
 
   // Auto-save scenarios to local storage whenever they change
   useEffect(() => {
@@ -197,19 +198,49 @@ export default function App() {
   // --- Drag and Drop Handlers ---
   const handleDragStart = (e: React.DragEvent<HTMLButtonElement>, index: number) => {
     setDraggedTabIndex(index);
-    e.dataTransfer.effectAllowed = "move";
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLButtonElement>, index: number) => {
-    e.preventDefault();
-    if (index !== dragOverIndex) {
-      setDragOverIndex(index);
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = "move";
     }
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLButtonElement>, targetIndex: number) => {
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    if (draggedTabIndex === null || draggedTabIndex === targetIndex) {
+    
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = "move";
+    }
+
+    if (draggedTabIndex === null || !tabsContainerRef.current) return;
+
+    const container = tabsContainerRef.current;
+    const tabElements = Array.from(container.querySelectorAll('button[data-tab-index]')) as HTMLButtonElement[];
+
+    let closestIndex = dragOverIndex;
+    let minDistance = Number.POSITIVE_INFINITY;
+
+    tabElements.forEach((tab) => {
+      const indexAttr = tab.getAttribute('data-tab-index');
+      if (!indexAttr) return;
+
+      const index = parseInt(indexAttr, 10);
+      const rect = tab.getBoundingClientRect();
+      const tabCenter = rect.left + rect.width / 2;
+      const distance = Math.abs(e.clientX - tabCenter);
+
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    if (closestIndex !== null && closestIndex !== dragOverIndex) {
+      setDragOverIndex(closestIndex);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (draggedTabIndex === null || dragOverIndex === null || draggedTabIndex === dragOverIndex) {
       setDragOverIndex(null);
       setDraggedTabIndex(null);
       return;
@@ -218,7 +249,7 @@ export default function App() {
     const newScenarios = [...scenarios];
     const draggedItem = newScenarios[draggedTabIndex];
     newScenarios.splice(draggedTabIndex, 1);
-    newScenarios.splice(targetIndex, 0, draggedItem);
+    newScenarios.splice(dragOverIndex, 0, draggedItem);
 
     setScenarios(newScenarios);
     setDraggedTabIndex(null);
@@ -232,7 +263,12 @@ export default function App() {
   // ------------------------------
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5] text-slate-900 p-4 md:p-8" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div 
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      className="min-h-screen bg-[#f5f5f5] text-slate-900 p-4 md:p-8" 
+      style={{ fontFamily: "'Inter', sans-serif" }}
+    >
       <div className="max-w-7xl mx-auto space-y-6">
 
         <header className="mb-6">
@@ -281,7 +317,11 @@ export default function App() {
           {/* Left: scenario tabs + add button */}
           <div className="flex flex-col gap-2">
             <div className="text-sm font-semibold text-slate-700 px-1">Scenarios</div>
-            <div className="flex items-center gap-2 overflow-x-auto overflow-y-hidden pb-1 min-w-0 [&::-webkit-scrollbar]:hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div 
+              ref={tabsContainerRef}
+              className="flex items-center gap-2 overflow-x-auto overflow-y-hidden pb-1 min-w-0 [&::-webkit-scrollbar]:hidden" 
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
               {scenarios.map((sc, index) => {
                 const isActive = sc.id === activeScenarioId;
                 const isDragged = draggedTabIndex === index;
@@ -297,11 +337,10 @@ export default function App() {
                 return (
                   <button
                     key={sc.id}
+                    data-tab-index={String(index)}
                     title={tooltipText}
                     draggable
                     onDragStart={(e) => handleDragStart(e, index)}
-                    onDragOver={(e) => handleDragOver(e, index)}
-                    onDrop={(e) => handleDrop(e, index)}
                     onDragEnd={handleDragEnd}
                     onClick={() => setActiveScenarioId(sc.id)}
                     className={`flex items-center justify-center w-10 h-10 flex-shrink-0 rounded-xl text-sm font-medium transition-all duration-200 border cursor-grab active:cursor-grabbing ${shiftClass} ${
@@ -314,7 +353,7 @@ export default function App() {
                   </button>
                 );
               })}
-              
+
               {scenarios.length < MAX_SCENARIOS && (
                 <div className="relative tab-add-btn flex-shrink-0">
                   <button
