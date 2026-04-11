@@ -10,7 +10,7 @@ import { ScenarioComparisonTable } from './components/ScenarioComparisonTable';
 import { Calculator, PlusIcon, DownloadIcon, UploadIcon, InfoIcon, Check, Copy, RotateCcw } from './components/Icons';
 import { MAX_SCENARIOS, TRANSIENT_KEYS } from './utils/constants';
 import { genId } from './utils/genId';
-import { login, signup, validateUsername } from './mocks/api';
+import { login, signup, validateUsername, getUserValuations } from './mocks/api';
 import { User } from './mocks/db';
 
 const LOCAL_STORAGE_KEY = 'fairvalue_scenarios';
@@ -157,7 +157,7 @@ export default function App() {
       try {
         const parsed = JSON.parse(evt.target?.result as string);
         if (!Array.isArray(parsed) || parsed.length === 0) {
-          setUploadError('Invalid file: not a valid DCF scenarios file.');
+          setUploadError('Invalid file: not a valid DCF valuation file.');
           setTimeout(() => setUploadError(''), 4000);
           return;
         }
@@ -375,7 +375,7 @@ export default function App() {
                 onClick={() => setShowSampleModal(true)}
                 className="px-4 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-sm font-medium transition-colors border border-indigo-200"
               >
-                Load Sample Scenarios
+                Load Sample Valuation
               </button>
               <button
                 onClick={() => setShowResetAllModal(true)}
@@ -458,14 +458,14 @@ export default function App() {
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all"
             >
               <DownloadIcon className="w-4 h-4" />
-              <span className="hidden sm:inline">Download Scenarios</span>
+              <span className="hidden sm:inline">Download Valuation (.json)</span>
             </button>
             <button
               onClick={() => setShowUploadModal(true)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border shadow-sm transition-all bg-white border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200"
             >
               <UploadIcon className="w-4 h-4" />
-              <span className="hidden sm:inline">Upload Scenarios</span>
+              <span className="hidden sm:inline">Upload Valuation (.json)</span>
             </button>
             <input
               ref={fileInputRef}
@@ -531,8 +531,8 @@ export default function App() {
       {showDownloadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
-            <h3 className="text-lg font-medium text-slate-900 mb-2">Save Scenarios</h3>
-            <p className="text-sm text-slate-500 mb-4">Enter a name for your scenarios file:</p>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">Save Valuation</h3>
+            <p className="text-sm text-slate-500 mb-4">Enter a name for your valuation file:</p>
             <input
               type="text"
               value={downloadFilename}
@@ -556,9 +556,9 @@ export default function App() {
       {showUploadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
-            <h3 className="text-lg font-medium text-slate-900 mb-2">Upload Scenarios</h3>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">Upload Valuation</h3>
             <p className="text-sm text-slate-500 mb-6">
-              Uploading scenarios will replace all your current scenarios. Any unsaved changes will be lost. Do you want to proceed?
+              Uploading a valuation will replace all your current scenarios. Any unsaved changes will be lost. Do you want to proceed?
             </p>
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowUploadModal(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
@@ -579,9 +579,9 @@ export default function App() {
       {showSampleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
-            <h3 className="text-lg font-medium text-slate-900 mb-2">Load Sample Scenarios</h3>
+            <h3 className="text-lg font-medium text-slate-900 mb-2">Load Sample Valuation</h3>
             <p className="text-sm text-slate-500 mb-6">
-              Loading sample scenarios will replace all your current scenarios. Any unsaved changes will be lost. Do you want to proceed?
+              Loading a sample valuation will replace all your current scenarios. Any unsaved changes will be lost. Do you want to proceed?
             </p>
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowSampleModal(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
@@ -680,7 +680,7 @@ export default function App() {
             {activeTab === 'login' ? (
               <>
                 <h3 className="text-lg font-medium text-slate-900 mb-2">Log In</h3>
-                <p className="text-sm text-slate-500 mb-4">Enter your credentials to access your scenario sets.</p>
+                <p className="text-sm text-slate-500 mb-4">Enter your credentials to access your valuations.</p>
                 <div className="space-y-4 mb-6">
                   <input
                     type="text"

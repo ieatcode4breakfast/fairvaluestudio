@@ -1,4 +1,4 @@
-import { USER_REGISTRY, User, ScenarioSetMetadata, validateUsername, addUser } from './db';
+import { USER_REGISTRY, User, ValuationMetadata, validateUsername, addUser } from './db';
 import { Scenario } from '../types';
 
 /**
@@ -16,26 +16,26 @@ export const login = (username: string, password: string): User | null => {
 };
 
 /**
- * Retrieves the scenario sets for a given user.
+ * Retrieves the valuations for a given user.
  * @param userId - The ID of the user.
- * @returns An array of scenario set metadata.
+ * @returns An array of valuation metadata.
  */
-export const getUserSets = (userId: string): ScenarioSetMetadata[] => {
+export const getUserValuations = (userId: string): ValuationMetadata[] => {
   const user = USER_REGISTRY.find(u => u.id === userId);
-  return user ? user.sets : [];
+  return user ? user.valuations : [];
 };
 
 /**
- * Retrieves the scenarios for a given set ID by loading the corresponding JSON file.
- * @param setId - The ID of the scenario set (e.g., 'set_1').
+ * Retrieves the scenarios for a given valuation ID by loading the corresponding JSON file.
+ * @param valuationId - The ID of the valuation (e.g., 'valuation_1').
  * @returns A promise that resolves to an array of scenarios.
  */
-export const getScenarios = async (setId: string): Promise<Scenario[]> => {
+export const getScenarios = async (valuationId: string): Promise<Scenario[]> => {
   try {
-    const module = await import(`./data/${setId}.json`);
+    const module = await import(`./data/${valuationId}.json`);
     return module.default;
   } catch (error) {
-    console.error(`Failed to load scenarios for set ${setId}`, error);
+    console.error(`Failed to load scenarios for valuation ${valuationId}`, error);
     return [];
   }
 };
