@@ -93,8 +93,13 @@ export default function App() {
   const [hasFetchedValuations, setHasFetchedValuations] = useState(false);
   const [saveAsName, setSaveAsName] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [showRetainGuestModal, setShowRetainGuestModal] = useState(false);
+  const [retainGuestName, setRetainGuestName] = useState('');
+  const [pendingLoginUser, setPendingLoginUser] = useState<User | null>(null);
   const ignoreNextSaveRef = useRef(false);
   const loadedValuationRef = useRef<string | null>(null);
+  // Snapshot of scenarios at login time — used to restore on logout
+  const guestScenariosBeforeLoginRef = useRef<Scenario[]>([]);
 
   const currentCleaned = useMemo(() => {
     return JSON.stringify(scenarios.map(sc => {
@@ -200,6 +205,21 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [isDirty, currentCleaned, loadedValuationId, currentUser, userValuations]);
 
+  // Guest localStorage persistence — write on every scenarios change when not logged in
+  useEffect(() => {
+    if (currentUser) return; // logged-in users persist via Supabase
+    try {
+      const cleaned = scenarios.map(sc => {
+        const copy: any = { ...sc };
+        TRANSIENT_KEYS.forEach(k => delete copy[k]);
+        return copy;
+      });
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleaned));
+    } catch (err) {
+      console.error('Failed to save to localStorage:', err);
+    }
+  }, [scenarios, currentUser]);
+
   // Auto-close signup success modal after 2 seconds
   useEffect(() => {
     if (showSignupSuccessModal) {
@@ -224,13 +244,13 @@ export default function App() {
     }
   }, [currentUser]);
 
-  // Force new valuation modal if empty
+  // Force new valuation modal if empty (suppressed while retain-guest prompt is active)
   useEffect(() => {
-    if (currentUser && hasFetchedValuations && userValuations.length === 0 && !loadedValuationId) {
+    if (currentUser && hasFetchedValuations && userValuations.length === 0 && !loadedValuationId && !showRetainGuestModal) {
       setNewValuationName('My First Valuation');
       setShowNewValuationModal(true);
     }
-  }, [currentUser, hasFetchedValuations, userValuations.length, loadedValuationId]);
+  }, [currentUser, hasFetchedValuations, userValuations.length, loadedValuationId, showRetainGuestModal]);
 
   const updateScenario = useCallback((id: number, changes: Partial<Scenario>) => {
     setScenarios(prev => prev.map(sc => {
@@ -300,7 +320,7 @@ export default function App() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (evt) => {
+    reader.onload = async (evt) => {
       try {
         const parsed = JSON.parse(evt.target?.result as string);
         if (!Array.isArray(parsed) || parsed.length === 0) {
@@ -329,9 +349,36 @@ export default function App() {
             showYearlyBreakdown: false,
           };
         }) as Scenario[];
-        setScenarios(loaded);
-        setActiveScenarioId(loaded[0].id);
-        setUploadError('');
+
+        if (currentUser) {
+          // Logged-in: create a brand-new valuation named after the file
+          const valName = file.name.replace(/\.json$/i, '');
+          try {
+            setIsSaving(true);
+            const newId = await createValuation(currentUser.id, valName, loaded);
+            setUserValuations(prev => [...prev, { id: newId, valuationName: valName }]);
+            setScenarios(loaded);
+            setActiveScenarioId(loaded[0].id);
+            setLoadedValuationId(newId);
+            const cleaned = loaded.map(sc => {
+              const copy: any = { ...sc };
+              TRANSIENT_KEYS.forEach(k => delete copy[k]);
+              return copy;
+            });
+            setLastSavedState(JSON.stringify(cleaned));
+            setUploadError('');
+          } catch (err) {
+            setUploadError('Failed to create valuation from file.');
+            setTimeout(() => setUploadError(''), 4000);
+          } finally {
+            setIsSaving(false);
+          }
+        } else {
+          // Guest: replace scenarios in place
+          setScenarios(loaded);
+          setActiveScenarioId(loaded[0].id);
+          setUploadError('');
+        }
       } catch (err) {
         setUploadError('Could not read file. Make sure it is a valid JSON file.');
         setTimeout(() => setUploadError(''), 4000);
@@ -339,7 +386,7 @@ export default function App() {
     };
     reader.readAsText(file);
     e.target.value = '';
-  }, []);
+  }, [currentUser]);
 
   const allResults = useMemo(() =>
     scenarios.map(sc => sc.dcfMethod === 'Basic DCF' ? computeSimple(sc) : computeAdvanced(sc)),
@@ -519,21 +566,68 @@ export default function App() {
     try {
       const user = await login(loginEmail, loginPassword);
       if (user) {
+        // Snapshot guest scenarios BEFORE any auth state changes
+        guestScenariosBeforeLoginRef.current = scenarios;
+
         setCurrentUser(user);
-        if (user.lastActiveValuationId) {
-          handleLoadValuation(user.lastActiveValuationId);
-        }
         setShowLoginModal(false);
         setLoginEmail('');
         setLoginPassword('');
         setLoginError('');
+
+        // Check if they had guest data worth offering to save
+        const guestData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (guestData) {
+          // Hold off loading their last active valuation — show retain prompt first
+          setPendingLoginUser(user);
+          setRetainGuestName('My Valuation');
+          setShowRetainGuestModal(true);
+        } else {
+          // No guest data — proceed normally
+          if (user.lastActiveValuationId) {
+            handleLoadValuation(user.lastActiveValuationId);
+          }
+        }
       } else {
         setLoginError('Invalid email or password');
       }
     } catch (error) {
       setLoginError('Login failed: ' + (error as Error).message);
     }
-  }, [loginEmail, loginPassword, handleLoadValuation]);
+  }, [loginEmail, loginPassword, handleLoadValuation, scenarios]);
+
+  const handleRetainGuestData = useCallback(async (retain: boolean) => {
+    setShowRetainGuestModal(false);
+    const user = pendingLoginUser || currentUser;
+    setPendingLoginUser(null);
+    if (!user) return;
+
+    if (retain && retainGuestName.trim()) {
+      setIsSaving(true);
+      try {
+        const cleaned = scenarios.map(sc => {
+          const copy: any = { ...sc };
+          TRANSIENT_KEYS.forEach(k => delete copy[k]);
+          return copy;
+        });
+        const newId = await createValuation(user.id, retainGuestName.trim(), cleaned);
+        setUserValuations(prev => [...prev, { id: newId, valuationName: retainGuestName.trim() }]);
+        setLoadedValuationId(newId);
+        setLastSavedState(JSON.stringify(cleaned));
+        // Keep localStorage intact — it serves as the restore point on logout
+      } catch (e) {
+        console.error('Failed to save guest data as valuation:', e);
+      } finally {
+        setIsSaving(false);
+      }
+    } else {
+      // Discard = don't save to account. Guest data in ref + localStorage is left intact
+      // so it restores correctly on logout. Just load their Supabase valuation.
+      if (user.lastActiveValuationId) {
+        handleLoadValuation(user.lastActiveValuationId);
+      }
+    }
+  }, [pendingLoginUser, currentUser, retainGuestName, scenarios, handleLoadValuation]);
 
   const handleSignup = useCallback(async () => {
     if (signupPassword !== signupConfirmPassword) {
@@ -542,6 +636,8 @@ export default function App() {
     }
     try {
       const user = await signup(signupEmail, signupPassword, signupUsername);
+      // Snapshot guest scenarios before auth state changes (for logout restoration)
+      guestScenariosBeforeLoginRef.current = scenarios;
       setCurrentUser(user);
       setShowLoginModal(false);
       setSignupEmail('');
@@ -554,12 +650,21 @@ export default function App() {
     } catch (error) {
       setSignupError('Signup failed: ' + (error as Error).message);
     }
-  }, [signupEmail, signupUsername, signupPassword, signupConfirmPassword]);
+  }, [signupEmail, signupUsername, signupPassword, signupConfirmPassword, scenarios]);
 
   const handleLogout = useCallback(async () => {
     await logout();
-    setCurrentUser(null);
+    // Restore the in-memory guest snapshot taken at login time.
+    // Falling back to loadInitialScenarios() only if the snapshot was never set
+    // (e.g. page was refreshed while logged in).
+    const snapshot = guestScenariosBeforeLoginRef.current;
+    const restoredScenarios = snapshot.length > 0 ? snapshot : loadInitialScenarios();
+    setScenarios(restoredScenarios);
+    setActiveScenarioId(restoredScenarios[0].id);
+    setLastSavedState(JSON.stringify(restoredScenarios));
     setLoadedValuationId(null);
+    setCurrentUser(null);
+    guestScenariosBeforeLoginRef.current = []; // reset for next login
   }, []);
 
 
@@ -864,7 +969,10 @@ export default function App() {
           <div className="flex items-center gap-2 flex-shrink-0 mb-1">
             <button
               onClick={() => {
-                setDownloadFilename(`dcf-scenarios-${new Date().toISOString().slice(0, 10)}`);
+                const currentValName = currentUser && loadedValuationId
+                  ? userValuations.find(v => v.id === loadedValuationId)?.valuationName || ''
+                  : '';
+                setDownloadFilename(currentValName || `dcf-scenarios-${new Date().toISOString().slice(0, 10)}`);
                 setShowDownloadModal(true);
               }}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all"
@@ -970,7 +1078,10 @@ export default function App() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Upload Valuation</h3>
             <p className="text-sm text-slate-500 mb-6">
-              Uploading a valuation will replace all your current scenarios. Any unsaved changes will be lost. Do you want to proceed?
+              {currentUser
+                ? 'This will create a new valuation. Do you want to proceed?'
+                : 'Uploading a valuation will replace all your current scenarios. Any unsaved changes will be lost. Do you want to proceed?'
+              }
             </p>
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowUploadModal(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
@@ -979,7 +1090,8 @@ export default function App() {
                   setShowUploadModal(false);
                   fileInputRef.current?.click();
                 }}
-                className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+                className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm ${currentUser ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-red-600 hover:bg-red-700'
+                  }`}
               >
                 Proceed
               </button>
@@ -987,6 +1099,45 @@ export default function App() {
           </div>
         </div>
       )}
+      {/* Retain Guest Data Modal */}
+      {showRetainGuestModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+            <h3 className="text-lg font-medium text-slate-900 mb-2">Save your current work?</h3>
+            <p className="text-sm text-slate-500 mb-5">
+              You have valuation data from your pre-login session. Give it a name to save it to your account, or discard and proceed with the login.
+            </p>
+            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Valuation name</label>
+            <input
+              type="text"
+              value={retainGuestName}
+              onChange={(e) => setRetainGuestName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && retainGuestName.trim()) handleRetainGuestData(true);
+                if (e.key === 'Escape') handleRetainGuestData(false);
+              }}
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm mb-6"
+              autoFocus
+            />
+            <div className="flex justify-between gap-3">
+              <button
+                onClick={() => handleRetainGuestData(false)}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              >
+                Discard
+              </button>
+              <button
+                onClick={() => handleRetainGuestData(true)}
+                disabled={!retainGuestName.trim() || isSaving}
+                className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50"
+              >
+                {isSaving ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Sample Scenarios Modal */}
       {showSampleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
