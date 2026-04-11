@@ -58,3 +58,63 @@ export const USER_REGISTRY: User[] = [
     ],
   },
 ];
+
+/**
+ * Reserved usernames that cannot be used for sign-up.
+ */
+const RESERVED_USERNAMES = new Set([
+  'admin', 'administrator', 'root',
+  'support', 'help', 'contact',
+  'moderator', 'mod', 'staff',
+  'guest', 'anonymous'
+]);
+
+/**
+ * Validates a username according to the rules.
+ * @param username - The username to validate.
+ * @returns An error message if invalid, null if valid.
+ */
+export function validateUsername(username: string): string | null {
+  if (!username) return 'Username is required';
+
+  const trimmed = username.trim();
+  if (trimmed !== username) return 'Username cannot have leading or trailing spaces';
+
+  if (trimmed.length < 3) return 'Username must be at least 3 characters long';
+  if (trimmed.length > 20) return 'Username must be at most 20 characters long';
+
+  const regex = /^[a-zA-Z][a-zA-Z0-9_-]{2,19}$/;
+  if (!regex.test(trimmed)) return 'Username must start with a letter and contain only letters, numbers, underscores, or hyphens (no consecutive symbols, cannot end with symbol)';
+
+  const lower = trimmed.toLowerCase();
+  if (RESERVED_USERNAMES.has(lower)) return 'This username is reserved and cannot be used';
+
+  // Check uniqueness (case-insensitive)
+  const exists = USER_REGISTRY.some(user => user.username.toLowerCase() === lower);
+  if (exists) return 'This username is already taken';
+
+  return null;
+}
+
+/**
+ * Adds a new user to the registry after validation.
+ * @param username - The username.
+ * @param password - The password.
+ * @returns The new user object, or throws an error if invalid.
+ */
+export function addUser(username: string, password: string): User {
+  const error = validateUsername(username);
+  if (error) throw new Error(error);
+
+  if (!password || password.length < 6) throw new Error('Password must be at least 6 characters long');
+
+  const newUser: User = {
+    id: `user_${Date.now()}`, // Simple ID generation
+    username,
+    password, // In real app, hash this
+    sets: [] // Start with no sets
+  };
+
+  USER_REGISTRY.push(newUser);
+  return newUser;
+}

@@ -1,4 +1,4 @@
-import { USER_REGISTRY, User, ScenarioSetMetadata } from './db';
+import { USER_REGISTRY, User, ScenarioSetMetadata, validateUsername, addUser } from './db';
 import { Scenario } from '../types';
 
 /**
@@ -38,4 +38,26 @@ export const getScenarios = async (setId: string): Promise<Scenario[]> => {
     console.error(`Failed to load scenarios for set ${setId}`, error);
     return [];
   }
+};
+
+/**
+ * Validates a username.
+ * @param username - The username to validate.
+ * @returns An error message if invalid, null if valid.
+ */
+export { validateUsername };
+
+/**
+ * Signs up a new user.
+ * @param username - The username.
+ * @param password - The password.
+ * @param confirmPassword - The password confirmation.
+ * @returns The new user object.
+ * @throws Error if validation fails.
+ */
+export const signup = (username: string, password: string, confirmPassword: string): User => {
+  if (password !== confirmPassword) {
+    throw new Error('Passwords do not match');
+  }
+  return addUser(username, password);
 };

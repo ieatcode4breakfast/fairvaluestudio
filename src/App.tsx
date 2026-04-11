@@ -10,6 +10,8 @@ import { ScenarioComparisonTable } from './components/ScenarioComparisonTable';
 import { Calculator, PlusIcon, DownloadIcon, UploadIcon, InfoIcon, Check, Copy, RotateCcw } from './components/Icons';
 import { MAX_SCENARIOS, TRANSIENT_KEYS } from './utils/constants';
 import { genId } from './utils/genId';
+import { login, signup, validateUsername } from './mocks/api';
+import { User } from './mocks/db';
 
 const LOCAL_STORAGE_KEY = 'fairvalue_scenarios';
 
@@ -61,18 +63,27 @@ export default function App() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showSampleModal, setShowSampleModal] = useState(false);
   const [showResetAllModal, setShowResetAllModal] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [loginUsername, setLoginUsername] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [signupUsername, setSignupUsername] = useState('');
+  const [signupPassword, setSignupPassword] = useState('');
+  const [signupConfirmPassword, setSignupConfirmPassword] = useState('');
+  const [signupError, setSignupError] = useState('');
+  const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
+  const [showSignupSuccessModal, setShowSignupSuccessModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const tabsContainerRef = useRef<HTMLDivElement>(null); // <-- Add this line
 
-  // Auto-save scenarios to local storage whenever they change
+  // Auto-close signup success modal after 2 seconds
   useEffect(() => {
-    const cleaned = scenarios.map(sc => {
-      const copy: any = { ...sc };
-      TRANSIENT_KEYS.forEach(k => delete copy[k]);
-      return copy;
-    });
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleaned));
-  }, [scenarios]);
+    if (showSignupSuccessModal) {
+      const timer = setTimeout(() => setShowSignupSuccessModal(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSignupSuccessModal]);
 
   const updateScenario = useCallback((id: number, changes: Partial<Scenario>) => {
     setScenarios(prev => prev.map(sc => {
@@ -272,7 +283,39 @@ export default function App() {
     setDropSuccessIndex(null);
     setShowReorderToast(false);
   };
-  // ------------------------------
+
+  const handleLogin = useCallback(() => {
+    const user = login(loginUsername, loginPassword);
+    if (user) {
+      setCurrentUser(user);
+      setShowLoginModal(false);
+      setLoginUsername('');
+      setLoginPassword('');
+      setLoginError('');
+    } else {
+      setLoginError('Invalid username or password');
+    }
+  }, [loginUsername, loginPassword]);
+
+  const handleSignup = useCallback(() => {
+    try {
+      const user = signup(signupUsername, signupPassword, signupConfirmPassword);
+      setCurrentUser(user);
+      setShowLoginModal(false);
+      setSignupUsername('');
+      setSignupPassword('');
+      setSignupConfirmPassword('');
+      setSignupError('');
+      setActiveTab('login');
+      setShowSignupSuccessModal(true);
+    } catch (error) {
+      setSignupError((error as Error).message);
+    }
+  }, [signupUsername, signupPassword, signupConfirmPassword]);
+
+  const handleLogout = useCallback(() => {
+    setCurrentUser(null);
+  }, []);
 
   return (
     <div 
@@ -284,15 +327,37 @@ export default function App() {
       <div className="max-w-7xl mx-auto space-y-6">
 
         <header className="mb-6">
-          <div className="flex items-center gap-4 mb-6">
-            <Calculator className="w-14 h-14 text-indigo-600 shrink-0" />
-            <div className="flex flex-col justify-center">
-              <h1 className="text-3xl font-light tracking-tight mb-1">
-                FairValue Studio
-              </h1>
-              <p className="text-slate-500 text-sm">
-                A multi-scenario valuation tool featuring basic DCF calculation and advanced, multi-phase growth forecasting.
-              </p>
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <div className="flex items-center gap-4">
+              <Calculator className="w-14 h-14 text-indigo-600 shrink-0" />
+              <div className="flex flex-col justify-center">
+                <h1 className="text-3xl font-light tracking-tight mb-1">
+                  FairValue Studio
+                </h1>
+                <p className="text-slate-500 text-sm">
+                  A multi-scenario valuation tool featuring basic DCF calculation and advanced, multi-phase growth forecasting.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {currentUser ? (
+                <div className="text-right">
+                  <div className="text-sm font-medium text-slate-700">Hi, {currentUser.username}!</div>
+                  <button
+                    onClick={handleLogout}
+                    className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+                  >
+                    Log out
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => { setShowLoginModal(true); setActiveTab('login'); }}
+                  className="px-3 py-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors cursor-pointer"
+                >
+                  Log in
+                </button>
+              )}
             </div>
           </div>
           <div className="text-slate-600 text-sm leading-relaxed bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
@@ -588,6 +653,130 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Login Modal */}
+      {showLoginModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+            <div className="flex border-b border-slate-200 mb-4">
+              <button
+                onClick={() => { setActiveTab('login'); setLoginError(''); setSignupError(''); }}
+                className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                  activeTab === 'login' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Log in
+              </button>
+              <button
+                onClick={() => { setActiveTab('signup'); setLoginError(''); setSignupError(''); }}
+                className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                  activeTab === 'signup' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Sign up
+              </button>
+            </div>
+
+            {activeTab === 'login' ? (
+              <>
+                <h3 className="text-lg font-medium text-slate-900 mb-2">Log In</h3>
+                <p className="text-sm text-slate-500 mb-4">Enter your credentials to access your scenario sets.</p>
+                <div className="space-y-4 mb-6">
+                  <input
+                    type="text"
+                    placeholder="Username"
+                    value={loginUsername}
+                    onChange={(e) => setLoginUsername(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleLogin();
+                    }}
+                  />
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleLogin();
+                    }}
+                  />
+                </div>
+                {loginError && (
+                  <div className="text-sm text-red-600 mb-4">{loginError}</div>
+                )}
+                <div className="flex justify-end gap-3">
+                  <button onClick={() => { setShowLoginModal(false); setLoginError(''); setLoginUsername(''); setLoginPassword(''); }} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
+                  <button onClick={handleLogin} className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Log In</button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-medium text-slate-900 mb-2">Sign Up</h3>
+                <p className="text-sm text-slate-500 mb-4">Create a new account to get started.</p>
+                <div className="space-y-4 mb-6">
+                  <input
+                    type="text"
+                    placeholder="Username"
+                    value={signupUsername}
+                    onChange={(e) => setSignupUsername(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSignup();
+                    }}
+                  />
+                  <input
+                    type="password"
+                    placeholder="Password (min 6 characters)"
+                    value={signupPassword}
+                    onChange={(e) => setSignupPassword(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSignup();
+                    }}
+                  />
+                  <input
+                    type="password"
+                    placeholder="Confirm Password"
+                    value={signupConfirmPassword}
+                    onChange={(e) => setSignupConfirmPassword(e.target.value)}
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleSignup();
+                    }}
+                  />
+                </div>
+                {signupError && (
+                  <div className="text-sm text-red-600 mb-4">{signupError}</div>
+                )}
+                <div className="flex justify-end gap-3">
+                  <button onClick={() => { setShowLoginModal(false); setSignupError(''); setSignupUsername(''); setSignupPassword(''); setSignupConfirmPassword(''); }} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
+                  <button onClick={handleSignup} className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Sign Up</button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Signup Success Modal */}
+      {showSignupSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 animate-in fade-in zoom-in-95">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Check className="w-6 h-6 text-green-600" />
+              </div>
+              <h3 className="text-lg font-medium text-slate-900 mb-2">Success!</h3>
+              <p className="text-sm text-slate-600">Your account has been created.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
