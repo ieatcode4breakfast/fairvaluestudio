@@ -847,15 +847,15 @@ export default function App() {
             </div>
           </div>
           <div className="text-slate-600 text-sm leading-relaxed bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-            <p className="mb-2 text-slate-800">How to use:</p>
+            <p className="font-semibold mb-2 text-slate-800">How to use:</p>
             <ul className="list-disc pl-5 space-y-1.5 text-slate-600 mb-4">
-              <li>Guest vs. Account: Use the app completely free as a guest by manually downloading/uploading your valuations. Creating an account unlocks automatic cloud saves, real-time cross-device syncing, and the ability to store and manage multiple valuations at once.</li>
-              <li>Choose a Method: Select "Basic DCF" for a quick estimate or "Advanced DCF" for detailed, multi-phase growth projections.</li>
-              <li>Configure Phases (Advanced): Click the timeline track to add growth phases. Drag the dots to adjust the years, or double-click/tap to remove them.</li>
-              <li>Enter Assumptions: Fill in your estimates for cash flows, growth rates, margins, and discount rates.</li>
-              <li>Compare Scenarios: Use the tabs to create and compare up to 10 different scenarios.</li>
-              <li>Save & Load: Use the Download and Upload buttons to save your scenarios to a file and load them later.</li>
-              <li>Text Summary Pro Tip: After finishing your inputs, copy the text summary at the bottom and paste into an AI chatbot for deeper analysis, sanity checks, or qualitative insights.</li>
+              <li><strong>Guest vs. Account:</strong> Use the app completely free as a guest by manually downloading/uploading your valuations. Creating an account unlocks automatic cloud saves, real-time cross-device syncing, and the ability to store and manage multiple valuations at once.</li>
+              <li><strong>Choose a Method:</strong> Select "Basic DCF" for a quick estimate or "Advanced DCF" for detailed, multi-phase growth projections.</li>
+              <li><strong>Configure Phases (Advanced):</strong> Click the timeline track to add growth phases. Drag the dots to adjust the years, or double-click/tap to remove them.</li>
+              <li><strong>Enter Assumptions:</strong> Fill in your estimates for cash flows, growth rates, margins, and discount rates.</li>
+              <li><strong>Compare Scenarios:</strong> Use the tabs to create and compare up to 10 different scenarios.</li>
+              <li><strong>Save & Load:</strong> Use the Download and Upload buttons to save your scenarios to a file and load them later.</li>
+              <li><strong>Text Summary Pro Tip:</strong> After finishing your inputs, copy the text summary at the bottom and paste into an AI chatbot for deeper analysis, sanity checks, or qualitative insights.</li>
             </ul>
             <div className="flex items-center gap-3 mt-4">
               <button
