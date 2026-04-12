@@ -7,7 +7,7 @@ import { computeAdvanced } from './utils/computeAdvanced';
 import { buildSummaryText } from './utils/summary';
 import { ScenarioPanel } from './components/ScenarioPanel';
 import { ScenarioComparisonTable } from './components/ScenarioComparisonTable';
-import { Calculator, PlusIcon, DownloadIcon, UploadIcon, InfoIcon, Check, Copy, RotateCcw } from './components/Icons';
+import { Calculator, PlusIcon, DownloadIcon, UploadIcon, InfoIcon, Check, Copy, RotateCcw, Eye, EyeOff } from './components/Icons';
 import { MAX_SCENARIOS, TRANSIENT_KEYS } from './utils/constants';
 import { genId } from './utils/genId';
 import { login, logout, getCurrentUser, signup, getUserValuations, getScenarios, createValuation, updateValuation, deleteValuation, renameValuation, updateLastActiveValuation, updateUsername, updateEmail, updatePassword, supabase } from './api';
@@ -110,6 +110,12 @@ export default function App() {
   const guestScenariosBeforeLoginRef = useRef<Scenario[]>([]);
   // Flag: after the signup-success modal closes, show the retain-guest-data modal
   const showRetainAfterSuccessRef = useRef(false);
+  // Password visibility states
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showSignupPassword, setShowSignupPassword] = useState(false);
+  const [showSignupConfirmPassword, setShowSignupConfirmPassword] = useState(false);
+  const [showAccountNewPassword, setShowAccountNewPassword] = useState(false);
+  const [showAccountConfirmPassword, setShowAccountConfirmPassword] = useState(false);
 
   const currentCleaned = useMemo(() => {
     return JSON.stringify(scenarios.map(sc => {
@@ -1342,16 +1348,25 @@ export default function App() {
                       if (e.key === 'Enter') handleLogin();
                     }}
                   />
-                  <input
-                    type="password"
-                    placeholder="Password"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleLogin();
-                    }}
-                  />
+                  <div className="relative">
+                    <input
+                      type={showLoginPassword ? "text" : "password"}
+                      placeholder="Password"
+                      value={loginPassword}
+                      onChange={(e) => setLoginPassword(e.target.value)}
+                      className="w-full pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleLogin();
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowLoginPassword(!showLoginPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    >
+                      {showLoginPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
                 </div>
                 {loginError && (
                   <div className="text-sm text-red-600 mb-4">{loginError}</div>
@@ -1387,26 +1402,44 @@ export default function App() {
                       if (e.key === 'Enter') handleSignup();
                     }}
                   />
-                  <input
-                    type="password"
-                    placeholder="Password (min 6 characters)"
-                    value={signupPassword}
-                    onChange={(e) => setSignupPassword(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSignup();
-                    }}
-                  />
-                  <input
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={signupConfirmPassword}
-                    onChange={(e) => setSignupConfirmPassword(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSignup();
-                    }}
-                  />
+                  <div className="relative">
+                    <input
+                      type={showSignupPassword ? "text" : "password"}
+                      placeholder="Password (min 6 characters)"
+                      value={signupPassword}
+                      onChange={(e) => setSignupPassword(e.target.value)}
+                      className="w-full pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSignup();
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowSignupPassword(!showSignupPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    >
+                      {showSignupPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showSignupConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm Password"
+                      value={signupConfirmPassword}
+                      onChange={(e) => setSignupConfirmPassword(e.target.value)}
+                      className="w-full pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSignup();
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowSignupConfirmPassword(!showSignupConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    >
+                      {showSignupConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
                 </div>
                 {signupError && (
                   <div className="text-sm text-red-600 mb-4">{signupError}</div>
@@ -1649,40 +1682,57 @@ export default function App() {
 
             <div className="border-t border-slate-100 my-4"></div>
 
-            {/* Password Section */}
             <div className="mb-5">
               <label className="block text-sm font-medium text-slate-700 mb-1.5">Change Password</label>
               <div className="space-y-2">
-                <input
-                  type="password"
-                  placeholder="New password (min 6 characters)"
-                  value={accountNewPassword}
-                  onChange={(e) => { setAccountNewPassword(e.target.value); setAccountError(''); setAccountSuccess(''); }}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
-                />
-                <div className="flex gap-2">
+                <div className="relative">
                   <input
-                    type="password"
-                    placeholder="Confirm new password"
-                    value={accountConfirmPassword}
-                    onChange={(e) => { setAccountConfirmPassword(e.target.value); setAccountError(''); setAccountSuccess(''); }}
-                    className="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && accountNewPassword && accountConfirmPassword) {
-                        (async () => {
-                          if (accountNewPassword !== accountConfirmPassword) { setAccountError('Passwords do not match'); return; }
-                          if (accountNewPassword.length < 6) { setAccountError('Password must be at least 6 characters'); return; }
-                          setAccountSaving(true); setAccountError(''); setAccountSuccess('');
-                          try {
-                            await updatePassword(accountNewPassword);
-                            setAccountNewPassword(''); setAccountConfirmPassword('');
-                            setAccountSuccess('Password updated!');
-                          } catch (err) { setAccountError((err as Error).message); }
-                          finally { setAccountSaving(false); }
-                        })();
-                      }
-                    }}
+                    type={showAccountNewPassword ? "text" : "password"}
+                    placeholder="New password (min 6 characters)"
+                    value={accountNewPassword}
+                    onChange={(e) => { setAccountNewPassword(e.target.value); setAccountError(''); setAccountSuccess(''); }}
+                    className="w-full pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowAccountNewPassword(!showAccountNewPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                  >
+                    {showAccountNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type={showAccountConfirmPassword ? "text" : "password"}
+                      placeholder="Confirm new password"
+                      value={accountConfirmPassword}
+                      onChange={(e) => { setAccountConfirmPassword(e.target.value); setAccountError(''); setAccountSuccess(''); }}
+                      className="w-full pl-3 pr-10 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && accountNewPassword && accountConfirmPassword) {
+                          (async () => {
+                            if (accountNewPassword !== accountConfirmPassword) { setAccountError('Passwords do not match'); return; }
+                            if (accountNewPassword.length < 6) { setAccountError('Password must be at least 6 characters'); return; }
+                            setAccountSaving(true); setAccountError(''); setAccountSuccess('');
+                            try {
+                              await updatePassword(accountNewPassword);
+                              setAccountNewPassword(''); setAccountConfirmPassword('');
+                              setAccountSuccess('Password updated!');
+                            } catch (err) { setAccountError((err as Error).message); }
+                            finally { setAccountSaving(false); }
+                          })();
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowAccountConfirmPassword(!showAccountConfirmPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none"
+                    >
+                      {showAccountConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
                   <button
                     onClick={async () => {
                       if (accountNewPassword !== accountConfirmPassword) { setAccountError('Passwords do not match'); return; }
