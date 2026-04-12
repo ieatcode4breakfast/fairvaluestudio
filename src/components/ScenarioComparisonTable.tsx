@@ -11,7 +11,7 @@ export function ScenarioComparisonTable({ scenarios, allResults }: Props) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-6">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mt-5 mb-4">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="w-full p-4 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors"
