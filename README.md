@@ -2,13 +2,17 @@
 
 FairValue Studio is a powerful, yet intuitive multi-scenario valuation tool designed to help you quickly perform Discounted Cash Flow (DCF) analyses. Whether you need a quick sanity check on a stock or a robust, multi-phase financial model, FairValue Studio streamlines the workflow.
 
+**Try the app live:** [https://fairvaluestudio.vercel.app/](https://fairvaluestudio.vercel.app/)
+
 This guide will walk you through how to use the app effectively.
 
 ---
 
 ## 🚀 Getting Started
 
-When you open FairValue Studio, you are immediately dropped into a new **Valuation**. 
+You can start using FairValue Studio immediately at [https://fairvaluestudio.vercel.app/](https://fairvaluestudio.vercel.app/)
+
+When you open the app, you are immediately dropped into a new **Valuation**.
 
 A single "Valuation" can hold up to **10 different Scenarios** (e.g., Base Case, Bear Case, Bull Case). You can add new scenarios using the tabs near the top of the interface. This makes it effortless to compare how sensitive a stock's intrinsic value is to your different growth assumptions. 
 
@@ -66,21 +70,3 @@ Once you have finished tweaking your inputs, click the **Copy Text** button. You
 Even with cloud auto-save, you remain in full control of your data.
 *   **Download Valuation**: You can export your entire valuation (with all 10 scenarios) as a `.json` file to back it up locally.
 *   **Upload Valuation**: Easily restore or share a valuation by uploading a previously downloaded `.json` file.
-
----
-
-<details>
-<summary><b>For Developers (Running Locally)</b></summary>
-
-Prerequisites: Node.js
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Start the development server:
-   ```bash
-   npm run dev
-   ```
-3. Supabase configuration requires valid environment variables in an `.env.local` file pointing to your backend instance.
-</details>
