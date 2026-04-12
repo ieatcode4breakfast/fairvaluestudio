@@ -10,7 +10,7 @@ import { ScenarioComparisonTable } from './components/ScenarioComparisonTable';
 import { Calculator, PlusIcon, DownloadIcon, UploadIcon, InfoIcon, Check, Copy, RotateCcw } from './components/Icons';
 import { MAX_SCENARIOS, TRANSIENT_KEYS } from './utils/constants';
 import { genId } from './utils/genId';
-import { login, logout, getCurrentUser, signup, getUserValuations, getScenarios, createValuation, updateValuation, deleteValuation, renameValuation, updateLastActiveValuation, supabase } from './api';
+import { login, logout, getCurrentUser, signup, getUserValuations, getScenarios, createValuation, updateValuation, deleteValuation, renameValuation, updateLastActiveValuation, updateUsername, updateEmail, updatePassword, supabase } from './api';
 import { User, ValuationMetadata } from './types';
 
 const LOCAL_STORAGE_KEY = 'fairvalue_scenarios';
@@ -96,6 +96,14 @@ export default function App() {
   const [showRetainGuestModal, setShowRetainGuestModal] = useState(false);
   const [retainGuestName, setRetainGuestName] = useState('');
   const [pendingLoginUser, setPendingLoginUser] = useState<User | null>(null);
+  const [showAccountModal, setShowAccountModal] = useState(false);
+  const [accountUsername, setAccountUsername] = useState('');
+  const [accountEmail, setAccountEmail] = useState('');
+  const [accountNewPassword, setAccountNewPassword] = useState('');
+  const [accountConfirmPassword, setAccountConfirmPassword] = useState('');
+  const [accountError, setAccountError] = useState('');
+  const [accountSuccess, setAccountSuccess] = useState('');
+  const [accountSaving, setAccountSaving] = useState(false);
   const ignoreNextSaveRef = useRef(false);
   const loadedValuationRef = useRef<string | null>(null);
   // Snapshot of scenarios at login time — used to restore on logout
@@ -807,7 +815,20 @@ export default function App() {
             <div className="flex items-center gap-2">
               {currentUser ? (
                 <div className="text-right">
-                  <div className="text-sm font-medium text-slate-700">Hi, {currentUser.username}!</div>
+                  <button
+                    onClick={() => {
+                      setAccountUsername(currentUser.username);
+                      setAccountEmail(currentUser.email);
+                      setAccountNewPassword('');
+                      setAccountConfirmPassword('');
+                      setAccountError('');
+                      setAccountSuccess('');
+                      setShowAccountModal(true);
+                    }}
+                    className="text-sm font-medium text-slate-700 hover:text-indigo-600 transition-colors cursor-pointer"
+                  >
+                    Hi, {currentUser.username}!
+                  </button>
                   <button
                     onClick={handleLogout}
                     className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
@@ -1527,6 +1548,183 @@ export default function App() {
             <div className="flex justify-end gap-3">
               <button onClick={() => setIsRenaming(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
               <button onClick={handleRenameValuation} className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Rename</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Account Settings Modal */}
+      {showAccountModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-slate-900">Account Settings</h3>
+              <button
+                onClick={() => setShowAccountModal(false)}
+                className="text-slate-400 hover:text-slate-600 transition-colors text-xl leading-none cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Username Section */}
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Username</label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={accountUsername}
+                  onChange={(e) => { setAccountUsername(e.target.value); setAccountError(''); setAccountSuccess(''); }}
+                  className="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && accountUsername.trim() && accountUsername !== currentUser?.username) {
+                      (async () => {
+                        setAccountSaving(true); setAccountError(''); setAccountSuccess('');
+                        try {
+                          await updateUsername(currentUser!.id, accountUsername.trim());
+                          setCurrentUser(prev => prev ? { ...prev, username: accountUsername.trim() } : prev);
+                          setAccountSuccess('Username updated!');
+                        } catch (err) { setAccountError((err as Error).message); }
+                        finally { setAccountSaving(false); }
+                      })();
+                    }
+                  }}
+                />
+                <button
+                  onClick={async () => {
+                    if (!accountUsername.trim() || accountUsername === currentUser?.username) return;
+                    setAccountSaving(true); setAccountError(''); setAccountSuccess('');
+                    try {
+                      await updateUsername(currentUser!.id, accountUsername.trim());
+                      setCurrentUser(prev => prev ? { ...prev, username: accountUsername.trim() } : prev);
+                      setAccountSuccess('Username updated!');
+                    } catch (err) { setAccountError((err as Error).message); }
+                    finally { setAccountSaving(false); }
+                  }}
+                  disabled={accountSaving || !accountUsername.trim() || accountUsername === currentUser?.username}
+                  className="px-3 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+
+            <div className="border-t border-slate-100 my-4"></div>
+
+            {/* Email Section */}
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Email Address</label>
+              <div className="flex gap-2">
+                <input
+                  type="email"
+                  value={accountEmail}
+                  onChange={(e) => { setAccountEmail(e.target.value); setAccountError(''); setAccountSuccess(''); }}
+                  className="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && accountEmail.trim() && accountEmail !== currentUser?.email) {
+                      (async () => {
+                        setAccountSaving(true); setAccountError(''); setAccountSuccess('');
+                        try {
+                          await updateEmail(accountEmail.trim());
+                          setCurrentUser(prev => prev ? { ...prev, email: accountEmail.trim() } : prev);
+                          setAccountSuccess('Email updated!');
+                        } catch (err) { setAccountError((err as Error).message); }
+                        finally { setAccountSaving(false); }
+                      })();
+                    }
+                  }}
+                />
+                <button
+                  onClick={async () => {
+                    if (!accountEmail.trim() || accountEmail === currentUser?.email) return;
+                    setAccountSaving(true); setAccountError(''); setAccountSuccess('');
+                    try {
+                      await updateEmail(accountEmail.trim());
+                      setCurrentUser(prev => prev ? { ...prev, email: accountEmail.trim() } : prev);
+                      setAccountSuccess('Email updated!');
+                    } catch (err) { setAccountError((err as Error).message); }
+                    finally { setAccountSaving(false); }
+                  }}
+                  disabled={accountSaving || !accountEmail.trim() || accountEmail === currentUser?.email}
+                  className="px-3 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+
+            <div className="border-t border-slate-100 my-4"></div>
+
+            {/* Password Section */}
+            <div className="mb-5">
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">Change Password</label>
+              <div className="space-y-2">
+                <input
+                  type="password"
+                  placeholder="New password (min 6 characters)"
+                  value={accountNewPassword}
+                  onChange={(e) => { setAccountNewPassword(e.target.value); setAccountError(''); setAccountSuccess(''); }}
+                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
+                />
+                <div className="flex gap-2">
+                  <input
+                    type="password"
+                    placeholder="Confirm new password"
+                    value={accountConfirmPassword}
+                    onChange={(e) => { setAccountConfirmPassword(e.target.value); setAccountError(''); setAccountSuccess(''); }}
+                    className="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors text-sm"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && accountNewPassword && accountConfirmPassword) {
+                        (async () => {
+                          if (accountNewPassword !== accountConfirmPassword) { setAccountError('Passwords do not match'); return; }
+                          if (accountNewPassword.length < 6) { setAccountError('Password must be at least 6 characters'); return; }
+                          setAccountSaving(true); setAccountError(''); setAccountSuccess('');
+                          try {
+                            await updatePassword(accountNewPassword);
+                            setAccountNewPassword(''); setAccountConfirmPassword('');
+                            setAccountSuccess('Password updated!');
+                          } catch (err) { setAccountError((err as Error).message); }
+                          finally { setAccountSaving(false); }
+                        })();
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={async () => {
+                      if (accountNewPassword !== accountConfirmPassword) { setAccountError('Passwords do not match'); return; }
+                      if (accountNewPassword.length < 6) { setAccountError('Password must be at least 6 characters'); return; }
+                      setAccountSaving(true); setAccountError(''); setAccountSuccess('');
+                      try {
+                        await updatePassword(accountNewPassword);
+                        setAccountNewPassword(''); setAccountConfirmPassword('');
+                        setAccountSuccess('Password updated!');
+                      } catch (err) { setAccountError((err as Error).message); }
+                      finally { setAccountSaving(false); }
+                    }}
+                    disabled={accountSaving || !accountNewPassword || !accountConfirmPassword}
+                    className="px-3 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Error / Success Messages */}
+            {accountError && (
+              <div className="text-sm text-red-600 mb-4 bg-red-50 p-2.5 rounded-lg border border-red-100">{accountError}</div>
+            )}
+            {accountSuccess && (
+              <div className="text-sm text-green-600 mb-4 bg-green-50 p-2.5 rounded-lg border border-green-100">{accountSuccess}</div>
+            )}
+
+            <div className="flex justify-end">
+              <button
+                onClick={() => setShowAccountModal(false)}
+                className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+              >
+                Close
+              </button>
             </div>
           </div>
         </div>

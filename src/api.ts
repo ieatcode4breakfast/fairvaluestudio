@@ -6,7 +6,7 @@ import { Scenario } from './types';
  * API functions using Supabase.
  */
 
-export const login = async (email: string, password: string): Promise<{ id: string; username: string; lastActiveValuationId?: string } | null> => {
+export const login = async (email: string, password: string): Promise<{ id: string; username: string; email: string; lastActiveValuationId?: string } | null> => {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
     console.error('Login error:', error.message);
@@ -25,14 +25,14 @@ export const login = async (email: string, password: string): Promise<{ id: stri
     return null;
   }
 
-  return { id: data.user.id, username: userData.username, lastActiveValuationId: userData.last_active_valuation_id };
+  return { id: data.user.id, username: userData.username, email: data.user.email!, lastActiveValuationId: userData.last_active_valuation_id };
 };
 
 export const logout = async (): Promise<void> => {
   await supabase.auth.signOut();
 };
 
-export const getCurrentUser = async (): Promise<{ id: string; username: string; lastActiveValuationId?: string } | null> => {
+export const getCurrentUser = async (): Promise<{ id: string; username: string; email: string; lastActiveValuationId?: string } | null> => {
   const { data: { session }, error } = await supabase.auth.getSession();
   if (error || !session) return null;
 
@@ -44,7 +44,7 @@ export const getCurrentUser = async (): Promise<{ id: string; username: string; 
 
   if (userError) return null;
   
-  return { id: session.user.id, username: userData.username, lastActiveValuationId: userData.last_active_valuation_id };
+  return { id: session.user.id, username: userData.username, email: session.user.email!, lastActiveValuationId: userData.last_active_valuation_id };
 };
 
 
@@ -81,7 +81,7 @@ export const getScenarios = async (valuationId: string): Promise<Scenario[]> => 
   }));
 };
 
-export const signup = async (email: string, password: string, username: string): Promise<{ id: string; username: string }> => {
+export const signup = async (email: string, password: string, username: string): Promise<{ id: string; username: string; email: string }> => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -95,7 +95,7 @@ export const signup = async (email: string, password: string, username: string):
   }
 
   // User profile is created automatically by the handle_new_user DB trigger.
-  return { id: data.user.id, username };
+  return { id: data.user.id, username, email };
 };
 
 export const createValuation = async (userId: string, name: string, scenarios: Scenario[]): Promise<string> => {
@@ -180,5 +180,29 @@ export const updateLastActiveValuation = async (userId: string, valuationId: str
   if (error) {
     console.error('Failed to update last active valuation:', error.message);
   }
+};
+
+export const updateUsername = async (userId: string, newUsername: string): Promise<void> => {
+  const { error } = await supabase
+    .from('users')
+    .update({ username: newUsername })
+    .eq('id', userId);
+
+  if (error) {
+    if (error.code === '23505') {
+      throw new Error('Username already taken');
+    }
+    throw new Error(error.message);
+  }
+};
+
+export const updateEmail = async (newEmail: string): Promise<void> => {
+  const { error } = await supabase.auth.updateUser({ email: newEmail });
+  if (error) throw new Error(error.message);
+};
+
+export const updatePassword = async (newPassword: string): Promise<void> => {
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) throw new Error(error.message);
 };
 

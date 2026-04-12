@@ -62,6 +62,7 @@ export interface Results {
 export interface User {
   id: string;
   username: string;
+  email: string;
   lastActiveValuationId?: string;
 }
 
