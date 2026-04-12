@@ -5,6 +5,7 @@ import { NumericFormat } from '../NumericFormat';
 import { Toggle } from '../Toggle';
 import { INPUT_CLS, MAX_SPLITS } from '../../utils/constants';
 import { getSimpleLabels } from '../../utils/summary';
+import { convertMillions } from '../../utils/helpers';
 
 interface GrowthCardProps {
   sc: Scenario;
@@ -195,7 +196,15 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-slate-600">Values in Millions</span>
-                <Toggle checked={sc.simpleInMillions} onChange={() => upd({ simpleInMillions: !sc.simpleInMillions })} />
+                <Toggle checked={sc.simpleInMillions} onChange={() => {
+                  const newFlag = !sc.simpleInMillions;
+                  upd({
+                    simpleInMillions: newFlag,
+                    simpleCurrentMetricTotal: convertMillions(sc.simpleCurrentMetricTotal, sc.simpleInMillions, newFlag),
+                    simpleCurrentShares: convertMillions(sc.simpleCurrentShares, sc.simpleInMillions, newFlag),
+                    simpleCurrentRevenue: convertMillions(sc.simpleCurrentRevenue, sc.simpleInMillions, newFlag),
+                  });
+                }} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
@@ -224,7 +233,15 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-slate-600">Values in Millions</span>
-                <Toggle checked={sc.simpleInMillions} onChange={() => upd({ simpleInMillions: !sc.simpleInMillions })} />
+                <Toggle checked={sc.simpleInMillions} onChange={() => {
+                  const newFlag = !sc.simpleInMillions;
+                  upd({
+                    simpleInMillions: newFlag,
+                    simpleCurrentMetricTotal: convertMillions(sc.simpleCurrentMetricTotal, sc.simpleInMillions, newFlag),
+                    simpleCurrentShares: convertMillions(sc.simpleCurrentShares, sc.simpleInMillions, newFlag),
+                    simpleCurrentRevenue: convertMillions(sc.simpleCurrentRevenue, sc.simpleInMillions, newFlag),
+                  });
+                }} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
@@ -276,7 +293,15 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
             <div className="mb-6 space-y-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-slate-600">Values in Millions</span>
-                <Toggle checked={sc.inMillions} onChange={() => upd({ inMillions: !sc.inMillions })} />
+                <Toggle checked={sc.inMillions} onChange={() => {
+                  const newFlag = !sc.inMillions;
+                  upd({
+                    inMillions: newFlag,
+                    currentMetricTotal: convertMillions(sc.currentMetricTotal, sc.inMillions, newFlag),
+                    currentShares: convertMillions(sc.currentShares, sc.inMillions, newFlag),
+                    currentRevenue: convertMillions(sc.currentRevenue, sc.inMillions, newFlag),
+                  });
+                }} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
@@ -295,7 +320,15 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
             <div className="mb-6 space-y-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-slate-600">Values in Millions</span>
-                <Toggle checked={sc.inMillions} onChange={() => upd({ inMillions: !sc.inMillions })} />
+                <Toggle checked={sc.inMillions} onChange={() => {
+                  const newFlag = !sc.inMillions;
+                  upd({
+                    inMillions: newFlag,
+                    currentMetricTotal: convertMillions(sc.currentMetricTotal, sc.inMillions, newFlag),
+                    currentShares: convertMillions(sc.currentShares, sc.inMillions, newFlag),
+                    currentRevenue: convertMillions(sc.currentRevenue, sc.inMillions, newFlag),
+                  });
+                }} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
