@@ -82,7 +82,11 @@ export const getScenarios = async (valuationId: string): Promise<Scenario[]> => 
 };
 
 export const signup = async (email: string, password: string, username: string): Promise<{ id: string; username: string }> => {
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { username } },
+  });
   if (error) {
     throw new Error(error.message);
   }
@@ -90,15 +94,7 @@ export const signup = async (email: string, password: string, username: string):
     throw new Error('Signup failed');
   }
 
-  const { error: insertError } = await supabase
-    .from('users')
-    .insert({ id: data.user.id, username });
-
-  if (insertError) {
-    console.error('Error creating user profile:', insertError.message);
-    throw new Error('Failed to create user profile');
-  }
-
+  // User profile is created automatically by the handle_new_user DB trigger.
   return { id: data.user.id, username };
 };
 

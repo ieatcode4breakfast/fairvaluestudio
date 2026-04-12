@@ -100,6 +100,8 @@ export default function App() {
   const loadedValuationRef = useRef<string | null>(null);
   // Snapshot of scenarios at login time — used to restore on logout
   const guestScenariosBeforeLoginRef = useRef<Scenario[]>([]);
+  // Flag: after the signup-success modal closes, show the retain-guest-data modal
+  const showRetainAfterSuccessRef = useRef(false);
 
   const currentCleaned = useMemo(() => {
     return JSON.stringify(scenarios.map(sc => {
@@ -220,10 +222,16 @@ export default function App() {
     }
   }, [scenarios, currentUser]);
 
-  // Auto-close signup success modal after 2 seconds
+  // Auto-close signup success modal after 3 seconds; then show retain-guest modal if applicable
   useEffect(() => {
     if (showSignupSuccessModal) {
-      const timer = setTimeout(() => setShowSignupSuccessModal(false), 2000);
+      const timer = setTimeout(() => {
+        setShowSignupSuccessModal(false);
+        if (showRetainAfterSuccessRef.current) {
+          showRetainAfterSuccessRef.current = false;
+          setShowRetainGuestModal(true);
+        }
+      }, 3000);
       return () => clearTimeout(timer);
     }
   }, [showSignupSuccessModal]);
@@ -244,13 +252,13 @@ export default function App() {
     }
   }, [currentUser]);
 
-  // Force new valuation modal if empty (suppressed while retain-guest prompt is active)
+  // Force new valuation modal if empty (suppressed while retain-guest or signup-success prompt is active)
   useEffect(() => {
-    if (currentUser && hasFetchedValuations && userValuations.length === 0 && !loadedValuationId && !showRetainGuestModal) {
+    if (currentUser && hasFetchedValuations && userValuations.length === 0 && !loadedValuationId && !showRetainGuestModal && !showSignupSuccessModal) {
       setNewValuationName('My First Valuation');
       setShowNewValuationModal(true);
     }
-  }, [currentUser, hasFetchedValuations, userValuations.length, loadedValuationId, showRetainGuestModal]);
+  }, [currentUser, hasFetchedValuations, userValuations.length, loadedValuationId, showRetainGuestModal, showSignupSuccessModal]);
 
   const updateScenario = useCallback((id: number, changes: Partial<Scenario>) => {
     setScenarios(prev => prev.map(sc => {
@@ -621,13 +629,17 @@ export default function App() {
         setIsSaving(false);
       }
     } else {
-      // Discard = don't save to account. Guest data in ref + localStorage is left intact
-      // so it restores correctly on logout. Just load their Supabase valuation.
+      // Discard = don't save to account. Guest data in ref + localStorage is left intact.
       if (user.lastActiveValuationId) {
         handleLoadValuation(user.lastActiveValuationId);
+      } else if (hasFetchedValuations && userValuations.length === 0) {
+        // Brand-new user with no valuations — explicitly open the new-valuation modal.
+        // The force-new useEffect is also a safety net if the fetch hasn't resolved yet.
+        setNewValuationName('My First Valuation');
+        setShowNewValuationModal(true);
       }
     }
-  }, [pendingLoginUser, currentUser, retainGuestName, scenarios, handleLoadValuation]);
+  }, [pendingLoginUser, currentUser, retainGuestName, scenarios, handleLoadValuation, hasFetchedValuations, userValuations]);
 
   const handleSignup = useCallback(async () => {
     if (signupPassword !== signupConfirmPassword) {
@@ -646,6 +658,15 @@ export default function App() {
       setSignupConfirmPassword('');
       setSignupError('');
       setActiveTab('login');
+
+      // If they had pre-login guest data, queue the retain prompt for after the success modal
+      const guestData = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (guestData) {
+        setPendingLoginUser(user);
+        setRetainGuestName('My Valuation');
+        showRetainAfterSuccessRef.current = true;
+      }
+
       setShowSignupSuccessModal(true);
     } catch (error) {
       setSignupError('Signup failed: ' + (error as Error).message);
@@ -1198,7 +1219,7 @@ export default function App() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Reset All Scenarios?</h3>
             <p className="text-sm text-slate-500 mb-6">
-              Are you sure you want to delete all current scenarios and start over with a blank slate? This action cannot be undone.
+              Are you sure you want to delete all current scenarios for this valuation and start over with a blank slate? This action cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowResetAllModal(false)} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
@@ -1249,7 +1270,7 @@ export default function App() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Delete Valuation?</h3>
             <p className="text-sm text-slate-500 mb-6">
-              This action cannot be reversed.
+              This action cannot be undone.
             </p>
             <div className="flex justify-end gap-3">
               <button
