@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Scenario, Results } from '../types';
 import { NumericFormat } from './NumericFormat';
 import { Toggle } from './Toggle';
-import { Settings2, TrendingUp, DollarSign, Trash2, InfoIcon, ChevronDown } from './Icons';
+import { Settings2, TrendingUp, DollarSign, Trash2, InfoIcon, ChevronDown, RotateCcw } from './Icons';
 import { INPUT_CLS, MAX_SPLITS } from '../utils/constants';
 import { formatCurrency, formatPercent } from '../utils/helpers';
 import { getSimpleLabels } from '../utils/summary';
@@ -16,14 +16,15 @@ interface ScenarioPanelProps {
   totalScenarios: number;
   onUpdate: (id: number, changes: Partial<Scenario>) => void;
   onDelete: (id: number) => void;
+  onResetAll: () => void;
   results: Results;
 }
 
-export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, results }: ScenarioPanelProps) {
-  const valYears   = Number(sc.years) || 0;
-  const isSimple   = sc.dcfMethod === 'Basic DCF';
+export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, onResetAll, results }: ScenarioPanelProps) {
+  const valYears = Number(sc.years) || 0;
+  const isSimple = sc.dcfMethod === 'Basic DCF';
   const showSlider = !isSimple && valYears >= 3;
-  const canDelete  = totalScenarios > 1;
+  const canDelete = totalScenarios > 1;
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const deleteTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -54,15 +55,15 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
     if (sc.splitYears.length >= MAX_SPLITS) return;
     if (year <= 1 || year >= valYears || sc.splitYears.includes(year)) return;
     const newSplits = [...sc.splitYears, year].sort((a, b) => a - b);
-    const newIndex  = newSplits.indexOf(year);
+    const newIndex = newSplits.indexOf(year);
     const ins = (arr: any[]) => { const r = [...arr]; r.splice(newIndex + 1, 0, r[newIndex]); return r.slice(0, 10); };
     upd({
-      splitYears:             newSplits,
-      metricGrowthRates:      ins(sc.metricGrowthRates),
+      splitYears: newSplits,
+      metricGrowthRates: ins(sc.metricGrowthRates),
       metricGrowthRatesTotal: ins(sc.metricGrowthRatesTotal),
-      revenueGrowthRates:     ins(sc.revenueGrowthRates),
-      finalMargins:           ins(sc.finalMargins),
-      sharesGrowthRates:      ins(sc.sharesGrowthRates),
+      revenueGrowthRates: ins(sc.revenueGrowthRates),
+      finalMargins: ins(sc.finalMargins),
+      sharesGrowthRates: ins(sc.sharesGrowthRates),
     });
   };
 
@@ -73,12 +74,12 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
     const rem = (arr: any[]) => { const r = [...arr]; r.splice(idx + 1, 1); r.push(r[r.length - 1]); return r.slice(0, 10); };
     upd({
       hoverYear: null,
-      splitYears:             sc.splitYears.filter(y => y !== year),
-      metricGrowthRates:      rem(sc.metricGrowthRates),
+      splitYears: sc.splitYears.filter(y => y !== year),
+      metricGrowthRates: rem(sc.metricGrowthRates),
       metricGrowthRatesTotal: rem(sc.metricGrowthRatesTotal),
-      revenueGrowthRates:     rem(sc.revenueGrowthRates),
-      finalMargins:           rem(sc.finalMargins),
-      sharesGrowthRates:      rem(sc.sharesGrowthRates),
+      revenueGrowthRates: rem(sc.revenueGrowthRates),
+      finalMargins: rem(sc.finalMargins),
+      sharesGrowthRates: rem(sc.sharesGrowthRates),
     });
   };
 
@@ -198,10 +199,10 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
     );
   };
 
-  const mosColor    = results.marginOfSafety !== null ? (results.marginOfSafety > 0 ? 'text-emerald-600' : 'text-red-600') : 'text-slate-900';
+  const mosColor = results.marginOfSafety !== null ? (results.marginOfSafety > 0 ? 'text-emerald-600' : 'text-red-600') : 'text-slate-900';
   const upsideColor = results.upside !== null ? (results.upside > 0 ? 'text-emerald-600' : 'text-red-600') : 'text-slate-900';
-  const irrColor    = results.irr && results.irr > (Number(sc.discountRate) || 0) ? 'text-emerald-600' : 'text-slate-900';
-  const maxYears    = isSimple ? 10 : 50;
+  const irrColor = results.irr && results.irr > (Number(sc.discountRate) || 0) ? 'text-emerald-600' : 'text-slate-900';
+  const maxYears = isSimple ? 10 : 50;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -214,16 +215,22 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
           {canDelete && (
             <button
               onClick={handleDeleteClick}
-              className={`w-full mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${
-                deleteConfirm
-                  ? 'bg-red-600 hover:bg-red-700 text-white border-red-600'
-                  : 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200'
-              }`}
+              className={`w-full mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${deleteConfirm
+                ? 'bg-red-600 hover:bg-red-700 text-white border-red-600'
+                : 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200'
+                }`}
             >
               <Trash2 className="w-4 h-4" />
               {deleteConfirm ? 'Are you sure? Click to confirm' : 'Delete Scenario'}
             </button>
           )}
+          <button
+            onClick={onResetAll}
+            className="w-full mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Reset All Scenarios
+          </button>
 
           <label className="block text-sm font-medium text-slate-600 mb-1">Scenario Name</label>
           <input
@@ -245,11 +252,10 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
                 onUpdate(sc.id, { ...fresh, id: sc.id, showResetConfirm: false });
               }
             }}
-            className={`w-full mt-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
-              sc.showResetConfirm
-                ? 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
-            }`}
+            className={`w-full mt-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${sc.showResetConfirm
+              ? 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200'
+              : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+              }`}
           >
             {sc.showResetConfirm ? 'Are you sure? (Click to confirm)' : 'Reset Scenario'}
           </button>
@@ -273,6 +279,66 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
               <option value="Advanced DCF">Advanced DCF</option>
             </select>
           </div>
+
+          {/* Basic DCF: Metric + Projection Method */}
+          {isSimple && lbl && (
+            <div className="mt-4 pt-4 border-t border-slate-100 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-600 mb-1">Metric</label>
+                <select value={sc.simpleMetricType} onChange={e => upd({ simpleMetricType: e.target.value })} className={INPUT_CLS}>
+                  <option>Free Cash Flow</option>
+                  <option>Net Income (Earnings)</option>
+                  <option>Custom</option>
+                </select>
+              </div>
+              {sc.simpleMetricType === 'Custom' && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-600 mb-1">Custom Metric Name</label>
+                  <input
+                    type="text"
+                    value={sc.simpleCustomMetric}
+                    onChange={e => upd({ simpleCustomMetric: e.target.value })}
+                    placeholder="e.g. EBITDA, Operating Cash Flow"
+                    className={INPUT_CLS}
+                  />
+                </div>
+              )}
+              <div>
+                {(() => {
+                  let m1 = 'Metric';
+                  let m2 = 'Metric';
+                  if (sc.simpleMetricType === 'Free Cash Flow') {
+                    m1 = 'Total FCF';
+                    m2 = 'FCF';
+                  } else if (sc.simpleMetricType === 'Net Income (Earnings)') {
+                    m1 = 'Net Income';
+                    m2 = 'Net Income';
+                  } else if (sc.simpleMetricType === 'Custom') {
+                    m1 = sc.simpleCustomMetric || 'Custom Metric';
+                    m2 = sc.simpleCustomMetric || 'Custom Metric';
+                  }
+                  return (
+                    <select value={sc.simpleProjectionMethod} onChange={e => upd({ simpleProjectionMethod: e.target.value })} className={INPUT_CLS}>
+                      <option value="Per Share">Per Share</option>
+                      <option value="Metric, Share Count">{m1}, Share Count</option>
+                      <option value="Revenue, Metric Margin, Share Count">Revenue, {m2} Margin, Share Count</option>
+                    </select>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
+
+          {/* Advanced DCF: Projection Method */}
+          {!isSimple && (
+            <div className="mt-4 pt-4 border-t border-slate-100">
+              <select value={sc.projectionMethod} onChange={e => upd({ projectionMethod: e.target.value })} className={INPUT_CLS}>
+                <option value="Per Share Method">Per Share</option>
+                <option value="Total FCF, Share Count">Total FCF, Share Count</option>
+                <option value="Revenue, FCF Margin, Share Count">Revenue, FCF Margin, Share Count</option>
+              </select>
+            </div>
+          )}
         </div>
 
         {/* General Assumptions */}
@@ -304,7 +370,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
                 <NumericFormat value={sc.discountRate} onValueChange={v => upd({ discountRate: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
               </div>
             </div>
-            
+
             {/* Terminal Value */}
             <div>
               <label className="block text-sm font-medium text-slate-600 mb-1 flex items-center gap-2">
@@ -316,7 +382,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
                   <option value="Yield">Exit Yield (%)</option>
                   {!isSimple && <option value="Perpetuity Growth">Growth in Perpetuity (%)</option>}
                 </select>
-                
+
                 {sc.exitAssumptionType === 'Multiple' && (
                   <NumericFormat value={sc.exitMultiple} onValueChange={v => upd({ exitMultiple: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 )}
@@ -340,51 +406,6 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
             <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-slate-400" /> Growth
             </h2>
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-slate-600 mb-1">Metric</label>
-              <select value={sc.simpleMetricType} onChange={e => upd({ simpleMetricType: e.target.value })} className={INPUT_CLS}>
-                <option>Free Cash Flow</option>
-                <option>Net Income (Earnings)</option>
-                <option>Custom</option>
-              </select>
-            </div>
-            {sc.simpleMetricType === 'Custom' && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-slate-600 mb-1">Custom Metric Name</label>
-                <input
-                  type="text"
-                  value={sc.simpleCustomMetric}
-                  onChange={e => upd({ simpleCustomMetric: e.target.value })}
-                  placeholder="e.g. EBITDA, Operating Cash Flow"
-                  className={INPUT_CLS}
-                />
-              </div>
-            )}
-
-            <div className="mb-6">
-              {(() => {
-                let m1 = 'Metric';
-                let m2 = 'Metric';
-                if (sc.simpleMetricType === 'Free Cash Flow') {
-                  m1 = 'Total FCF';
-                  m2 = 'FCF';
-                } else if (sc.simpleMetricType === 'Net Income (Earnings)') {
-                  m1 = 'Net Income';
-                  m2 = 'Net Income';
-                } else if (sc.simpleMetricType === 'Custom') {
-                  m1 = sc.simpleCustomMetric || 'Custom Metric';
-                  m2 = sc.simpleCustomMetric || 'Custom Metric';
-                }
-                return (
-                  <select value={sc.simpleProjectionMethod} onChange={e => upd({ simpleProjectionMethod: e.target.value })} className={INPUT_CLS}>
-                    <option value="Per Share">Per Share</option>
-                    <option value="Metric, Share Count">{m1}, Share Count</option>
-                    <option value="Revenue, Metric Margin, Share Count">Revenue, {m2} Margin, Share Count</option>
-                  </select>
-                );
-              })()}
-            </div>
 
             {sc.simpleProjectionMethod === 'Per Share' && (
               <div className="space-y-4">
@@ -469,13 +490,6 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
             <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-slate-400" /> Growth
             </h2>
-            <div className="mb-6">
-              <select value={sc.projectionMethod} onChange={e => upd({ projectionMethod: e.target.value })} className={INPUT_CLS}>
-                <option value="Per Share Method">Per Share</option>
-                <option value="Total FCF, Share Count">Total FCF, Share Count</option>
-                <option value="Revenue, FCF Margin, Share Count">Revenue, FCF Margin, Share Count</option>
-              </select>
-            </div>
 
             {/* Growth Phases Slider */}
             {showSlider && (
@@ -492,8 +506,8 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
                     onMouseMove={(e) => {
                       if (sc.splitYears.length >= MAX_SPLITS) { upd({ hoverYear: null }); return; }
                       const rect = e.currentTarget.getBoundingClientRect();
-                      const pct  = (e.clientX - rect.left) / rect.width;
-                      const yr   = Math.round(pct * (valYears - 1)) + 1;
+                      const pct = (e.clientX - rect.left) / rect.width;
+                      const yr = Math.round(pct * (valYears - 1)) + 1;
                       upd({ hoverYear: (yr > 1 && yr < valYears && !sc.splitYears.includes(yr)) ? yr : null });
                     }}
                     onMouseLeave={() => upd({ hoverYear: null })}
@@ -501,8 +515,8 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
                       if (Date.now() < ignoreTrackClickUntil) return;
                       if (sc.splitYears.length >= MAX_SPLITS) return;
                       const rect = e.currentTarget.getBoundingClientRect();
-                      const pct  = (e.clientX - rect.left) / rect.width;
-                      const yr   = Math.round(pct * (valYears - 1)) + 1;
+                      const pct = (e.clientX - rect.left) / rect.width;
+                      const yr = Math.round(pct * (valYears - 1)) + 1;
                       if (yr > 1 && yr < valYears && !sc.splitYears.includes(yr)) {
                         handleAddSplit(yr);
                         upd({ hoverYear: null });
@@ -510,10 +524,10 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
                     }}
                   >
                     {Array.from({ length: sc.splitYears.length + 1 }).map((_, i) => {
-                      const s    = i === 0 ? 1 : sc.splitYears[i - 1];
-                      const e2   = i === sc.splitYears.length ? valYears : sc.splitYears[i];
+                      const s = i === 0 ? 1 : sc.splitYears[i - 1];
+                      const e2 = i === sc.splitYears.length ? valYears : sc.splitYears[i];
                       const left = ((s - 1) / (valYears - 1)) * 100;
-                      const width= ((e2 - s) / (valYears - 1)) * 100;
+                      const width = ((e2 - s) / (valYears - 1)) * 100;
                       return <div key={i} className="absolute h-full bg-indigo-500 rounded-lg opacity-20" style={{ left: `${left}%`, width: `${width}%` }} />;
                     })}
                     {sc.hoverYear !== null && sc.splitYears.length < MAX_SPLITS && (
@@ -552,17 +566,17 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
                             return;
                           }
                           target.dataset.lastTap = now;
-                          
+
                           if (e.cancelable) e.preventDefault();
                           const track = e.currentTarget.parentElement;
                           if (!track) return;
                           upd({ draggingIndex: idx });
                           const onMove = (mv: TouchEvent) => {
-                            const rect    = track.getBoundingClientRect();
-                            const pct     = Math.max(0, Math.min(1, (mv.touches[0].clientX - rect.left) / rect.width));
-                            const newYr   = Math.round(pct * (valYears - 1)) + 1;
-                            const minYr   = idx === 0 ? 2 : sc.splitYears[idx - 1] + 1;
-                            const maxYr   = idx === sc.splitYears.length - 1 ? valYears - 1 : sc.splitYears[idx + 1] - 1;
+                            const rect = track.getBoundingClientRect();
+                            const pct = Math.max(0, Math.min(1, (mv.touches[0].clientX - rect.left) / rect.width));
+                            const newYr = Math.round(pct * (valYears - 1)) + 1;
+                            const minYr = idx === 0 ? 2 : sc.splitYears[idx - 1] + 1;
+                            const maxYr = idx === sc.splitYears.length - 1 ? valYears - 1 : sc.splitYears[idx + 1] - 1;
                             const clamped = Math.max(minYr, Math.min(maxYr, newYr));
                             upd({ splitYears: sc.splitYears.map((y, si) => si === idx ? clamped : y) });
                           };
@@ -581,11 +595,11 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
                           if (!track) return;
                           upd({ draggingIndex: idx });
                           const onMove = (mv: MouseEvent) => {
-                            const rect    = track.getBoundingClientRect();
-                            const pct     = Math.max(0, Math.min(1, (mv.clientX - rect.left) / rect.width));
-                            const newYr   = Math.round(pct * (valYears - 1)) + 1;
-                            const minYr   = idx === 0 ? 2 : sc.splitYears[idx - 1] + 1;
-                            const maxYr   = idx === sc.splitYears.length - 1 ? valYears - 1 : sc.splitYears[idx + 1] - 1;
+                            const rect = track.getBoundingClientRect();
+                            const pct = Math.max(0, Math.min(1, (mv.clientX - rect.left) / rect.width));
+                            const newYr = Math.round(pct * (valYears - 1)) + 1;
+                            const minYr = idx === 0 ? 2 : sc.splitYears[idx - 1] + 1;
+                            const maxYr = idx === sc.splitYears.length - 1 ? valYears - 1 : sc.splitYears[idx + 1] - 1;
                             const clamped = Math.max(minYr, Math.min(maxYr, newYr));
                             upd({ splitYears: sc.splitYears.map((y, si) => si === idx ? clamped : y) });
                           };
@@ -705,8 +719,8 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
                     {sc.simpleProjectionMethod === 'Per Share'
                       ? `The constant per-share growth rate required to justify the current buy price.`
                       : sc.simpleProjectionMethod === 'Metric, Share Count'
-                      ? `The constant ${lbl.metricName.toLowerCase()} growth rate required to justify the current buy price.`
-                      : `The constant revenue growth rate required to justify the current buy price.`}
+                        ? `The constant ${lbl.metricName.toLowerCase()} growth rate required to justify the current buy price.`
+                        : `The constant revenue growth rate required to justify the current buy price.`}
                   </div>
                 </button>
               </div>
@@ -724,7 +738,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, r
             {isSimple && (
               <p className="text-sm text-slate-500 mt-2 flex items-start gap-2">
                 <InfoIcon className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
-                This Basic DCF method does not discount yearly cash flows. Instead, it treats the exit price at year {valYears || 'N'} as the sole cash flow, discounting it back to present value. This approach is more conservative and places greater emphasis on price appreciation rather than interim income.
+                This Basic DCF method does not discount yearly cash flows. Instead, it treats the exit price at year {valYears || 'N'} as the sole cash flow, discounting it back to present value. This approach places greater emphasis on price appreciation rather and does not account for interim income.
               </p>
             )}
           </div>

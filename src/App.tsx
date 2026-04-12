@@ -870,13 +870,6 @@ export default function App() {
               >
                 {isSaving ? 'Saving...' : 'Load Sample Valuation'}
               </button>
-              <button
-                onClick={() => setShowResetAllModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg text-sm font-medium transition-colors border border-red-200"
-              >
-                <RotateCcw className="w-4 h-4" />
-                Reset All Scenarios
-              </button>
             </div>
           </div>
         </header>
@@ -1068,6 +1061,7 @@ export default function App() {
           totalScenarios={scenarios.length}
           onUpdate={updateScenario}
           onDelete={deleteScenario}
+          onResetAll={() => setShowResetAllModal(true)}
           results={activeResults}
         />
 
