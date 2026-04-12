@@ -124,7 +124,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
           return (
             <div key={i}>
               <h3 className="text-sm font-medium text-slate-800 mb-2">Phase {i + 1} (Yrs {s}-{e})</h3>
-              <div className="grid grid-cols-2 gap-4 items-end">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">FCF Growth (%)</label>
                   <NumericFormat value={sc.metricGrowthRatesTotal[i]} onValueChange={v => { const n = [...sc.metricGrowthRatesTotal]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ metricGrowthRatesTotal: n }); }} className={INPUT_CLS} />
@@ -140,7 +140,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
       </div>
     );
     return (
-      <div className="grid grid-cols-2 gap-4 items-end">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
         <div>
           <label className="block text-xs font-medium text-slate-600 mb-1">FCF Growth (%)</label>
           <NumericFormat value={sc.metricGrowthRatesTotal[0]} onValueChange={v => { const n = [...sc.metricGrowthRatesTotal]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ metricGrowthRatesTotal: n }); }} className={INPUT_CLS} />
@@ -162,7 +162,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
           return (
             <div key={i}>
               <h3 className="text-sm font-medium text-slate-800 mb-2">Phase {i + 1} (Yrs {s}-{e})</h3>
-              <div className="grid grid-cols-3 gap-3 items-end">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
                 <div>
                   <label className="block text-xs font-medium text-slate-600 mb-1">Rev Growth (%)</label>
                   <NumericFormat value={sc.revenueGrowthRates[i]} onValueChange={v => { const n = [...sc.revenueGrowthRates]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ revenueGrowthRates: n }); }} className={INPUT_CLS} />
@@ -182,7 +182,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
       </div>
     );
     return (
-      <div className="grid grid-cols-3 gap-3 items-end">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
         <div>
           <label className="block text-xs font-medium text-slate-600 mb-1">Rev Growth (%)</label>
           <NumericFormat value={sc.revenueGrowthRates[0]} onValueChange={v => { const n = [...sc.revenueGrowthRates]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ revenueGrowthRates: n }); }} className={INPUT_CLS} />
@@ -353,7 +353,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
                 <label className="block text-sm font-medium text-slate-600 mb-1">Buy Price ($)</label>
                 <NumericFormat value={sc.buyPrice} onValueChange={v => upd({ buyPrice: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
               </div>
-              <div className="grid grid-cols-2 gap-4 items-end">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
                   <label className="block text-sm font-medium text-slate-600 mb-1">Years to Forecast (Max {maxYears})</label>
                   <NumericFormat
@@ -428,7 +428,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
                     <span className="text-sm font-medium text-slate-600">Values in Millions</span>
                     <Toggle checked={sc.simpleInMillions} onChange={() => upd({ simpleInMillions: !sc.simpleInMillions })} />
                   </div>
-                  <div className="grid grid-cols-2 gap-4 items-end">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                     <div>
                       <label className="block text-sm font-medium text-slate-600 mb-1">Current {lbl.metricName} {sc.simpleInMillions ? '(M)' : ''}</label>
                       <NumericFormat value={sc.simpleCurrentMetricTotal} onValueChange={v => upd({ simpleCurrentMetricTotal: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
@@ -438,7 +438,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
                       <NumericFormat value={sc.simpleMetricGrowthRateTotal} onValueChange={v => upd({ simpleMetricGrowthRateTotal: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 items-end">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                     <div>
                       <label className="block text-sm font-medium text-slate-600 mb-1">Shares {sc.simpleInMillions ? '(M)' : ''}</label>
                       <NumericFormat value={sc.simpleCurrentShares} onValueChange={v => upd({ simpleCurrentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
@@ -457,7 +457,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
                     <span className="text-sm font-medium text-slate-600">Values in Millions</span>
                     <Toggle checked={sc.simpleInMillions} onChange={() => upd({ simpleInMillions: !sc.simpleInMillions })} />
                   </div>
-                  <div className="grid grid-cols-2 gap-4 items-end">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                     <div>
                       <label className="block text-sm font-medium text-slate-600 mb-1">Current Revenue {sc.simpleInMillions ? '(M)' : ''}</label>
                       <NumericFormat value={sc.simpleCurrentRevenue} onValueChange={v => upd({ simpleCurrentRevenue: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
@@ -471,7 +471,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
                     <label className="block text-sm font-medium text-slate-600 mb-1">Final {lbl.metricName} Margin (%)</label>
                     <NumericFormat value={sc.simpleFinalMargin} onValueChange={v => upd({ simpleFinalMargin: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                   </div>
-                  <div className="grid grid-cols-2 gap-4 items-end">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                     <div>
                       <label className="block text-sm font-medium text-slate-600 mb-1">Shares {sc.simpleInMillions ? '(M)' : ''}</label>
                       <NumericFormat value={sc.simpleCurrentShares} onValueChange={v => upd({ simpleCurrentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
@@ -509,7 +509,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
                     <span className="text-sm font-medium text-slate-600">Values in Millions</span>
                     <Toggle checked={sc.inMillions} onChange={() => upd({ inMillions: !sc.inMillions })} />
                   </div>
-                  <div className="grid grid-cols-2 gap-4 items-end">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                     <div>
                       <label className="block text-sm font-medium text-slate-600 mb-1">Current FCF {sc.inMillions ? '(M)' : ''}</label>
                       <NumericFormat value={sc.currentMetricTotal} onValueChange={v => upd({ currentMetricTotal: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
@@ -528,7 +528,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
                     <span className="text-sm font-medium text-slate-600">Values in Millions</span>
                     <Toggle checked={sc.inMillions} onChange={() => upd({ inMillions: !sc.inMillions })} />
                   </div>
-                  <div className="grid grid-cols-2 gap-4 items-end">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                     <div>
                       <label className="block text-sm font-medium text-slate-600 mb-1">Current Revenue {sc.inMillions ? '(M)' : ''}</label>
                       <NumericFormat value={sc.currentRevenue} onValueChange={v => upd({ currentRevenue: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />

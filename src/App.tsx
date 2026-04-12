@@ -794,13 +794,13 @@ export default function App() {
     <div
       onDragOver={handleDragOver}
       onDrop={handleDrop}
-      className="min-h-screen bg-[#f5f5f5] text-slate-900 p-4 md:p-8"
+      className="min-h-screen w-full max-w-[100vw] overflow-x-hidden bg-[#f5f5f5] text-slate-900 p-4 md:p-8"
       style={{ fontFamily: "'Inter', sans-serif" }}
     >
       <div className={`max-w-7xl mx-auto space-y-6 ${showSaveSuccessModal ? 'pointer-events-none select-none' : ''}`}>
 
         <header className="mb-6">
-          <div className="flex items-center justify-between gap-4 mb-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             <div className="flex items-center gap-4">
               <Calculator className="w-14 h-14 text-indigo-600 shrink-0" />
               <div className="flex flex-col justify-center">
@@ -812,9 +812,9 @@ export default function App() {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center self-start md:self-auto gap-2">
               {currentUser ? (
-                <div className="text-right">
+                <div className="text-left md:text-right">
                   <button
                     onClick={() => {
                       setAccountUsername(currentUser.username);
@@ -947,8 +947,7 @@ export default function App() {
             <div className="text-sm font-semibold text-slate-700 px-1">Scenarios</div>
             <div
               ref={tabsContainerRef}
-              className="flex items-center gap-2 overflow-x-auto overflow-y-hidden pb-1 min-w-0 [&::-webkit-scrollbar]:hidden"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+              className="flex flex-wrap items-center gap-2 pb-1 min-w-0"
             >
               {scenarios.map((sc, index) => {
                 const isActive = sc.id === activeScenarioId;
@@ -984,25 +983,25 @@ export default function App() {
 
               {scenarios.length < MAX_SCENARIOS && (
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <div className="relative tab-add-btn">
+                  <div className="relative group">
                     <button
                       onClick={addScenario}
                       className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-200/60 hover:bg-white hover:border-slate-200 border border-transparent text-slate-400 hover:text-indigo-600 transition-all"
                     >
                       <PlusIcon className="w-4 h-4" />
                     </button>
-                    <div className="tab-tooltip absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none">
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
                       Add Scenario
                     </div>
                   </div>
-                  <div className="relative tab-add-btn">
+                  <div className="relative group">
                     <button
                       onClick={() => duplicateScenario(activeScenarioId)}
                       className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-200/60 hover:bg-white hover:border-slate-200 border border-transparent text-slate-400 hover:text-indigo-600 transition-all"
                     >
                       <Copy className="w-4 h-4" />
                     </button>
-                    <div className="tab-tooltip absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none">
+                    <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
                       Duplicate Scenario
                     </div>
                   </div>
@@ -1097,7 +1096,7 @@ export default function App() {
       {/* Download Modal */}
       {showDownloadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Save Valuation</h3>
             <p className="text-sm text-slate-500 mb-4">Enter a name for your valuation file:</p>
             <input
@@ -1122,7 +1121,7 @@ export default function App() {
       {/* Upload Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Upload Valuation</h3>
             <p className="text-sm text-slate-500 mb-6">
               {currentUser
@@ -1149,7 +1148,7 @@ export default function App() {
       {/* Retain Guest Data Modal */}
       {showRetainGuestModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Save your current work?</h3>
             <p className="text-sm text-slate-500 mb-5">
               You have valuation data from your pre-login session. Give it a name to save it to your account, or discard and proceed with the login.
@@ -1188,7 +1187,7 @@ export default function App() {
       {/* Sample Scenarios Modal */}
       {showSampleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Load Sample Valuation</h3>
             <p className="text-sm text-slate-500 mb-6">
               Loading a sample valuation will replace all your current scenarios. Any unsaved changes will be lost. Do you want to proceed?
@@ -1231,7 +1230,7 @@ export default function App() {
       {/* Reset All Modal */}
       {showResetAllModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Reset All Scenarios?</h3>
             <p className="text-sm text-slate-500 mb-6">
               Are you sure you want to delete all current scenarios for this valuation and start over with a blank slate? This action cannot be undone.
@@ -1282,7 +1281,7 @@ export default function App() {
       {/* Delete Valuation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Delete Valuation?</h3>
             <p className="text-sm text-slate-500 mb-6">
               This action cannot be undone.
@@ -1308,7 +1307,7 @@ export default function App() {
       {/* Login Modal */}
       {showLoginModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
             <div className="flex border-b border-slate-200 mb-4">
               <button
                 onClick={() => { setActiveTab('login'); setLoginError(''); setSignupError(''); }}
@@ -1424,7 +1423,7 @@ export default function App() {
       {/* Signup Success Modal */}
       {showSignupSuccessModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
             <div className="text-center">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Check className="w-6 h-6 text-green-600" />
@@ -1439,7 +1438,7 @@ export default function App() {
       {/* Save As New Modal */}
       {showSaveAsModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Save As New Valuation</h3>
             <p className="text-sm text-slate-500 mb-4">Enter a name for the new valuation:</p>
             <input
@@ -1525,7 +1524,7 @@ export default function App() {
       {/* Rename Modal */}
       {isRenaming && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Rename Valuation</h3>
             <p className="text-sm text-slate-500 mb-4">Enter the new name for your valuation:</p>
             <input
@@ -1550,7 +1549,7 @@ export default function App() {
       {/* Account Settings Modal */}
       {showAccountModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 animate-in fade-in zoom-in-95">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-slate-900">Account Settings</h3>
               <button
