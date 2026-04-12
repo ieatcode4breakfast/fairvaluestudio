@@ -39,7 +39,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
   }, [sc.id, onUpdate]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 md:p-6">
 
       {/* ══ LEFT: INPUTS ══ */}
       <div className="lg:col-span-4 space-y-6">
