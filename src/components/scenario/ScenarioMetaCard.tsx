@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Scenario } from '../../types';
-import { Trash2, RotateCcw } from '../Icons';
+import { Trash2, RotateCcw, Copy } from '../Icons';
 import { INPUT_CLS } from '../../utils/constants';
 
 interface ScenarioMetaCardProps {
@@ -8,10 +8,11 @@ interface ScenarioMetaCardProps {
   canDelete: boolean;
   onDeleteClick: () => void;
   onResetAll: () => void;
+  onDuplicateClick: () => void;
   onUpdate: (changes: Partial<Scenario>) => void;
 }
 
-export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onResetAll, onUpdate }: ScenarioMetaCardProps) {
+export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onResetAll, onDuplicateClick, onUpdate }: ScenarioMetaCardProps) {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const deleteTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -36,18 +37,6 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onResetAll, onU
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-      {canDelete && (
-        <button
-          onClick={handleDeleteClick}
-          className={`w-full mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${deleteConfirm
-            ? 'bg-red-600 hover:bg-red-700 text-white border-red-600'
-            : 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200'
-            }`}
-        >
-          <Trash2 className="w-4 h-4" />
-          {deleteConfirm ? 'Are you sure? Click to confirm' : 'Delete Scenario'}
-        </button>
-      )}
       <button
         onClick={onResetAll}
         className="w-full mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors"
@@ -67,6 +56,14 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onResetAll, onU
       />
 
       <button
+        onClick={onDuplicateClick}
+        className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 transition-colors"
+      >
+        <Copy className="w-4 h-4" />
+        Duplicate Scenario
+      </button>
+
+      <button
         onClick={() => {
           if (!sc.showResetConfirm) {
             onUpdate({ showResetConfirm: true });
@@ -75,7 +72,7 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onResetAll, onU
             // we let the parent handle the FULL reset because we need createDefaultScenario. Wait, parent doesn't handle the inner reset right now!
             // No problem, we can pass a special flag or the parent has the scenario. let App handle it or we do it here. 
             // Better to handle reset here. But `createDefaultScenario` requires genId. I will just dispatch an event:
-            onUpdate({ _resetRequest: true } as any); 
+            onUpdate({ _resetRequest: true } as any);
           }
         }}
         className={`w-full mt-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${sc.showResetConfirm
@@ -85,6 +82,19 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onResetAll, onU
       >
         {sc.showResetConfirm ? 'Are you sure? (Click to confirm)' : 'Reset Scenario'}
       </button>
+
+      {canDelete && (
+        <button
+          onClick={handleDeleteClick}
+          className={`w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${deleteConfirm
+            ? 'bg-red-600 hover:bg-red-700 text-white border-red-600'
+            : 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200'
+            }`}
+        >
+          <Trash2 className="w-4 h-4" />
+          {deleteConfirm ? 'Are you sure? Click to confirm' : 'Delete Scenario'}
+        </button>
+      )}
 
       <div className="mt-4 pt-4 border-t border-slate-100">
         <label className="block text-sm font-medium text-slate-600 mb-1">Method</label>

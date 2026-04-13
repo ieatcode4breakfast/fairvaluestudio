@@ -13,11 +13,12 @@ interface ScenarioPanelProps {
   totalScenarios: number;
   onUpdate: (id: number, changes: Partial<Scenario>) => void;
   onDelete: (id: number) => void;
+  onDuplicate: (id: number) => void;
   onResetAll: () => void;
   results: Results;
 }
 
-export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, onResetAll, results }: ScenarioPanelProps) {
+export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, onDuplicate, onResetAll, results }: ScenarioPanelProps) {
   const [ignoreTrackClickUntil, setIgnoreTrackClickUntil] = useState(0);
 
   const canDelete = totalScenarios > 1;
@@ -34,7 +35,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
       });
       return;
     }
-    
+
     onUpdate(sc.id, changes);
   }, [sc.id, onUpdate]);
 
@@ -43,32 +44,33 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
 
       {/* ══ LEFT: INPUTS ══ */}
       <div className="lg:col-span-4 space-y-6">
-        
+
         {/* Meta card */}
-        <ScenarioMetaCard 
-          sc={sc} 
-          canDelete={canDelete} 
-          onDeleteClick={() => onDelete(sc.id)} 
-          onResetAll={onResetAll} 
-          onUpdate={handleUpdate} 
+        <ScenarioMetaCard
+          sc={sc}
+          canDelete={canDelete}
+          onDeleteClick={() => onDelete(sc.id)}
+          onResetAll={onResetAll}
+          onDuplicateClick={() => onDuplicate(sc.id)}
+          onUpdate={handleUpdate}
         />
 
         {/* COMBINED: Assumptions & Growth card wrapper */}
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-          
-          <AssumptionsCard 
-            sc={sc} 
-            results={results} 
-            onUpdate={handleUpdate} 
+
+          <AssumptionsCard
+            sc={sc}
+            results={results}
+            onUpdate={handleUpdate}
           />
 
-          <GrowthCard 
-            sc={sc} 
-            onUpdate={handleUpdate} 
+          <GrowthCard
+            sc={sc}
+            onUpdate={handleUpdate}
             ignoreTrackClickUntil={ignoreTrackClickUntil}
             setIgnoreTrackClickUntil={setIgnoreTrackClickUntil}
           />
-          
+
         </div>
       </div>
 
@@ -76,16 +78,16 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
       <div className="lg:col-span-8 space-y-6">
 
         {/* Key metric cards */}
-        <ResultsCard 
-          sc={sc} 
-          results={results} 
+        <ResultsCard
+          sc={sc}
+          results={results}
         />
 
         {/* Valuation Breakdown */}
-        <YearlyBreakdown 
-          sc={sc} 
-          results={results} 
-          onUpdate={handleUpdate} 
+        <YearlyBreakdown
+          sc={sc}
+          results={results}
+          onUpdate={handleUpdate}
         />
 
       </div>

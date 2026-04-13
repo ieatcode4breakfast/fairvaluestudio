@@ -388,6 +388,7 @@ export default function App() {
               totalScenarios={scenarios.length}
               onUpdate={updateScenario}
               onDelete={deleteScenario}
+              onDuplicate={duplicateScenario}
               onResetAll={() => setShowResetAllConfirm(true)}
               results={activeResults}
             />
