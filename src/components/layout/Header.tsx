@@ -36,7 +36,7 @@ export function Header(props: HeaderProps) {
                 FairValue Studio
               </h1>
               <p className="text-slate-500 text-sm">
-                A multi-scenario valuation tool featuring basic DCF calculation and advanced, multi-phase growth forecasting.
+                Welcome to FairValue Studio, a multi-scenario valuation tool featuring basic DCF calculation and advanced, multi-phase growth forecasting.
               </p>
             </div>
           </div>
