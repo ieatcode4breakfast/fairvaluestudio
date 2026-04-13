@@ -7,12 +7,11 @@ interface ScenarioMetaCardProps {
   sc: Scenario;
   canDelete: boolean;
   onDeleteClick: () => void;
-  onResetAll: () => void;
   onDuplicateClick: () => void;
   onUpdate: (changes: Partial<Scenario>) => void;
 }
 
-export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onResetAll, onDuplicateClick, onUpdate }: ScenarioMetaCardProps) {
+export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClick, onUpdate }: ScenarioMetaCardProps) {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const deleteTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -37,14 +36,6 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onResetAll, onD
 
   return (
     <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-      <button
-        onClick={onResetAll}
-        className="w-full mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-colors"
-      >
-        <RotateCcw className="w-4 h-4" />
-        Reset All Scenarios
-      </button>
-
       <label className="block text-sm font-medium text-slate-600 mb-1">Scenario Name</label>
       <input
         type="text"

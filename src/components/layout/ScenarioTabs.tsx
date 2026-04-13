@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlusIcon } from '../Icons';
+import { PlusIcon, RotateCcw } from '../Icons';
 import { Scenario } from '../../types';
 import { MAX_SCENARIOS } from '../../utils/constants';
 
@@ -16,6 +16,7 @@ interface ScenarioTabsProps {
   handleDragEnd: () => void;
   addScenario: () => void;
   duplicateScenario: (id: number) => void;
+  onResetAll: () => void;
 
   tabsContainerRef: React.RefObject<HTMLDivElement>;
 
@@ -73,6 +74,17 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
                 </button>
                 <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
                   Add Scenario
+                </div>
+              </div>
+              <div className="relative group">
+                <button
+                  onClick={props.onResetAll}
+                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-200/60 hover:bg-white hover:border-slate-200 border border-transparent text-slate-400 hover:text-indigo-600 transition-all"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                </button>
+                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
+                  Reset All Scenarios
                 </div>
               </div>
             </div>

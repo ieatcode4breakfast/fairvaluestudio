@@ -14,11 +14,10 @@ interface ScenarioPanelProps {
   onUpdate: (id: number, changes: Partial<Scenario>) => void;
   onDelete: (id: number) => void;
   onDuplicate: (id: number) => void;
-  onResetAll: () => void;
   results: Results;
 }
 
-export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, onDuplicate, onResetAll, results }: ScenarioPanelProps) {
+export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, onDuplicate, results }: ScenarioPanelProps) {
   const [ignoreTrackClickUntil, setIgnoreTrackClickUntil] = useState(0);
 
   const canDelete = totalScenarios > 1;
@@ -50,7 +49,6 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
           sc={sc}
           canDelete={canDelete}
           onDeleteClick={() => onDelete(sc.id)}
-          onResetAll={onResetAll}
           onDuplicateClick={() => onDuplicate(sc.id)}
           onUpdate={handleUpdate}
         />

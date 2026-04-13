@@ -377,6 +377,7 @@ export default function App() {
                 handleDragEnd={handleDragEnd}
                 addScenario={addScenario}
                 duplicateScenario={duplicateScenario}
+                onResetAll={() => setShowResetAllConfirm(true)}
                 tabsContainerRef={tabsContainerRef}
               />
             </div>
@@ -389,7 +390,6 @@ export default function App() {
               onUpdate={updateScenario}
               onDelete={deleteScenario}
               onDuplicate={duplicateScenario}
-              onResetAll={() => setShowResetAllConfirm(true)}
               results={activeResults}
             />
           </div>
