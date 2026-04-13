@@ -355,6 +355,10 @@ export default function App() {
           setIsRenaming={setIsRenaming}
           setShowSaveAsModal={(s) => { setSaveAsName(`${userValuations.find(v => v.id === loadedValuationId)?.valuationName || 'Valuation'} (Copy)`); setShowSaveAsModal(s); }}
           setShowDeleteModal={setShowDeleteConfirm}
+          setShowDownloadModal={setShowDownloadModal}
+          setShowUploadModal={setShowUploadModal}
+          setDownloadFilename={setDownloadFilename}
+          defaultDownloadName={currentUser && loadedValuationId ? (userValuations.find(v => v.id === loadedValuationId)?.valuationName || 'valuation') : 'valuation'}
         />
 
         {(!currentUser || (currentUser && userValuations.length > 0)) && (
@@ -374,10 +378,6 @@ export default function App() {
                 addScenario={addScenario}
                 duplicateScenario={duplicateScenario}
                 tabsContainerRef={tabsContainerRef}
-                setShowDownloadModal={setShowDownloadModal}
-                setShowUploadModal={setShowUploadModal}
-                setDownloadFilename={setDownloadFilename}
-                defaultDownloadName={currentUser && loadedValuationId ? (userValuations.find(v => v.id === loadedValuationId)?.valuationName || 'valuation') : 'valuation'}
               />
             </div>
 

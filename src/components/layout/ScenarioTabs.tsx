@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlusIcon, Copy, DownloadIcon, UploadIcon } from '../Icons';
+import { PlusIcon, Copy } from '../Icons';
 import { Scenario } from '../../types';
 import { MAX_SCENARIOS } from '../../utils/constants';
 
@@ -16,13 +16,9 @@ interface ScenarioTabsProps {
   handleDragEnd: () => void;
   addScenario: () => void;
   duplicateScenario: (id: number) => void;
-  
+
   tabsContainerRef: React.RefObject<HTMLDivElement>;
 
-  setShowDownloadModal: (s: boolean) => void;
-  setShowUploadModal: (s: boolean) => void;
-  setDownloadFilename: (name: string) => void;
-  defaultDownloadName: string;
 }
 
 export function ScenarioTabs(props: ScenarioTabsProps) {
@@ -95,26 +91,6 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
         </div>
       </div>
 
-      {/* Right: download + upload */}
-      <div className="flex items-center gap-2 flex-shrink-0 mb-1">
-        <button
-          onClick={() => {
-            props.setDownloadFilename(props.defaultDownloadName);
-            props.setShowDownloadModal(true);
-          }}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all"
-        >
-          <DownloadIcon className="w-4 h-4" />
-          <span className="hidden sm:inline">Download Valuation (.json)</span>
-        </button>
-        <button
-          onClick={() => props.setShowUploadModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border shadow-sm transition-all bg-white border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200"
-        >
-          <UploadIcon className="w-4 h-4" />
-          <span className="hidden sm:inline">Upload Valuation (.json)</span>
-        </button>
-      </div>
     </div>
   );
 }
