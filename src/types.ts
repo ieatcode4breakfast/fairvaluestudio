@@ -64,6 +64,7 @@ export interface User {
   username: string;
   email: string;
   lastActiveValuationId?: string;
+  notes?: string;
 }
 
 export interface ValuationMetadata {
