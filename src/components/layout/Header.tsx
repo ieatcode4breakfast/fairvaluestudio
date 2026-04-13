@@ -12,14 +12,14 @@ interface HeaderProps {
   onLogoutClick: () => void;
   onAccountClick: () => void;
   onSampleClick: () => void;
-  
+
   setNewValuationName: (name: string) => void;
   setShowNewValuationModal: (s: boolean) => void;
   handleLoadValuation: (id: string) => void;
-  
+
   setEditValuationName: (name: string) => void;
   setIsRenaming: (s: boolean) => void;
-  
+
   setShowSaveAsModal: (s: boolean) => void;
   setShowDeleteModal: (s: boolean) => void;
 }
@@ -27,7 +27,7 @@ interface HeaderProps {
 export function Header(props: HeaderProps) {
   return (
     <>
-      <header className="mb-6">
+      <header className="mb-50">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4">
             <Calculator className="w-14 h-14 text-indigo-600 shrink-0" />
@@ -124,9 +124,9 @@ export function Header(props: HeaderProps) {
               </select>
               {props.loadedValuationId && (
                 <button
-                  onClick={() => { 
-                    props.setEditValuationName(props.userValuations.find(v => v.id === props.loadedValuationId)?.valuationName || ''); 
-                    props.setIsRenaming(true); 
+                  onClick={() => {
+                    props.setEditValuationName(props.userValuations.find(v => v.id === props.loadedValuationId)?.valuationName || '');
+                    props.setIsRenaming(true);
                   }}
                   className="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:text-indigo-600 hover:border-indigo-200 transition-colors shadow-sm"
                   title="Rename Valuation"
