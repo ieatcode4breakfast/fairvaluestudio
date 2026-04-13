@@ -27,7 +27,7 @@ interface HeaderProps {
 export function Header(props: HeaderProps) {
   return (
     <>
-      <header className="mb-50">
+      <header className="mb-6">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4">
             <Calculator className="w-14 h-14 text-indigo-600 shrink-0" />
