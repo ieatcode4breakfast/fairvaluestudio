@@ -70,16 +70,17 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onResetAll, onD
             setTimeout(() => onUpdate({ showResetConfirm: false }), 3000);
           } else {
             // we let the parent handle the FULL reset because we need createDefaultScenario. Wait, parent doesn't handle the inner reset right now!
-            // No problem, we can pass a special flag or the parent has the scenario. let App handle it or we do it here. 
+            // No problem, we can pass a special flag or the parent has the scenario. let App handle it or we do it here.
             // Better to handle reset here. But `createDefaultScenario` requires genId. I will just dispatch an event:
             onUpdate({ _resetRequest: true } as any);
           }
         }}
-        className={`w-full mt-3 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${sc.showResetConfirm
+        className={`w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${sc.showResetConfirm
           ? 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200'
           : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
           }`}
       >
+        <RotateCcw className="w-4 h-4" />
         {sc.showResetConfirm ? 'Are you sure? (Click to confirm)' : 'Reset Scenario'}
       </button>
 
