@@ -7,7 +7,7 @@ export function DownloadModal({ show, setShow, filename, setFilename, onDownload
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
-        <h3 className="text-lg font-medium text-slate-900 mb-2">Save Valuation</h3>
+        <h3 className="text-lg font-medium text-slate-900 mb-2">Download Valuation</h3>
         <p className="text-sm text-slate-500 mb-4">Enter a name for your valuation file:</p>
         <input
           type="text"
