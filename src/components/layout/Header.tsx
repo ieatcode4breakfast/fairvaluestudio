@@ -138,11 +138,13 @@ export function Header(props: HeaderProps) {
                 >
                   <option value="NEW" className="font-semibold text-indigo-600">✨ New valuation...</option>
                   {props.userValuations.length > 0 && <option disabled>──────────</option>}
-                  {props.userValuations.map((val) => (
-                    <option key={val.id} value={val.id}>
-                      {val.valuationName}
-                    </option>
-                  ))}
+                  {[...props.userValuations]
+                    .sort((a, b) => a.valuationName.localeCompare(b.valuationName))
+                    .map((val) => (
+                      <option key={val.id} value={val.id}>
+                        {val.valuationName}
+                      </option>
+                    ))}
                 </select>
                 {props.loadedValuationId && (
                   <button
