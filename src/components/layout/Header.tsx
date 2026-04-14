@@ -1,5 +1,5 @@
-import React from 'react';
-import { Calculator, DownloadIcon, UploadIcon } from '../Icons';
+import React, { useState } from 'react';
+import { Calculator, DownloadIcon, UploadIcon, ChevronDown, ChevronUp } from '../Icons';
 import { User, ValuationMetadata } from '../../types';
 
 interface HeaderProps {
@@ -30,6 +30,7 @@ interface HeaderProps {
 }
 
 export function Header(props: HeaderProps) {
+  const [isHowToUseExpanded, setIsHowToUseExpanded] = useState(false);
   return (
     <>
       <header className="mb-6">
@@ -71,26 +72,41 @@ export function Header(props: HeaderProps) {
             )}
           </div>
         </div>
-        <div className="text-slate-600 text-sm leading-relaxed bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-          <p className="font-semibold mb-2 text-slate-800">How to use:</p>
-          <ul className="list-disc pl-5 space-y-1.5 text-slate-600 mb-4">
-            <li><strong>Guest vs. Account:</strong> Use the app as a guest and save or load your data by manually downloading/uploading your valuations. Creating an account unlocks automatic cloud saves, real-time cross-device syncing, and the ability to store and manage multiple valuations at once.</li>
-            <li><strong>Choose a Method:</strong> Select "Basic DCF" for a quick estimate or "Advanced DCF" for detailed, multi-phase growth projections.</li>
-            <li><strong>Configure Phases (Advanced):</strong> Click the timeline track to add growth phases. Drag the dots to adjust the years, or double-click/tap to remove them.</li>
-            <li><strong>Enter Assumptions:</strong> Fill in your estimates for cash flows, growth rates, margins, and discount rates.</li>
-            <li><strong>Compare Scenarios:</strong> Use the tabs to create and compare up to 10 different scenarios.</li>
-            <li><strong>Save & Load:</strong> Use the Download and Upload buttons to save your scenarios to a file and load them later.</li>
-            <li><strong>Text Summary Pro Tip:</strong> After finishing your inputs, copy the text summary at the bottom and paste into an AI chatbot for deeper analysis, sanity checks, or qualitative insights.</li>
-          </ul>
-          <div className="flex items-center justify-between mt-4">
-            <button
-              onClick={props.onSampleClick}
-              disabled={props.isSaving}
-              className="px-4 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-sm font-medium transition-colors border border-indigo-200 disabled:opacity-50"
-            >
-              {props.isSaving ? 'Saving...' : 'Load Sample Valuation'}
-            </button>
-          </div>
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+          <button
+            onClick={() => setIsHowToUseExpanded(!isHowToUseExpanded)}
+            className="w-full p-4 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors"
+          >
+            <h2 className="text-sm font-semibold text-slate-800">How to Use</h2>
+            {isHowToUseExpanded ? (
+              <ChevronUp className="w-5 h-5 text-slate-400" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-slate-400" />
+            )}
+          </button>
+
+          {isHowToUseExpanded && (
+            <div className="p-5 pt-0 border-t border-slate-100 text-slate-600 text-sm leading-relaxed">
+              <ul className="list-disc pl-5 space-y-1.5 text-slate-600 mb-4">
+                <li><strong>Guest vs. Account:</strong> Use the app as a guest and save or load your data by manually downloading/uploading your valuations. Creating an account unlocks automatic cloud saves, real-time cross-device syncing, and the ability to store and manage multiple valuations at once.</li>
+                <li><strong>Choose a Method:</strong> Select "Basic DCF" for a quick estimate or "Advanced DCF" for detailed, multi-phase growth projections.</li>
+                <li><strong>Configure Phases (Advanced):</strong> Click the timeline track to add growth phases. Drag the dots to adjust the years, or double-click/tap to remove them.</li>
+                <li><strong>Enter Assumptions:</strong> Fill in your estimates for cash flows, growth rates, margins, and discount rates.</li>
+                <li><strong>Compare Scenarios:</strong> Use the tabs to create and compare up to 10 different scenarios.</li>
+                <li><strong>Save & Load:</strong> Use the Download and Upload buttons to save your scenarios to a file and load them later.</li>
+                <li><strong>Text Summary Pro Tip:</strong> After finishing your inputs, copy the text summary at the bottom and paste into an AI chatbot for deeper analysis, sanity checks, or qualitative insights.</li>
+              </ul>
+              <div className="flex items-center justify-between mt-4">
+                <button
+                  onClick={props.onSampleClick}
+                  disabled={props.isSaving}
+                  className="px-4 py-2 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-sm font-medium transition-colors border border-indigo-200 disabled:opacity-50"
+                >
+                  {props.isSaving ? 'Saving...' : 'Load Sample Valuation'}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
@@ -161,7 +177,7 @@ export function Header(props: HeaderProps) {
             </div>
           </div>
         )}
-        
+
         <div className="flex items-center gap-2 ml-auto">
           <button
             onClick={() => {
