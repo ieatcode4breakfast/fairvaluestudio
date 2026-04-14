@@ -51,7 +51,7 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
         className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 transition-colors"
       >
         <Copy className="w-4 h-4" />
-        Duplicate Scenario
+        Copy Scenario
       </button>
 
       <button
