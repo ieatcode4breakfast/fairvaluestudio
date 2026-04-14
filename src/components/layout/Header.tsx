@@ -34,27 +34,18 @@ export function Header(props: HeaderProps) {
   return (
     <>
       <header className="mb-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-          <div className="flex items-center gap-4">
-            <Calculator className="w-14 h-14 text-indigo-600 shrink-0" />
-            <div className="flex flex-col justify-center">
-              <h1 className="text-3xl font-light tracking-tight mb-1">
-                FairValue Studio
-              </h1>
-              <p className="text-slate-500 text-sm">
-                Welcome to FairValue Studio, a multi-scenario valuation tool featuring basic DCF calculation and advanced, multi-phase growth forecasting.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center self-start md:self-auto gap-2">
+        {/* User / Auth Bar */}
+        <div className="flex justify-end mb-2">
+          <div className="flex items-center gap-2">
             {props.currentUser ? (
-              <div className="text-left md:text-right">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={props.onAccountClick}
                   className="text-sm font-medium text-slate-700 hover:text-indigo-600 transition-colors cursor-pointer"
                 >
                   Hi, {props.currentUser.username}!
                 </button>
+                <div className="w-px h-4 bg-slate-200 mx-1" />
                 <button
                   onClick={props.onLogoutClick}
                   className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
@@ -70,6 +61,18 @@ export function Header(props: HeaderProps) {
                 Log in
               </button>
             )}
+          </div>
+        </div>
+
+        <div className="flex items-start gap-4 mb-6">
+          <Calculator className="w-14 h-14 text-indigo-600 shrink-0 mt-1" />
+          <div className="flex flex-col justify-center">
+            <h1 className="text-3xl font-light tracking-tight mb-1">
+              FairValue Studio
+            </h1>
+            <p className="text-slate-500 text-sm max-w-2xl">
+              Welcome to FairValue Studio, a multi-scenario valuation tool featuring basic DCF calculation and advanced, multi-phase growth forecasting.
+            </p>
           </div>
         </div>
         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
@@ -113,8 +116,8 @@ export function Header(props: HeaderProps) {
       {/* Load Valuation Dropdown */}
       <div className="flex flex-wrap items-end justify-between gap-4 mb-4">
         {props.currentUser && (
-          <div className="flex flex-wrap items-end gap-4">
-            <div className="flex flex-col gap-2 px-1 min-w-[280px]">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-end w-full sm:w-auto gap-4">
+            <div className="flex flex-col gap-2 w-full sm:min-w-[320px]">
               <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
                 Valuations
                 {props.loadedValuationId && (
@@ -123,7 +126,7 @@ export function Header(props: HeaderProps) {
                   </span>
                 )}
               </label>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex items-center w-full gap-2">
                 <select
                   value={props.loadedValuationId ?? 'NEW'}
                   onChange={(e) => {
@@ -134,7 +137,7 @@ export function Header(props: HeaderProps) {
                       props.handleLoadValuation(e.target.value);
                     }
                   }}
-                  className="flex-1 w-full min-w-[200px] px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors shadow-sm"
+                  className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors shadow-sm"
                 >
                   <option value="NEW" className="font-semibold text-indigo-600">✨ New valuation...</option>
                   {props.userValuations.length > 0 && <option disabled>──────────</option>}
@@ -152,7 +155,7 @@ export function Header(props: HeaderProps) {
                       props.setEditValuationName(props.userValuations.find(v => v.id === props.loadedValuationId)?.valuationName || '');
                       props.setIsRenaming(true);
                     }}
-                    className="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:text-indigo-600 hover:border-indigo-200 transition-colors shadow-sm"
+                    className="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:text-indigo-600 hover:border-indigo-200 transition-colors shadow-sm whitespace-nowrap"
                     title="Rename Valuation"
                   >
                     Rename
@@ -161,17 +164,17 @@ export function Header(props: HeaderProps) {
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <button
                 onClick={() => props.setShowSaveAsModal(true)}
-                className="px-4 py-2 bg-white text-indigo-600 border border-indigo-200 rounded-lg text-sm font-medium hover:bg-indigo-50 transition-colors shadow-sm"
+                className="flex-1 px-4 py-2 bg-white text-indigo-600 border border-indigo-200 rounded-lg text-sm font-medium hover:bg-indigo-50 transition-colors shadow-sm whitespace-nowrap"
               >
                 Save As New
               </button>
               {props.loadedValuationId && (
                 <button
                   onClick={() => props.setShowDeleteModal(true)}
-                  className="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors border border-red-200"
+                  className="flex-1 px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors border border-red-200"
                 >
                   Delete
                 </button>
