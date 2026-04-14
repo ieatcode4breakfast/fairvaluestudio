@@ -18,7 +18,7 @@ interface ScenarioTabsProps {
   duplicateScenario: (id: number) => void;
   onResetAll: () => void;
 
-  tabsContainerRef: React.RefObject<HTMLDivElement>;
+  tabsContainerRef: React.RefObject<HTMLDivElement | null>;
 
 }
 
