@@ -59,7 +59,6 @@ export function cloneScenario(src: Scenario): Scenario {
   return {
     ...src,
     id: genId(),
-    scenarioName: '',
     splitYears:             [...src.splitYears],
     metricGrowthRates:      [...src.metricGrowthRates],
     metricGrowthRatesTotal: [...src.metricGrowthRatesTotal],

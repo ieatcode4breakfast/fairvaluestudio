@@ -108,6 +108,7 @@ export function useScenarios(currentUser: User | null) {
     const activeIndex = scenarios.findIndex(s => s.id === activeScenarioId);
     const src = activeIndex >= 0 ? scenarios[activeIndex] : scenarios[scenarios.length - 1];
     const newSc = cloneScenario(src);
+    newSc.scenarioName = `${newSc.scenarioName || 'Untitled'} (Copy)`;
     setScenarios([...scenarios, newSc]);
     setActiveScenarioId(newSc.id);
   }, [scenarios, activeScenarioId]);
