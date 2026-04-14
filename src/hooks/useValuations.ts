@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { ValuationMetadata, User, Scenario } from '../types';
-import { getUserValuations, getScenarios, createValuation, deleteValuation, renameValuation, updateLastActiveValuation } from '../api';
-import { createDefaultScenario } from '../utils/scenario';
+import { getUserValuations, getScenarios, createValuation, deleteValuation, renameValuation, updateLastActiveValuation, appendScenarioToValuation, getScenarioCount } from '../api';
+import { createDefaultScenario, cloneScenario } from '../utils/scenario';
 import { genId } from '../utils/genId';
 import { MAX_SCENARIOS, TRANSIENT_KEYS } from '../utils/constants';
 
@@ -125,6 +125,16 @@ export function useValuations(
     }
   };
 
+  const handleCopyScenarioToValuation = async (targetValuationId: string, scenario: Scenario) => {
+    const count = await getScenarioCount(targetValuationId);
+    if (count >= MAX_SCENARIOS) {
+      throw new Error(`Target valuation already has ${MAX_SCENARIOS} scenarios (the maximum).`);
+    }
+    const cleaned = cloneScenario(scenario);
+    cleaned.scenarioName = `${scenario.scenarioName || 'Untitled'} (Copy)`;
+    await appendScenarioToValuation(targetValuationId, cleaned);
+  };
+
   return {
     userValuations,
     setUserValuations,
@@ -136,6 +146,7 @@ export function useValuations(
     handleLoadValuation,
     handleCreateNewValuation,
     handleDeleteValuation,
-    handleRenameValuation
+    handleRenameValuation,
+    handleCopyScenarioToValuation
   };
 }

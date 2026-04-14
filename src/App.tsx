@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useCallback } from 'react';
 import { User, Scenario } from './types';
 import { getSampleScenarios } from './utils/sampleScenarios';
 import { computeSimple } from './utils/computeSimple';
@@ -20,7 +20,8 @@ import { Header } from './components/layout/Header';
 import { ScenarioTabs } from './components/layout/ScenarioTabs';
 import { AuthModal } from './components/modals/AuthModal';
 import { AccountModal } from './components/modals/AccountModal';
-import { Copy, PlusIcon } from './components/Icons'; // Ensure imported if needed locally, else remove
+import { CopyScenarioModal } from './components/modals/CopyScenarioModal';
+import { Copy, PlusIcon } from './components/Icons';
 import {
   DownloadModal,
   UploadModal,
@@ -47,7 +48,7 @@ export default function App() {
 
   const {
     userValuations, setUserValuations, hasFetchedValuations, loadedValuationId, setLoadedValuationId, isSaving, setIsSaving,
-    handleLoadValuation, handleCreateNewValuation, handleDeleteValuation, handleRenameValuation
+    handleLoadValuation, handleCreateNewValuation, handleDeleteValuation, handleRenameValuation, handleCopyScenarioToValuation
   } = useValuations(currentUser, setScenarios, setActiveScenarioId, setLastSavedState);
 
   const { pendingLoginUser, setPendingLoginUser, handleLogin, handleSignup, handleLogout } = useAuth(
@@ -100,6 +101,11 @@ export default function App() {
   const [isRenaming, setIsRenaming] = useState(false);
   const [editValuationName, setEditValuationName] = useState('');
   const [showResetAllConfirm, setShowResetAllConfirm] = useState(false);
+
+  // Copy Scenario Modal State
+  const [showCopyScenarioModal, setShowCopyScenarioModal] = useState(false);
+  const [isCopyingScenario, setIsCopyingScenario] = useState(false);
+  const pendingCopyScenarioRef = useRef<Scenario | null>(null);
 
   // Summary State
   const [showCopySuccess, setShowCopySuccess] = useState(false);
@@ -179,6 +185,15 @@ export default function App() {
     const initialScenarios = loadSample ? getSampleScenarios() : loadInitialScenarios();
     const newId = await handleCreateNewValuation(newValuationName, initialScenarios);
     if (newId) {
+      // If there's a pending copy scenario, append it to the newly created valuation
+      if (pendingCopyScenarioRef.current) {
+        try {
+          await handleCopyScenarioToValuation(newId, pendingCopyScenarioRef.current);
+        } catch (err) {
+          console.error('Failed to copy scenario to new valuation:', err);
+        }
+        pendingCopyScenarioRef.current = null;
+      }
       setShowNewValuationModal(false);
     }
   };
@@ -210,6 +225,33 @@ export default function App() {
     setScenarios(defaultSc);
     setActiveScenarioId(defaultSc[0].id);
     if (!currentUser) setLastSavedState(getCleanedScenariosString(defaultSc));
+  };
+
+  // Copy Scenario handlers
+  const handleCopyScenario = useCallback((id: number) => {
+    if (!currentUser) {
+      // Guest user: immediate local duplicate
+      duplicateScenario(id);
+      return;
+    }
+    // Logged-in user: open modal
+    setShowCopyScenarioModal(true);
+  }, [currentUser, duplicateScenario]);
+
+  const doCopyToOther = async (targetValuationId: string) => {
+    setIsCopyingScenario(true);
+    try {
+      await handleCopyScenarioToValuation(targetValuationId, activeScenario);
+    } finally {
+      setIsCopyingScenario(false);
+    }
+  };
+
+  const doCopyNewValuation = () => {
+    pendingCopyScenarioRef.current = activeScenario;
+    setShowCopyScenarioModal(false);
+    setNewValuationName('New Valuation');
+    setShowNewValuationModal(true);
   };
 
   const doDownload = () => {
@@ -389,7 +431,7 @@ export default function App() {
               totalScenarios={scenarios.length}
               onUpdate={updateScenario}
               onDelete={deleteScenario}
-              onDuplicate={duplicateScenario}
+              onDuplicate={handleCopyScenario}
               results={activeResults}
             />
           </div>
@@ -475,6 +517,18 @@ export default function App() {
       <DeleteModal show={showDeleteConfirm} setShow={setShowDeleteConfirm} onDelete={doDeleteValuation} />
       <RenameModal show={isRenaming} setShow={setIsRenaming} name={editValuationName} setName={setEditValuationName} onRename={doRenameValuation} />
       <RetainGuestModal show={showRetainGuestModal} name={retainValuationName} setName={setRetainValuationName} isSaving={isSaving} onRetain={doRetainGuest} />
+
+      <CopyScenarioModal
+        show={showCopyScenarioModal}
+        setShow={setShowCopyScenarioModal}
+        scenario={activeScenario}
+        userValuations={userValuations}
+        loadedValuationId={loadedValuationId}
+        isCopying={isCopyingScenario}
+        onCopyToThis={() => { duplicateScenario(activeScenario.id); }}
+        onCopyToOther={doCopyToOther}
+        onNewValuation={doCopyNewValuation}
+      />
 
       <GenericConfirmModal
         show={showResetAllConfirm} setShow={setShowResetAllConfirm}

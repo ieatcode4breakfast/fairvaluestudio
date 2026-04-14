@@ -206,3 +206,25 @@ export const updatePassword = async (newPassword: string): Promise<void> => {
   if (error) throw new Error(error.message);
 };
 
+export const getScenarioCount = async (valuationId: string): Promise<number> => {
+  const { count, error } = await supabase
+    .from('scenarios')
+    .select('*', { count: 'exact', head: true })
+    .eq('valuation_id', valuationId);
+
+  if (error) throw new Error(error.message);
+  return count ?? 0;
+};
+
+export const appendScenarioToValuation = async (valuationId: string, scenario: Scenario): Promise<void> => {
+  const { error } = await supabase
+    .from('scenarios')
+    .insert({
+      valuation_id: valuationId,
+      name: scenario.scenarioName || 'Untitled',
+      parameters: scenario
+    });
+
+  if (error) throw new Error(error.message);
+};
+
