@@ -137,7 +137,7 @@ export function Header(props: HeaderProps) {
                       props.handleLoadValuation(e.target.value);
                     }
                   }}
-                  className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors shadow-sm"
+                  className="flex-1 pl-3 pr-10 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors shadow-sm custom-select appearance-none"
                 >
                   <option value="NEW" className="font-semibold text-indigo-600">✨ New valuation...</option>
                   {props.userValuations.length > 0 && <option disabled>──────────</option>}
