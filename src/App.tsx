@@ -182,18 +182,19 @@ export default function App() {
 
   const doCreateValuation = async (loadSample: boolean) => {
     if (!newValuationName.trim()) return;
-    const initialScenarios = loadSample ? getSampleScenarios() : loadInitialScenarios();
+    let initialScenarios = loadSample ? getSampleScenarios() : loadInitialScenarios();
+
+    // If there's a pending copy scenario, bundle it into the initial scenarios
+    if (pendingCopyScenarioRef.current) {
+      const { cloneScenario } = await import('./utils/scenario');
+      const copied = cloneScenario(pendingCopyScenarioRef.current);
+      copied.scenarioName = `${pendingCopyScenarioRef.current.scenarioName || 'Untitled'} (Copy)`;
+      initialScenarios = [...initialScenarios, copied];
+      pendingCopyScenarioRef.current = null;
+    }
+
     const newId = await handleCreateNewValuation(newValuationName, initialScenarios);
     if (newId) {
-      // If there's a pending copy scenario, append it to the newly created valuation
-      if (pendingCopyScenarioRef.current) {
-        try {
-          await handleCopyScenarioToValuation(newId, pendingCopyScenarioRef.current);
-        } catch (err) {
-          console.error('Failed to copy scenario to new valuation:', err);
-        }
-        pendingCopyScenarioRef.current = null;
-      }
       setShowNewValuationModal(false);
     }
   };
