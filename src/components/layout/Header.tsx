@@ -90,95 +90,98 @@ export function Header(props: HeaderProps) {
             >
               {props.isSaving ? 'Saving...' : 'Load Sample Valuation'}
             </button>
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => {
-                  props.setDownloadFilename(props.defaultDownloadName);
-                  props.setShowDownloadModal(true);
-                }}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all"
-              >
-                <DownloadIcon className="w-4 h-4" />
-                <span className="hidden sm:inline">Download Valuation (.json)</span>
-              </button>
-              <button
-                onClick={() => props.setShowUploadModal(true)}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border shadow-sm transition-all bg-white border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200"
-              >
-                <UploadIcon className="w-4 h-4" />
-                <span className="hidden sm:inline">Upload Valuation (.json)</span>
-              </button>
-            </div>
           </div>
         </div>
       </header>
 
       {/* Load Valuation Dropdown */}
-      {props.currentUser && (
-        <div className="flex flex-wrap items-end gap-4 mb-4">
-          <div className="flex flex-col gap-2 px-1 min-w-[280px]">
-            <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-              Valuations
-              {props.loadedValuationId && (
-                <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full font-medium">
-                  {props.isSaving ? 'Saving...' : 'Saved'}
-                </span>
-              )}
-            </label>
-            <div className="flex flex-wrap gap-2">
-              <select
-                value={props.loadedValuationId ?? 'NEW'}
-                onChange={(e) => {
-                  if (e.target.value === 'NEW') {
-                    props.setNewValuationName('New Valuation');
-                    props.setShowNewValuationModal(true);
-                  } else if (e.target.value) {
-                    props.handleLoadValuation(e.target.value);
-                  }
-                }}
-                className="flex-1 w-full min-w-[200px] px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors shadow-sm"
+      <div className="flex flex-wrap items-end justify-between gap-4 mb-4">
+        {props.currentUser && (
+          <div className="flex flex-wrap items-end gap-4">
+            <div className="flex flex-col gap-2 px-1 min-w-[280px]">
+              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                Valuations
+                {props.loadedValuationId && (
+                  <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full font-medium">
+                    {props.isSaving ? 'Saving...' : 'Saved'}
+                  </span>
+                )}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <select
+                  value={props.loadedValuationId ?? 'NEW'}
+                  onChange={(e) => {
+                    if (e.target.value === 'NEW') {
+                      props.setNewValuationName('New Valuation');
+                      props.setShowNewValuationModal(true);
+                    } else if (e.target.value) {
+                      props.handleLoadValuation(e.target.value);
+                    }
+                  }}
+                  className="flex-1 w-full min-w-[200px] px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors shadow-sm"
+                >
+                  <option value="NEW" className="font-semibold text-indigo-600">✨ New valuation...</option>
+                  {props.userValuations.length > 0 && <option disabled>──────────</option>}
+                  {props.userValuations.map((val) => (
+                    <option key={val.id} value={val.id}>
+                      {val.valuationName}
+                    </option>
+                  ))}
+                </select>
+                {props.loadedValuationId && (
+                  <button
+                    onClick={() => {
+                      props.setEditValuationName(props.userValuations.find(v => v.id === props.loadedValuationId)?.valuationName || '');
+                      props.setIsRenaming(true);
+                    }}
+                    className="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:text-indigo-600 hover:border-indigo-200 transition-colors shadow-sm"
+                    title="Rename Valuation"
+                  >
+                    Rename
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => props.setShowSaveAsModal(true)}
+                className="px-4 py-2 bg-white text-indigo-600 border border-indigo-200 rounded-lg text-sm font-medium hover:bg-indigo-50 transition-colors shadow-sm"
               >
-                <option value="NEW" className="font-semibold text-indigo-600">✨ New valuation...</option>
-                {props.userValuations.length > 0 && <option disabled>──────────</option>}
-                {props.userValuations.map((val) => (
-                  <option key={val.id} value={val.id}>
-                    {val.valuationName}
-                  </option>
-                ))}
-              </select>
+                Save As New
+              </button>
               {props.loadedValuationId && (
                 <button
-                  onClick={() => {
-                    props.setEditValuationName(props.userValuations.find(v => v.id === props.loadedValuationId)?.valuationName || '');
-                    props.setIsRenaming(true);
-                  }}
-                  className="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:text-indigo-600 hover:border-indigo-200 transition-colors shadow-sm"
-                  title="Rename Valuation"
+                  onClick={() => props.setShowDeleteModal(true)}
+                  className="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors border border-red-200"
                 >
-                  Rename
+                  Delete
                 </button>
               )}
             </div>
           </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => props.setShowSaveAsModal(true)}
-              className="px-4 py-2 bg-white text-indigo-600 border border-indigo-200 rounded-lg text-sm font-medium hover:bg-indigo-50 transition-colors shadow-sm"
-            >
-              Save As New
-            </button>
-            {props.loadedValuationId && (
-              <button
-                onClick={() => props.setShowDeleteModal(true)}
-                className="px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors border border-red-200"
-              >
-                Delete
-              </button>
-            )}
-          </div>
+        )}
+        
+        <div className="flex items-center gap-2 ml-auto">
+          <button
+            onClick={() => {
+              props.setDownloadFilename(props.defaultDownloadName);
+              props.setShowDownloadModal(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all"
+          >
+            <DownloadIcon className="w-4 h-4" />
+            <span className="hidden sm:inline">Download Valuation (.json)</span>
+          </button>
+          <button
+            onClick={() => props.setShowUploadModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border shadow-sm transition-all bg-white border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200"
+          >
+            <UploadIcon className="w-4 h-4" />
+            <span className="hidden sm:inline">Upload Valuation (.json)</span>
+          </button>
         </div>
-      )}
+      </div>
     </>
   );
 }
