@@ -208,10 +208,10 @@ export function AccountModal(props: AccountModalProps) {
 
         {/* Error / Success Messages */}
         {props.accountError && (
-          <div className="text-sm text-red-600 mb-4 bg-red-50 p-2.5 rounded-lg border border-red-100">{props.accountError}</div>
+          <div className="text-sm text-red-600 mb-4 bg-red-50 p-2.5 rounded-lg border border-red-100 text-center">{props.accountError}</div>
         )}
         {props.accountSuccess && (
-          <div className="text-sm text-green-600 mb-4 bg-green-50 p-2.5 rounded-lg border border-green-100">{props.accountSuccess}</div>
+          <div className="text-sm text-green-600 mb-4 bg-green-50 p-2.5 rounded-lg border border-green-100 text-center">{props.accountSuccess}</div>
         )}
 
         <div className="flex justify-end">

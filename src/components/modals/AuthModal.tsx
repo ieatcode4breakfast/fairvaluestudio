@@ -96,7 +96,7 @@ export function AuthModal(props: AuthModalProps) {
               </div>
             </div>
             {props.loginError && (
-              <div className="text-sm text-red-600 mb-4">{props.loginError}</div>
+              <div className="text-sm text-red-600 mb-4 text-center">{props.loginError}</div>
             )}
             <div className="flex justify-end gap-3">
               <button onClick={() => { props.setShowLoginModal(false); props.setLoginError(''); props.setLoginEmail(''); props.setLoginPassword(''); }} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>
@@ -169,7 +169,7 @@ export function AuthModal(props: AuthModalProps) {
               </div>
             </div>
             {props.signupError && (
-              <div className="text-sm text-red-600 mb-4">{props.signupError}</div>
+              <div className="text-sm text-red-600 mb-4 text-center">{props.signupError}</div>
             )}
             <div className="flex justify-end gap-3">
               <button onClick={() => { props.setShowLoginModal(false); props.setSignupError(''); props.setSignupEmail(''); props.setSignupUsername(''); props.setSignupPassword(''); props.setSignupConfirmPassword(''); }} className="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors">Cancel</button>

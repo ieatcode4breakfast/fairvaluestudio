@@ -162,7 +162,7 @@ export function CopyScenarioModal({
             </select>
 
             {error && (
-              <p className="text-sm text-red-600 mt-2 mb-2">{error}</p>
+              <p className="text-sm text-red-600 mt-2 mb-2 text-center">{error}</p>
             )}
 
             <div className="mt-5 flex justify-end gap-3">
