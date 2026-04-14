@@ -446,7 +446,7 @@ export default function App() {
         {/* Combined Text Summary */}
         {(!currentUser || (currentUser && userValuations.length > 0)) && (
           <div className="mt-4 bg-white border-y border-x-0 md:border-x border-slate-200 rounded-none md:rounded-3xl p-6 md:p-8 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
               <div>
                 <h3 className="text-lg font-semibold text-slate-800">Text Summary</h3>
                 <p className="text-sm text-slate-500 mt-1">
@@ -455,7 +455,7 @@ export default function App() {
               </div>
               <button
                 onClick={copySummary}
-                className={`flex items-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-xl text-sm font-semibold shadow-sm transition-all relative ${showCopySuccess ? 'bg-green-50 border-green-200 text-green-700' : 'hover:bg-indigo-100'
+                className={`flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-xl text-sm font-semibold shadow-sm transition-all relative shrink-0 whitespace-nowrap ${showCopySuccess ? 'bg-green-50 border-green-200 text-green-700' : 'hover:bg-indigo-100'
                   }`}
               >
                 {showCopySuccess ? (
