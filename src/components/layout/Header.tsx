@@ -33,49 +33,54 @@ export function Header(props: HeaderProps) {
   const [isHowToUseExpanded, setIsHowToUseExpanded] = useState(false);
   return (
     <>
-      <header className="mb-6">
-        {/* User / Auth Bar */}
-        <div className="flex justify-end mb-2">
-          <div className="flex items-center gap-2">
-            {props.currentUser ? (
-              <div className="flex items-center gap-2">
+      <div className="px-4 md:px-0">
+        <header className="mb-6">
+          {/* User / Auth Bar */}
+          <div className="flex justify-end mb-2">
+            <div className="flex items-center gap-2">
+              {props.currentUser ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={props.onAccountClick}
+                    className="text-sm font-medium text-slate-700 hover:text-indigo-600 transition-colors cursor-pointer"
+                  >
+                    Hi, {props.currentUser.username}!
+                  </button>
+                  <div className="w-px h-4 bg-slate-200 mx-1" />
+                  <button
+                    onClick={props.onLogoutClick}
+                    className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+                  >
+                    Log out
+                  </button>
+                </div>
+              ) : (
                 <button
-                  onClick={props.onAccountClick}
-                  className="text-sm font-medium text-slate-700 hover:text-indigo-600 transition-colors cursor-pointer"
+                  onClick={props.onLoginClick}
+                  className="px-3 py-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors cursor-pointer"
                 >
-                  Hi, {props.currentUser.username}!
+                  Log in
                 </button>
-                <div className="w-px h-4 bg-slate-200 mx-1" />
-                <button
-                  onClick={props.onLogoutClick}
-                  className="px-3 py-1.5 text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
-                >
-                  Log out
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={props.onLoginClick}
-                className="px-3 py-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors cursor-pointer"
-              >
-                Log in
-              </button>
-            )}
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-start gap-4 mb-6">
-          <Calculator className="w-14 h-14 text-indigo-600 shrink-0 mt-1" />
-          <div className="flex flex-col justify-center">
-            <h1 className="text-3xl font-light tracking-tight mb-1">
-              FairValue Studio
-            </h1>
-            <p className="text-slate-500 text-sm max-w-2xl">
-              Welcome to FairValue Studio, a multi-scenario valuation tool featuring basic DCF calculation and advanced, multi-phase growth forecasting.
-            </p>
+          <div className="flex items-start gap-4 mb-6">
+            <Calculator className="w-14 h-14 text-indigo-600 shrink-0 mt-1" />
+            <div className="flex flex-col justify-center">
+              <h1 className="text-3xl font-light tracking-tight mb-1">
+                FairValue Studio
+              </h1>
+              <p className="text-slate-500 text-sm max-w-2xl">
+                Welcome to FairValue Studio, a multi-scenario valuation tool featuring basic DCF calculation and advanced, multi-phase growth forecasting.
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        </header>
+      </div>
+
+      <div className="px-4 md:px-0">
+        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mb-6">
           <button
             onClick={() => setIsHowToUseExpanded(!isHowToUseExpanded)}
             className="w-full p-4 flex items-center justify-between bg-white hover:bg-slate-50 transition-colors"
@@ -111,95 +116,97 @@ export function Header(props: HeaderProps) {
             </div>
           )}
         </div>
-      </header>
+      </div>
 
-      {/* Load Valuation Dropdown */}
-      <div className="flex flex-wrap items-end justify-between gap-4 mb-4">
-        {props.currentUser && (
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-end w-full sm:w-auto gap-4 sm:gap-2">
-            <div className="flex flex-col gap-2 w-full max-w-[400px] sm:max-w-none sm:min-w-[400px]">
-              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                Valuations
-                {props.loadedValuationId && (
-                  <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full font-medium">
-                    {props.isSaving ? 'Saving...' : 'Saved'}
-                  </span>
-                )}
-              </label>
-              <div className="flex items-center w-full gap-2">
-                <select
-                  value={props.loadedValuationId ?? 'NEW'}
-                  onChange={(e) => {
-                    if (e.target.value === 'NEW') {
-                      props.setNewValuationName('New Valuation');
-                      props.setShowNewValuationModal(true);
-                    } else if (e.target.value) {
-                      props.handleLoadValuation(e.target.value);
-                    }
-                  }}
-                  className="flex-1 pl-3 pr-10 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors shadow-sm custom-select appearance-none"
+      <div className="px-4 md:px-0">
+        {/* Load Valuation Dropdown */}
+        <div className="flex flex-wrap items-end justify-between gap-4 mb-4">
+          {props.currentUser && (
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-end w-full sm:w-auto gap-4 sm:gap-2">
+              <div className="flex flex-col gap-2 w-full max-w-[400px] sm:max-w-none sm:min-w-[400px]">
+                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                  Valuations
+                  {props.loadedValuationId && (
+                    <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full font-medium">
+                      {props.isSaving ? 'Saving...' : 'Saved'}
+                    </span>
+                  )}
+                </label>
+                <div className="flex items-center w-full gap-2">
+                  <select
+                    value={props.loadedValuationId ?? 'NEW'}
+                    onChange={(e) => {
+                      if (e.target.value === 'NEW') {
+                        props.setNewValuationName('New Valuation');
+                        props.setShowNewValuationModal(true);
+                      } else if (e.target.value) {
+                        props.handleLoadValuation(e.target.value);
+                      }
+                    }}
+                    className="flex-1 pl-3 pr-10 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors shadow-sm custom-select appearance-none"
+                  >
+                    <option value="NEW" className="font-semibold text-indigo-600">✨ New valuation...</option>
+                    {[...props.userValuations]
+                      .sort((a, b) => a.valuationName.localeCompare(b.valuationName))
+                      .map((val) => (
+                        <option key={val.id} value={val.id}>
+                          {val.valuationName}
+                        </option>
+                      ))}
+                  </select>
+                  {props.loadedValuationId && (
+                    <button
+                      onClick={() => {
+                        props.setEditValuationName(props.userValuations.find(v => v.id === props.loadedValuationId)?.valuationName || '');
+                        props.setIsRenaming(true);
+                      }}
+                      className="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:text-indigo-600 hover:border-indigo-200 transition-colors shadow-sm whitespace-nowrap"
+                      title="Rename Valuation"
+                    >
+                      Rename
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <button
+                  onClick={() => props.setShowSaveAsModal(true)}
+                  className="flex-1 px-4 py-2 bg-white text-indigo-600 border border-indigo-200 rounded-lg text-sm font-medium hover:bg-indigo-50 transition-colors shadow-sm whitespace-nowrap"
                 >
-                  <option value="NEW" className="font-semibold text-indigo-600">✨ New valuation...</option>
-                  {[...props.userValuations]
-                    .sort((a, b) => a.valuationName.localeCompare(b.valuationName))
-                    .map((val) => (
-                      <option key={val.id} value={val.id}>
-                        {val.valuationName}
-                      </option>
-                    ))}
-                </select>
+                  Save As New
+                </button>
                 {props.loadedValuationId && (
                   <button
-                    onClick={() => {
-                      props.setEditValuationName(props.userValuations.find(v => v.id === props.loadedValuationId)?.valuationName || '');
-                      props.setIsRenaming(true);
-                    }}
-                    className="px-3 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-200 rounded-lg hover:text-indigo-600 hover:border-indigo-200 transition-colors shadow-sm whitespace-nowrap"
-                    title="Rename Valuation"
+                    onClick={() => props.setShowDeleteModal(true)}
+                    className="flex-1 px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors border border-red-200"
                   >
-                    Rename
+                    Delete
                   </button>
                 )}
               </div>
             </div>
+          )}
 
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <button
-                onClick={() => props.setShowSaveAsModal(true)}
-                className="flex-1 px-4 py-2 bg-white text-indigo-600 border border-indigo-200 rounded-lg text-sm font-medium hover:bg-indigo-50 transition-colors shadow-sm whitespace-nowrap"
-              >
-                Save As New
-              </button>
-              {props.loadedValuationId && (
-                <button
-                  onClick={() => props.setShowDeleteModal(true)}
-                  className="flex-1 px-4 py-2 bg-red-50 text-red-600 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors border border-red-200"
-                >
-                  Delete
-                </button>
-              )}
-            </div>
+          <div className="flex items-center gap-2 ml-auto">
+            <button
+              onClick={() => {
+                props.setDownloadFilename(props.defaultDownloadName);
+                props.setShowDownloadModal(true);
+              }}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all"
+            >
+              <DownloadIcon className="w-4 h-4" />
+              <span className="hidden sm:inline">Download Valuation (.json)</span>
+            </button>
+            <button
+              onClick={() => props.setShowUploadModal(true)}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border shadow-sm transition-all bg-white border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200"
+            >
+              <UploadIcon className="w-4 h-4" />
+              <span className="hidden sm:inline">Upload Valuation (.json)</span>
+            </button>
           </div>
-        )}
-
-        <div className="flex items-center gap-2 ml-auto">
-          <button
-            onClick={() => {
-              props.setDownloadFilename(props.defaultDownloadName);
-              props.setShowDownloadModal(true);
-            }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white border border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200 shadow-sm transition-all"
-          >
-            <DownloadIcon className="w-4 h-4" />
-            <span className="hidden sm:inline">Download Valuation (.json)</span>
-          </button>
-          <button
-            onClick={() => props.setShowUploadModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border shadow-sm transition-all bg-white border-slate-200 text-slate-600 hover:text-indigo-600 hover:border-indigo-200"
-          >
-            <UploadIcon className="w-4 h-4" />
-            <span className="hidden sm:inline">Upload Valuation (.json)</span>
-          </button>
         </div>
       </div>
     </>

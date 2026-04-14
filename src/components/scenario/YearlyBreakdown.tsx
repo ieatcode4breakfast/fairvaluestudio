@@ -16,7 +16,7 @@ export function YearlyBreakdown({ sc, results, onUpdate }: YearlyBreakdownProps)
   const lbl = isSimple ? getSimpleLabels(sc) : null;
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+    <div className="bg-white rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 overflow-hidden">
       <div className="p-6 border-b border-slate-100">
         <h2 className="text-lg font-medium text-slate-800">Valuation Breakdown</h2>
         {isSimple && (

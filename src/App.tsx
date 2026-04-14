@@ -360,7 +360,7 @@ export default function App() {
         </div>
       </div>
 
-      <div className="max-w-6xl w-full mx-auto px-4 md:px-6 pt-6 md:pt-10">
+      <div className="max-w-6xl w-full mx-auto px-0 md:px-6 pt-6 md:pt-10">
         <Header
           currentUser={currentUser}
           userValuations={userValuations}
@@ -405,7 +405,7 @@ export default function App() {
         />
 
         {(!currentUser || (currentUser && userValuations.length > 0)) && (
-          <div className="bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden" onDragOver={(e) => handleDragOver(e, tabsContainerRef.current)} onDrop={handleDrop}>
+          <div className="bg-white rounded-none md:rounded-3xl shadow-lg border-y border-x-0 md:border-x border-slate-200 overflow-hidden" onDragOver={(e) => handleDragOver(e, tabsContainerRef.current)} onDrop={handleDrop}>
             <div className="bg-slate-50/80 px-4 md:px-6 py-4 border-b border-slate-200">
               <ScenarioTabs
                 scenarios={scenarios}
@@ -445,7 +445,7 @@ export default function App() {
 
         {/* Combined Text Summary */}
         {(!currentUser || (currentUser && userValuations.length > 0)) && (
-          <div className="mt-4 bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
+          <div className="mt-4 bg-white border-y border-x-0 md:border-x border-slate-200 rounded-none md:rounded-3xl p-6 md:p-8 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h3 className="text-lg font-semibold text-slate-800">Text Summary</h3>

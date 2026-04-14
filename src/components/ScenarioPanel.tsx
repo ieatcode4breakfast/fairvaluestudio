@@ -39,7 +39,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
   }, [sc.id, onUpdate]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 p-4 md:p-6">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 p-0 md:p-6">
 
       {/* ══ LEFT: INPUTS ══ */}
       <div className="lg:col-span-4 space-y-6">
@@ -54,7 +54,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
         />
 
         {/* COMBINED: Assumptions & Growth card wrapper */}
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="bg-white rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 overflow-hidden">
 
           <AssumptionsCard
             sc={sc}
