@@ -117,7 +117,7 @@ export function Header(props: HeaderProps) {
       <div className="flex flex-wrap items-end justify-between gap-4 mb-4">
         {props.currentUser && (
           <div className="flex flex-col sm:flex-row items-stretch sm:items-end w-full sm:w-auto gap-4 sm:gap-2">
-            <div className="flex flex-col gap-2 w-full sm:min-w-[320px]">
+            <div className="flex flex-col gap-2 w-full max-w-[400px] sm:max-w-none sm:min-w-[400px]">
               <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
                 Valuations
                 {props.loadedValuationId && (
