@@ -15,7 +15,7 @@ export default defineConfig({
       },
       manifest: {
         name: 'FairValue Studio',
-        short_name: 'FairValue',
+        short_name: 'FairValue Studio',
         description: 'A multi-scenario valuation tool',
         theme_color: '#4f46e5',
         background_color: '#ffffff',
