@@ -6,7 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   plugins: [
-    react(), 
+    react(),
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
@@ -17,7 +17,8 @@ export default defineConfig({
         name: 'FairValue Studio',
         short_name: 'FairValue',
         description: 'A multi-scenario valuation tool',
-        theme_color: '#ffffff',
+        theme_color: '#4f46e5',
+        background_color: '#ffffff',
         icons: [
           {
             src: '/favicon.svg',
