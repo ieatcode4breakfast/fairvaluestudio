@@ -27,7 +27,7 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
     <div className="flex items-end justify-between gap-3">
       {/* Left: scenario tabs + add button */}
       <div className="flex flex-col gap-2">
-        <div className="text-sm font-semibold text-slate-700 px-1">Scenarios</div>
+        <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 px-1">Scenarios</div>
         <div
           ref={props.tabsContainerRef}
           className="flex flex-wrap items-center gap-2 pb-1 min-w-0"
@@ -54,9 +54,9 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
                 onDragEnd={props.handleDragEnd}
                 onClick={() => props.setActiveScenarioId(sc.id)}
                 className={`flex items-center justify-center w-10 h-10 flex-shrink-0 rounded-xl text-sm font-medium transition-all duration-200 border cursor-grab active:cursor-grabbing ${shiftClass} ${isActive
-                  ? 'bg-white text-indigo-600 border-indigo-200 shadow-sm'
-                  : 'bg-slate-200/60 text-slate-500 border-transparent hover:bg-white hover:text-slate-700 hover:border-slate-200'
-                  } ${isDragged ? 'opacity-20 scale-75 border-dashed border-indigo-300' : 'opacity-100'} ${isDropSuccess ? 'bg-green-100 border-green-300 text-green-700 shadow-md scale-110' : ''}`}
+                  ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-600 shadow-sm'
+                  : 'bg-slate-200/60 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-transparent hover:bg-white dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-200 dark:hover:border-slate-600'
+                  } ${isDragged ? 'opacity-20 scale-75 border-dashed border-indigo-300 dark:border-indigo-500' : 'opacity-100'} ${isDropSuccess ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 shadow-md scale-110' : ''}`}
               >
                 {index + 1}
               </button>
@@ -68,22 +68,22 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
               <div className="relative group">
                 <button
                   onClick={props.addScenario}
-                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-200/60 hover:bg-white hover:border-slate-200 border border-transparent text-slate-400 hover:text-indigo-600 transition-all"
+                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-200/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 hover:border-slate-200 dark:hover:border-slate-600 border border-transparent text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
                 >
                   <PlusIcon className="w-4 h-4" />
                 </button>
-                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
+                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 dark:bg-slate-900 text-white dark:text-slate-200 text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
                   Add Scenario
                 </div>
               </div>
               <div className="relative group">
                 <button
                   onClick={props.onResetAll}
-                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-200/60 hover:bg-white hover:border-slate-200 border border-transparent text-slate-400 hover:text-indigo-600 transition-all"
+                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-200/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 hover:border-slate-200 dark:hover:border-slate-600 border border-transparent text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
                 >
                   <RotateCcw className="w-4 h-4" />
                 </button>
-                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
+                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 dark:bg-slate-900 text-white dark:text-slate-200 text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
                   Reset All Scenarios
                 </div>
               </div>

@@ -53,22 +53,23 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
           onUpdate={handleUpdate}
         />
 
-        {/* COMBINED: Assumptions & Growth card wrapper */}
-        <div className="bg-white rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 overflow-hidden">
-
+        {/* Assumptions Card */}
+        <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 overflow-hidden">
           <AssumptionsCard
             sc={sc}
             results={results}
             onUpdate={handleUpdate}
           />
+        </div>
 
+        {/* Growth Card */}
+        <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 overflow-hidden">
           <GrowthCard
             sc={sc}
             onUpdate={handleUpdate}
             ignoreTrackClickUntil={ignoreTrackClickUntil}
             setIgnoreTrackClickUntil={setIgnoreTrackClickUntil}
           />
-
         </div>
       </div>
 

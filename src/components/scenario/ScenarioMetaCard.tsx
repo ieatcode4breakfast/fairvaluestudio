@@ -35,8 +35,8 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
   };
 
   return (
-    <div className="bg-white p-6 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100">
-      <label className="block text-sm font-medium text-slate-600 mb-1">Scenario Name</label>
+    <div className="bg-white dark:bg-slate-800 p-6 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700">
+      <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Scenario Name</label>
       <input
         type="text"
         value={sc.scenarioName}
@@ -48,7 +48,7 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
 
       <button
         onClick={onDuplicateClick}
-        className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 transition-colors"
+        className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-indigo-50 hover:bg-indigo-100 text-indigo-600 border border-indigo-200 dark:bg-indigo-900/40 dark:hover:bg-indigo-900/60 dark:text-indigo-300 dark:border-indigo-800 transition-colors"
       >
         <Copy className="w-4 h-4" />
         Copy Scenario
@@ -67,8 +67,8 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
           }
         }}
         className={`w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${sc.showResetConfirm
-          ? 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200'
-          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
+          ? 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200 dark:bg-red-900/40 dark:hover:bg-red-900/60 dark:text-red-300 dark:border-red-800'
+          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-700 dark:text-slate-300 dark:border-slate-700'
           }`}
       >
         <RotateCcw className="w-4 h-4" />
@@ -80,7 +80,7 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
           onClick={handleDeleteClick}
           className={`w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors ${deleteConfirm
             ? 'bg-red-600 hover:bg-red-700 text-white border-red-600'
-            : 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200'
+            : 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200 dark:bg-red-900/40 dark:hover:bg-red-900/60 dark:text-red-300 dark:border-red-800'
             }`}
         >
           <Trash2 className="w-4 h-4" />
@@ -88,8 +88,8 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
         </button>
       )}
 
-      <div className="mt-4 pt-4 border-t border-slate-100">
-        <label className="block text-sm font-medium text-slate-600 mb-1">Method</label>
+      <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+        <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Method</label>
         <select
           value={sc.dcfMethod}
           onChange={e => {
@@ -109,9 +109,9 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
       </div>
 
       {sc.dcfMethod === 'Basic DCF' && (
-        <div className="mt-4 pt-4 border-t border-slate-100 space-y-4">
+        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">Metric</label>
+            <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Metric</label>
             <select value={sc.simpleMetricType} onChange={e => onUpdate({ simpleMetricType: e.target.value })} className={INPUT_CLS}>
               <option>Free Cash Flow</option>
               <option>Net Income (Earnings)</option>
@@ -157,7 +157,7 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
       )}
 
       {sc.dcfMethod !== 'Basic DCF' && (
-        <div className="mt-4 pt-4 border-t border-slate-100">
+        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
           <select value={sc.projectionMethod} onChange={e => onUpdate({ projectionMethod: e.target.value })} className={INPUT_CLS}>
             <option value="Per Share Method">Per Share</option>
             <option value="Total FCF, Share Count">Total FCF, Share Count</option>
