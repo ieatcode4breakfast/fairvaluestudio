@@ -22,7 +22,15 @@ export function useValuations(
   useEffect(() => {
     if (currentUser) {
       getUserValuations(currentUser.id).then(vals => {
-        setUserValuations(vals);
+        setUserValuations(prev => {
+          const map = new Map(vals.map(v => [v.id, v]));
+          prev.forEach(p => {
+            if (!map.has(p.id)) {
+              map.set(p.id, p);
+            }
+          });
+          return Array.from(map.values());
+        });
         setHasFetchedValuations(true);
       }).catch(err => {
         console.error(err);
@@ -79,12 +87,16 @@ export function useValuations(
     }
   }, [setScenarios, setActiveScenarioId, setLastSavedState]);
 
-  const handleCreateNewValuation = async (newValuationName: string, newScenarios: Scenario[]) => {
-    if (!currentUser || !newValuationName.trim()) return null;
+  const handleCreateNewValuation = async (newValuationName: string, newScenarios: Scenario[], targetUserId?: string) => {
+    const userId = targetUserId || currentUser?.id;
+    if (!userId || !newValuationName.trim()) return null;
     setIsSaving(true);
     try {
-      const newId = await createValuation(currentUser.id, newValuationName.trim(), newScenarios);
-      setUserValuations(prev => [...prev, { id: newId, valuationName: newValuationName.trim() }]);
+      const newId = await createValuation(userId, newValuationName.trim(), newScenarios);
+      setUserValuations(prev => {
+        if (prev.some(v => v.id === newId)) return prev;
+        return [...prev, { id: newId, valuationName: newValuationName.trim() }];
+      });
       await handleLoadValuation(newId);
       return newId;
     } catch (e) {

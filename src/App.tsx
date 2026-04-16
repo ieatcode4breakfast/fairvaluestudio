@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import { User, Scenario } from './types';
 import { getSampleScenarios } from './utils/sampleScenarios';
 import { computeSimple } from './utils/computeSimple';
@@ -6,6 +6,9 @@ import { computeAdvanced } from './utils/computeAdvanced';
 import { buildSummaryText } from './utils/summary';
 import { MAX_SCENARIOS, TRANSIENT_KEYS } from './utils/constants';
 import { genId } from './utils/genId';
+
+// Custom Utils
+import { createDefaultScenario } from './utils/scenario';
 
 // Custom Hooks
 import { loadInitialScenarios, useScenarios } from './hooks/useScenarios';
@@ -51,7 +54,7 @@ export default function App() {
     handleLoadValuation, handleCreateNewValuation, handleDeleteValuation, handleRenameValuation, handleCopyScenarioToValuation
   } = useValuations(currentUser, setScenarios, setActiveScenarioId, setLastSavedState);
 
-  const { pendingLoginUser, setPendingLoginUser, handleLogin, handleSignup, handleLogout } = useAuth(
+  const { handleLogin, handleSignup, handleLogout } = useAuth(
     currentUser, setCurrentUser, scenarios, setScenarios, setActiveScenarioId, setLastSavedState, setLoadedValuationId, handleLoadValuation, loadInitialScenarios
   );
 
@@ -96,11 +99,14 @@ export default function App() {
   const [newValuationName, setNewValuationName] = useState('New Valuation');
   const [showRetainGuestModal, setShowRetainGuestModal] = useState(false);
   const [retainValuationName, setRetainValuationName] = useState('My Scenarios');
+  const [pendingGuestAction, setPendingGuestAction] = useState<{ action: 'retain' | 'discard', name?: string } | null>(null);
   const [showSaveAsModal, setShowSaveAsModal] = useState(false);
   const [saveAsName, setSaveAsName] = useState('');
   const [isRenaming, setIsRenaming] = useState(false);
   const [editValuationName, setEditValuationName] = useState('');
   const [showResetAllConfirm, setShowResetAllConfirm] = useState(false);
+  const [showGuestRetentionError, setShowGuestRetentionError] = useState(false);
+  const [guestRetentionError, setGuestRetentionError] = useState('');
 
   // Copy Scenario Modal State
   const [showCopyScenarioModal, setShowCopyScenarioModal] = useState(false);
@@ -124,14 +130,52 @@ export default function App() {
     [scenarios, allResults]
   );
 
+  // Process the pending guest action and load appropriate valuation
+  const handleAuthSuccess = async (user: User) => {
+    if (pendingGuestAction) {
+      const action = pendingGuestAction;
+      setPendingGuestAction(null); // Ensure we don't re-process
+
+      if (action.action === 'retain' && action.name) {
+        setIsSaving(true);
+        try {
+          const newId = await handleCreateNewValuation(action.name, scenarios, user.id);
+          localStorage.removeItem('fairvalue_scenarios');
+          if (newId) {
+            await handleLoadValuation(newId);
+          } else {
+            setGuestRetentionError('An error occurred and the pre-login session could not be added. Try logging out and back in, then choose to save the session again.');
+            setShowGuestRetentionError(true);
+          }
+        } catch (err: any) {
+          setGuestRetentionError('An error occurred and the pre-login session could not be added. Try logging out and back in, then choose to save the session again.');
+          setShowGuestRetentionError(true);
+        } finally {
+          setIsSaving(false);
+        }
+      } else if (action.action === 'discard') {
+        localStorage.removeItem('fairvalue_scenarios');
+        if (user.lastActiveValuationId) {
+          handleLoadValuation(user.lastActiveValuationId);
+        }
+      }
+    } else {
+      // Normal login flow (no guest data was handled)
+      if (user.lastActiveValuationId) {
+        handleLoadValuation(user.lastActiveValuationId);
+      }
+    }
+  };
+
   // Handlers wrapped with UI state updates
   const doLogin = async () => {
     setLoginError('');
     try {
-      const user = await handleLogin(loginEmail, loginPassword, () => setShowRetainGuestModal(true));
+      const user = await handleLogin(loginEmail, loginPassword);
       if (user) {
         setShowLoginModal(false);
         setLoginEmail(''); setLoginPassword('');
+        await handleAuthSuccess(user);
       } else {
         setLoginError('Invalid email or password');
       }
@@ -147,37 +191,45 @@ export default function App() {
     if (!signupUsername.trim()) { setSignupError('Username is required'); return; }
 
     try {
-      const user = await handleSignup(signupEmail, signupPassword, signupUsername, () => setShowRetainGuestModal(true));
+      const user = await handleSignup(signupEmail, signupPassword, signupUsername);
       if (user) {
         setShowLoginModal(false);
         setShowSignupSuccess(true);
         setTimeout(() => setShowSignupSuccess(false), 3000);
         setSignupEmail(''); setSignupUsername(''); setSignupPassword(''); setSignupConfirmPassword('');
+        await handleAuthSuccess(user);
       }
     } catch (err: any) {
       setSignupError(err.message || 'Signup failed');
     }
   };
 
-  const doRetainGuest = async (retain: boolean) => {
-    if (!retain || !retainValuationName.trim() || !pendingLoginUser) {
-      setPendingLoginUser(null);
-      setShowRetainGuestModal(false);
-      localStorage.removeItem('fairvalue_scenarios');
-      if (pendingLoginUser?.lastActiveValuationId) {
-        handleLoadValuation(pendingLoginUser.lastActiveValuationId);
-      }
-      return;
+  const setShowLoginModalWrapper = useCallback((show: boolean) => {
+    if (!show && pendingGuestAction) {
+      setPendingGuestAction(null);
     }
+    setShowLoginModal(show);
+  }, [pendingGuestAction, setShowLoginModal]);
 
-    setIsSaving(true);
-    const newId = await handleCreateNewValuation(retainValuationName, scenarios);
-    if (newId) {
-      localStorage.removeItem('fairvalue_scenarios');
-      setPendingLoginUser(null);
-      setShowRetainGuestModal(false);
+  const doRetainGuest = async (retain: boolean) => {
+    if (!retain) {
+      setPendingGuestAction({ action: 'discard' });
+      // NEW: Clear the current UI workspace immediately so they see the effect of their choice
+      const defaultSc = [createDefaultScenario()];
+      setScenarios(defaultSc);
+      setActiveScenarioId(defaultSc[0].id);
+      setLastSavedState(getCleanedScenariosString(defaultSc));
+      
+      // We DEFER removing from localStorage until authentication passes
+      // This prevents permanent data loss if the user backs out of the login modal completely.
+      // However, the useScenarios effect will immediately see the UI change and update 
+      // localStorage with the default scenario. This is why it "doesn't ask again" 
+      // after the first discard (because the data is now just the default).
+    } else {
+      setPendingGuestAction({ action: 'retain', name: retainValuationName });
     }
-    setIsSaving(false);
+    setShowRetainGuestModal(false);
+    setShowLoginModal(true);
   };
 
   const doCreateValuation = async (loadSample: boolean) => {
@@ -348,7 +400,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 font-sans selection:bg-indigo-100 selection:text-indigo-900 pb-12 overflow-x-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans selection:bg-indigo-100 dark:selection:bg-indigo-900 selection:text-indigo-900 dark:selection:text-indigo-100 pb-12 overflow-x-hidden">
 
       {/* Reorder Toast Notification */}
       <div
@@ -366,7 +418,16 @@ export default function App() {
           userValuations={userValuations}
           isSaving={isSaving}
           loadedValuationId={loadedValuationId}
-          onLoginClick={() => setShowLoginModal(true)}
+          onLoginClick={() => {
+            const guestData = localStorage.getItem('fairvalue_scenarios');
+            // Only prompt if there is data and it's not just the default empty state
+            // (Standard length for an empty-ish default state is short)
+            if (guestData && guestData.length > 300) {
+              setShowRetainGuestModal(true);
+            } else {
+              setShowLoginModal(true);
+            }
+          }}
           onLogoutClick={handleLogout}
           onAccountClick={() => {
             if (currentUser) {
@@ -405,8 +466,8 @@ export default function App() {
         />
 
         {(!currentUser || (currentUser && userValuations.length > 0)) && (
-          <div className="bg-white rounded-none md:rounded-3xl shadow-lg border-y border-x-0 md:border-x border-slate-200 overflow-hidden" onDragOver={(e) => handleDragOver(e, tabsContainerRef.current)} onDrop={handleDrop}>
-            <div className="bg-slate-50/80 px-4 md:px-6 py-4 border-b border-slate-200">
+          <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-3xl shadow-lg border-y border-x-0 md:border-x border-slate-200 dark:border-slate-700 overflow-hidden" onDragOver={(e) => handleDragOver(e, tabsContainerRef.current)} onDrop={handleDrop}>
+            <div className="bg-slate-50/80 dark:bg-slate-900/50 px-4 md:px-6 py-4 border-b border-slate-200 dark:border-slate-700">
               <ScenarioTabs
                 scenarios={scenarios}
                 activeScenarioId={activeScenarioId}
@@ -445,17 +506,17 @@ export default function App() {
 
         {/* Combined Text Summary */}
         {(!currentUser || (currentUser && userValuations.length > 0)) && (
-          <div className="mt-4 bg-white border-y border-x-0 md:border-x border-slate-200 rounded-none md:rounded-3xl p-6 md:p-8 shadow-sm">
+          <div className="mt-4 bg-white dark:bg-slate-800 border-y border-x-0 md:border-x border-slate-200 dark:border-slate-700 rounded-none md:rounded-3xl p-6 md:p-8 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-slate-800">Text Summary</h3>
-                <p className="text-sm text-slate-500 mt-1">
+                <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200">Text Summary</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                   Copy this text and paste it into ChatGPT, Claude, or any LLM to ask for an analysis of your valuation scenarios.
                 </p>
               </div>
               <button
                 onClick={copySummary}
-                className={`flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-xl text-sm font-semibold shadow-sm transition-all relative shrink-0 whitespace-nowrap ${showCopySuccess ? 'bg-green-50 border-green-200 text-green-700' : 'hover:bg-indigo-100'
+                className={`flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 rounded-xl text-sm font-semibold shadow-sm transition-all relative shrink-0 whitespace-nowrap ${showCopySuccess ? 'bg-green-50 dark:bg-green-900/30 border-green-200 dark:border-green-800 text-green-700 dark:text-green-300' : 'hover:bg-indigo-100 dark:hover:bg-indigo-900/50'
                   }`}
               >
                 {showCopySuccess ? (
@@ -472,7 +533,7 @@ export default function App() {
             <textarea
               readOnly
               value={combinedSummary}
-              className="w-full h-48 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-700 font-mono resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
+              className="w-full h-48 px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-700 dark:text-slate-300 font-mono resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors"
             />
           </div>
         )}
@@ -480,7 +541,7 @@ export default function App() {
 
       {/* Modals */}
       <AuthModal
-        showLoginModal={showLoginModal} setShowLoginModal={setShowLoginModal}
+        showLoginModal={showLoginModal} setShowLoginModal={setShowLoginModalWrapper}
         activeTab={activeTab} setActiveTab={setActiveTab}
         loginEmail={loginEmail} setLoginEmail={setLoginEmail}
         loginPassword={loginPassword} setLoginPassword={setLoginPassword}
@@ -535,6 +596,15 @@ export default function App() {
         show={showResetAllConfirm} setShow={setShowResetAllConfirm}
         title="Reset All Scenarios?" description="Are you sure you want to reset all scenarios to their default values? This action cannot be undone."
         confirmText="Reset All" confirmClass="bg-red-600 hover:bg-red-700 text-white" onConfirm={doResetAll}
+      />
+
+      <GenericConfirmModal
+        show={showGuestRetentionError} setShow={setShowGuestRetentionError}
+        title="Could Not Save Pre‑Login Session"
+        description={guestRetentionError}
+        confirmText="OK"
+        confirmClass="bg-indigo-600 hover:bg-indigo-700 text-white"
+        onConfirm={() => setShowGuestRetentionError(false)}
       />
 
       <SaveSuccessModal show={false} name={""} />

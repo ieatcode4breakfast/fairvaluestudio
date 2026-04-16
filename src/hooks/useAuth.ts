@@ -13,12 +13,10 @@ export function useAuth(
   handleLoadValuation: (valuationId: string) => Promise<void>,
   loadInitialScenarios: () => Scenario[]
 ) {
-  const [pendingLoginUser, setPendingLoginUser] = useState<User | null>(null);
-  
   // Snapshot of scenarios at login time — used to restore on logout
   const guestScenariosBeforeLoginRef = useRef<Scenario[]>([]);
 
-  // Restore persistent login 
+  // Restore persistent login
   useEffect(() => {
     getCurrentUser().then(user => {
       if (user) {
@@ -31,37 +29,20 @@ export function useAuth(
     }).catch(err => console.error("Failed to load session", err));
   }, [handleLoadValuation, setCurrentUser]);
 
-  const handleLogin = useCallback(async (email: string, pass: string, onRequiresRetainPrompt: () => void) => {
+  const handleLogin = useCallback(async (email: string, pass: string) => {
     const user = await apiLogin(email, pass);
     if (user) {
       guestScenariosBeforeLoginRef.current = scenarios;
       setCurrentUser(user);
-
-      // Check if they had guest data worth offering to save
-      const guestData = localStorage.getItem('fairvalue_scenarios');
-      if (guestData) {
-        setPendingLoginUser(user);
-        onRequiresRetainPrompt();
-      } else {
-        if (user.lastActiveValuationId) {
-          handleLoadValuation(user.lastActiveValuationId);
-        }
-      }
       return user;
     }
     return null;
-  }, [handleLoadValuation, scenarios, setCurrentUser]);
+  }, [scenarios, setCurrentUser]);
 
-  const handleSignup = useCallback(async (email: string, pass: string, username: string, onRequiresRetainPrompt: () => void) => {
+  const handleSignup = useCallback(async (email: string, pass: string, username: string) => {
     const user = await apiSignup(email, pass, username);
     guestScenariosBeforeLoginRef.current = scenarios;
     setCurrentUser(user);
-
-    const guestData = localStorage.getItem('fairvalue_scenarios');
-    if (guestData) {
-      setPendingLoginUser(user);
-      onRequiresRetainPrompt();
-    }
     return user;
   }, [scenarios, setCurrentUser]);
 
@@ -78,8 +59,6 @@ export function useAuth(
   }, [loadInitialScenarios, setScenarios, setActiveScenarioId, setLastSavedState, setLoadedValuationId, setCurrentUser]);
 
   return {
-    pendingLoginUser,
-    setPendingLoginUser,
     handleLogin,
     handleSignup,
     handleLogout

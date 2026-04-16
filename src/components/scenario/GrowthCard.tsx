@@ -57,7 +57,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
   /* ── Advanced phase input renderers ── */
   const renderAdvancedPerShare = () => {
     if (sc.splitYears.length > 0) return (
-      <div className="space-y-4 pt-4 border-t border-slate-100">
+      <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-700">
         {Array.from({ length: sc.splitYears.length + 1 }).map((_, i) => {
           const s = i === 0 ? 1 : sc.splitYears[i - 1];
           const e = i === sc.splitYears.length ? valYears : sc.splitYears[i] - 1;
@@ -88,7 +88,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
 
   const renderAdvancedTotal = () => {
     if (sc.splitYears.length > 0) return (
-      <div className="space-y-4 pt-4 border-t border-slate-100">
+      <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-700">
         {Array.from({ length: sc.splitYears.length + 1 }).map((_, i) => {
           const s = i === 0 ? 1 : sc.splitYears[i - 1];
           const e = i === sc.splitYears.length ? valYears : sc.splitYears[i] - 1;
@@ -126,7 +126,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
 
   const renderAdvancedRevenue = () => {
     if (sc.splitYears.length > 0) return (
-      <div className="space-y-4 pt-4 border-t border-slate-100">
+      <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-700">
         {Array.from({ length: sc.splitYears.length + 1 }).map((_, i) => {
           const s = i === 0 ? 1 : sc.splitYears[i - 1];
           const e = i === sc.splitYears.length ? valYears : sc.splitYears[i] - 1;
@@ -174,8 +174,8 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
     <>
       {/* ── SIMPLE: Growth section ── */}
       {isSimple && lbl && (
-        <div className="p-6 pt-0 mt-6 border-t border-slate-100 relative">
-          <h2 className="text-lg font-medium mb-4 mt-6 flex items-center gap-2">
+        <div className="p-6 relative">
+          <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-slate-400" /> Growth
           </h2>
 
@@ -274,8 +274,8 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
 
       {/* ── ADVANCED: Growth section ── */}
       {!isSimple && (
-        <div className="p-6 pt-0 mt-6 border-t border-slate-100 relative">
-          <h2 className="text-lg font-medium mb-4 mt-6 flex items-center gap-2">
+        <div className="p-6 relative">
+          <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-slate-400" /> Growth
           </h2>
 
@@ -345,7 +345,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
 
           {/* Growth Phases Slider */}
           {showSlider && (
-            <div className="mb-8 pt-6 border-t border-slate-100">
+            <div className="mb-8 pt-6 border-t border-slate-100 dark:border-slate-700">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-sm font-medium text-slate-800">Growth Phases</h3>
                 <span className="text-xs font-medium bg-indigo-50 text-indigo-600 px-2 py-1 rounded-md">
@@ -480,7 +480,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
           )}
 
           {/* Phase Growth Inputs */}
-          <div className={!showSlider ? "pt-6 border-t border-slate-100" : ""}>
+          <div className={!showSlider ? "pt-6 border-t border-slate-100 dark:border-slate-700" : ""}>
             {sc.projectionMethod === 'Per Share Method' && renderAdvancedPerShare()}
             {sc.projectionMethod === 'Total FCF, Share Count' && renderAdvancedTotal()}
             {sc.projectionMethod === 'Revenue, FCF Margin, Share Count' && renderAdvancedRevenue()}
