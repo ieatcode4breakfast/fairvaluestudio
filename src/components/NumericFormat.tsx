@@ -6,9 +6,10 @@ interface NumericFormatProps {
   className?: string;
   isAllowed?: (values: { floatValue: number | undefined }) => boolean;
   placeholder?: string;
+  onFocus?: () => void;
 }
 
-export function NumericFormat({ value, onValueChange, className, isAllowed, placeholder }: NumericFormatProps) {
+export function NumericFormat({ value, onValueChange, className, isAllowed, placeholder, onFocus: onFocusProp }: NumericFormatProps) {
   const [display, setDisplay] = useState('');
   const [isFocused, setIsFocused] = useState(false);
 
@@ -77,6 +78,7 @@ export function NumericFormat({ value, onValueChange, className, isAllowed, plac
 
   function handleFocus() {
     setIsFocused(true);
+    onFocusProp?.();
   }
 
   return (

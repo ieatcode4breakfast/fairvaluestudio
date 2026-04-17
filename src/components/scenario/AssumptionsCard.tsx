@@ -14,6 +14,7 @@ interface AssumptionsCardProps {
 export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps) {
   const maxYears = sc.dcfMethod === 'Basic DCF' ? 10 : 50;
   const [showStockSearch, setShowStockSearch] = useState(false);
+  const [buyPriceHighlighted, setBuyPriceHighlighted] = useState(false);
 
   return (
     <div className="p-6">
@@ -32,7 +33,15 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Buy Price</label>
-          <NumericFormat value={sc.buyPrice} onValueChange={v => onUpdate({ buyPrice: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+          <NumericFormat
+            value={sc.buyPrice}
+            onValueChange={v => onUpdate({ buyPrice: v.floatValue === undefined ? '' : v.floatValue })}
+            className={buyPriceHighlighted
+              ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
+              : INPUT_CLS
+            }
+            onFocus={() => setBuyPriceHighlighted(false)}
+          />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
           <div>
@@ -86,6 +95,7 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
         onClose={() => setShowStockSearch(false)}
         onSelect={(symbol, price) => {
           onUpdate({ buyPrice: price });
+          setBuyPriceHighlighted(true);
           setShowStockSearch(false);
         }}
       />
