@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search } from '../Icons';
-import { searchStocks, StockSearchResult } from '../../api/finnhub';
+import { searchStocks, StockSearchResult, getStockFundamentals, FinnhubFundamentals } from '../../api/finnhub';
 
 interface StockSearchModalProps {
     show: boolean;
     onClose: () => void;
-    onSelect: (symbol: string, price: number) => void;
+    onSelect: (symbol: string, data: FinnhubFundamentals) => void;
 }
 
 export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalProps) {
@@ -13,6 +13,7 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
     const [results, setResults] = useState<StockSearchResult[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [selectingSymbol, setSelectingSymbol] = useState<string | null>(null);
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     // Debounced search effect
@@ -62,26 +63,26 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
             setResults([]);
             setLoading(false);
             setError(null);
+            setSelectingSymbol(null);
         }
     }, [show]);
 
     const handleSelect = async (symbol: string) => {
+        setSelectingSymbol(symbol);
+        setError(null);
         try {
-            // Fetch current price
-            const priceResponse = await fetch(
-                `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${import.meta.env.VITE_FINHUB_API_KEY}`
-            );
-            const data = await priceResponse.json();
-            const price = data.c;
-            if (price && typeof price === 'number') {
-                onSelect(symbol, price);
-                onClose();
-            } else {
-                setError('Could not retrieve current price for this symbol.');
+            const data = await getStockFundamentals(symbol);
+            if (data.price === null) {
+                setError('Could not retrieve a current price for this symbol.');
+                setSelectingSymbol(null);
+                return;
             }
+            // Parent closes this modal and opens the preview modal
+            onSelect(symbol, data);
         } catch (err) {
-            console.error('Price fetch error:', err);
-            setError('Failed to load price. Please try again.');
+            console.error('Data fetch error:', err);
+            setError('Failed to load data. Please try again.');
+            setSelectingSymbol(null);
         }
     };
 
@@ -111,7 +112,7 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
                         type="text"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Enter ticker or company name (e.g., MSFT, Apple)"
+                        placeholder="(e.g., MSFT, Apple, Tesla, AMZN)"
                         className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:focus:ring-indigo-500/30 focus:border-indigo-500 dark:focus:border-indigo-400 transition-colors text-sm text-slate-900 dark:text-slate-100"
                         autoFocus
                         onKeyDown={(e) => {
@@ -138,13 +139,21 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
                                 <li key={stock.symbol}>
                                     <button
                                         onClick={() => handleSelect(stock.symbol)}
-                                        className="w-full text-left p-3 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors group"
+                                        disabled={selectingSymbol !== null}
+                                        className="w-full text-left p-3 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-60 disabled:cursor-wait rounded-lg transition-colors group"
                                     >
-                                        <div className="font-medium text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
-                                            {stock.symbol}
-                                        </div>
-                                        <div className="text-sm text-slate-500 dark:text-slate-400 truncate">
-                                            {stock.description}
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <div className="font-medium text-slate-900 dark:text-slate-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                                                    {stock.symbol}
+                                                </div>
+                                                <div className="text-sm text-slate-500 dark:text-slate-400 truncate">
+                                                    {stock.description}
+                                                </div>
+                                            </div>
+                                            {selectingSymbol === stock.symbol && (
+                                                <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin ml-3 flex-shrink-0" />
+                                            )}
                                         </div>
                                     </button>
                                 </li>
