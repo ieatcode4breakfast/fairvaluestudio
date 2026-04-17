@@ -71,7 +71,7 @@ export function StockDataPreviewModal({ show, symbol, fields, onApply, onClose }
                                     <p className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
                                         {field.label}
                                     </p>
-                                    <p className="text-xs text-indigo-500 dark:text-indigo-400 mt-0.5 font-mono">
+                                    <p className="text-base font-semibold text-indigo-500 dark:text-indigo-400 mt-0.5">
                                         {field.formatted}
                                     </p>
                                 </div>

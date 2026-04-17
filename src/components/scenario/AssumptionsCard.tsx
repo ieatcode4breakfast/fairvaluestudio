@@ -30,7 +30,7 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
       key: 'buyPrice',
       label: 'Buy Price',
       value: v,
-      formatted: `$${v}`,
+      formatted: v,
     });
   }
 
@@ -49,7 +49,7 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
             key: 'simpleCurrentMetricPerShare',
             label: 'Current FCF Per Share',
             value: fv,
-            formatted: `$${fv}`,
+            formatted: fv,
           });
         }
       } else if (sc.simpleMetricType === 'Net Income (Earnings)') {
@@ -60,12 +60,12 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
             key: 'simpleCurrentMetricPerShare',
             label: 'Current EPS',
             value: fv,
-            formatted: `$${fv}`,
+            formatted: fv,
           });
         }
       }
 
-    // ── Basic – Metric, Share Count ───────────────────────────────────────
+      // ── Basic – Metric, Share Count ───────────────────────────────────────
     } else if (sc.simpleProjectionMethod === 'Metric, Share Count') {
       if (sc.simpleMetricType === 'Free Cash Flow' && data.freeCashFlowTTM !== null) {
         const label = inM ? 'Current FCF (M)' : 'Current FCF';
@@ -85,7 +85,7 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
         fields.push({ key: 'simpleCurrentShares', label, value: fv, formatted: fv });
       }
 
-    // ── Basic – Revenue, Metric Margin, Share Count ────────────────────────
+      // ── Basic – Revenue, Metric Margin, Share Count ────────────────────────
     } else if (sc.simpleProjectionMethod === 'Revenue, Metric Margin, Share Count') {
       if (data.revenueTTM !== null) {
         const label = inM ? 'Current Revenue (M)' : 'Current Revenue';
@@ -114,11 +114,11 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
           key: 'currentMetricPerShare',
           label: 'Current FCF Per Share',
           value: fv,
-          formatted: `$${fv}`,
+          formatted: fv,
         });
       }
 
-    // Advanced – Total FCF, Share Count
+      // Advanced – Total FCF, Share Count
     } else if (sc.projectionMethod === 'Total FCF, Share Count') {
       if (data.freeCashFlowTTM !== null) {
         const label = inM ? 'Current FCF (M)' : 'Current FCF';
@@ -133,7 +133,7 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
         fields.push({ key: 'currentShares', label, value: fv, formatted: fv });
       }
 
-    // Advanced – Revenue, FCF Margin, Share Count
+      // Advanced – Revenue, FCF Margin, Share Count
     } else if (sc.projectionMethod === 'Revenue, FCF Margin, Share Count') {
       if (data.revenueTTM !== null) {
         const label = inM ? 'Current Revenue (M)' : 'Current Revenue';
@@ -211,7 +211,7 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
         <button
           onClick={() => setShowStockSearch(true)}
           className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"
-          title="Search stock price"
+          title="Load Stock Data"
         >
           <Search className="w-5 h-5 text-slate-400" />
         </button>
