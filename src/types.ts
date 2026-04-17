@@ -3,43 +3,43 @@ export interface Scenario {
   scenarioName: string;
   dcfMethod: string;
 
-  buyPrice: number | '';
-  years: number | '';
-  discountRate: number | '';
+  buyPrice: number | string | '';
+  years: number | string | '';
+  discountRate: number | string | '';
 
   exitAssumptionType: string;
-  exitMultiple: number | '';
-  exitYield: number | '';
-  perpetuityGrowthRate: number | '';
+  exitMultiple: number | string | '';
+  exitYield: number | string | '';
+  perpetuityGrowthRate: number | string | '';
 
   simpleProjectionMethod: string;
   simpleMetricType: string;
   simpleCustomMetric: string;
-  simpleCurrentMetricPerShare: number | '';
-  simpleMetricGrowthRate: number | '';
-  simpleCurrentMetricTotal: number | '';
-  simpleMetricGrowthRateTotal: number | '';
-  simpleCurrentRevenue: number | '';
-  simpleRevenueGrowthRate: number | '';
-  simpleFinalMargin: number | '';
-  simpleCurrentShares: number | '';
-  simpleSharesGrowthRate: number | '';
+  simpleCurrentMetricPerShare: number | string | '';
+  simpleMetricGrowthRate: number | string | '';
+  simpleCurrentMetricTotal: number | string | '';
+  simpleMetricGrowthRateTotal: number | string | '';
+  simpleCurrentRevenue: number | string | '';
+  simpleRevenueGrowthRate: number | string | '';
+  simpleFinalMargin: number | string | '';
+  simpleCurrentShares: number | string | '';
+  simpleSharesGrowthRate: number | string | '';
   simpleInMillions: boolean;
 
   splitYears: number[];
   hoverYear: number | null;
   draggingIndex: number | null;
   projectionMethod: string;
-  currentMetricPerShare: number | '';
-  metricGrowthRates: (number | '')[];
-  currentMetricTotal: number | '';
-  metricGrowthRatesTotal: (number | '')[];
-  currentRevenue: number | '';
-  revenueGrowthRates: (number | '')[];
-  finalMargins: (number | '')[];
+  currentMetricPerShare: number | string | '';
+  metricGrowthRates: (number | string | '')[];
+  currentMetricTotal: number | string | '';
+  metricGrowthRatesTotal: (number | string | '')[];
+  currentRevenue: number | string | '';
+  revenueGrowthRates: (number | string | '')[];
+  finalMargins: (number | string | '')[];
   inMillions: boolean;
-  currentShares: number | '';
-  sharesGrowthRates: (number | '')[];
+  currentShares: number | string | '';
+  sharesGrowthRates: (number | string | '')[];
 
   showResetConfirm: boolean;
   showYearlyBreakdown: boolean;

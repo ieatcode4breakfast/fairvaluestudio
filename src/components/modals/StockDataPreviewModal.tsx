@@ -4,7 +4,7 @@ import { Toggle } from '../Toggle';
 export interface DataField {
     key: string;
     label: string;
-    value: number;
+    value: number | string;
     formatted: string;
 }
 

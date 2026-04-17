@@ -63,8 +63,8 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
             );
           })}
 
-          {props.scenarios.length < MAX_SCENARIOS && (
-            <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {props.scenarios.length < MAX_SCENARIOS && (
               <div className="relative group">
                 <button
                   onClick={props.addScenario}
@@ -76,19 +76,20 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
                   Add Scenario
                 </div>
               </div>
-              <div className="relative group">
-                <button
-                  onClick={props.onResetAll}
-                  className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-200/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 hover:border-slate-200 dark:hover:border-slate-600 border border-transparent text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                </button>
-                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 dark:bg-slate-900 text-white dark:text-slate-200 text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
-                  Reset All Scenarios
-                </div>
+            )}
+
+            <div className="relative group">
+              <button
+                onClick={props.onResetAll}
+                className="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-200/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 hover:border-slate-200 dark:hover:border-slate-600 border border-transparent text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all"
+              >
+                <RotateCcw className="w-4 h-4" />
+              </button>
+              <div className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-slate-800 dark:bg-slate-900 text-white dark:text-slate-200 text-xs px-2 py-1 rounded whitespace-nowrap z-50 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity hidden md:block">
+                Reset All Scenarios
               </div>
             </div>
-          )}
+          </div>
         </div>
       </div>
 
