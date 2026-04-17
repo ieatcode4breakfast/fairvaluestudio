@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Scenario } from '../../types';
 import { Trash2, RotateCcw, Copy } from '../Icons';
-import { INPUT_CLS } from '../../utils/constants';
+import { INPUT_CLS, SELECT_CLS } from '../../utils/constants';
 
 interface ScenarioMetaCardProps {
   sc: Scenario;
@@ -101,7 +101,7 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
             }
             onUpdate(changes);
           }}
-          className={INPUT_CLS}
+          className={SELECT_CLS}
         >
           <option value="Basic DCF">Basic DCF</option>
           <option value="Advanced DCF">Advanced DCF</option>
@@ -112,7 +112,7 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
         <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Metric</label>
-            <select value={sc.simpleMetricType} onChange={e => onUpdate({ simpleMetricType: e.target.value })} className={INPUT_CLS}>
+            <select value={sc.simpleMetricType} onChange={e => onUpdate({ simpleMetricType: e.target.value })} className={SELECT_CLS}>
               <option>Free Cash Flow</option>
               <option>Net Income (Earnings)</option>
               <option>Custom</option>
@@ -145,7 +145,7 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
                 m2 = sc.simpleCustomMetric || 'Custom Metric';
               }
               return (
-                <select value={sc.simpleProjectionMethod} onChange={e => onUpdate({ simpleProjectionMethod: e.target.value })} className={INPUT_CLS}>
+                <select value={sc.simpleProjectionMethod} onChange={e => onUpdate({ simpleProjectionMethod: e.target.value })} className={SELECT_CLS}>
                   <option value="Per Share">Per Share</option>
                   <option value="Metric, Share Count">{m1}, Share Count</option>
                   <option value="Revenue, Metric Margin, Share Count">Revenue, {m2} Margin, Share Count</option>
@@ -158,7 +158,7 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
 
       {sc.dcfMethod !== 'Basic DCF' && (
         <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
-          <select value={sc.projectionMethod} onChange={e => onUpdate({ projectionMethod: e.target.value })} className={INPUT_CLS}>
+          <select value={sc.projectionMethod} onChange={e => onUpdate({ projectionMethod: e.target.value })} className={SELECT_CLS}>
             <option value="Per Share Method">Per Share</option>
             <option value="Total FCF, Share Count">Total FCF, Share Count</option>
             <option value="Revenue, FCF Margin, Share Count">Revenue, FCF Margin, Share Count</option>

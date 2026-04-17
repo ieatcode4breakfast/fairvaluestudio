@@ -3,7 +3,7 @@ import { Scenario, Results } from '../../types';
 import { Settings2, Search } from '../Icons';
 import { StockSearchModal } from '../modals/StockSearchModal';
 import { NumericFormat } from '../NumericFormat';
-import { INPUT_CLS } from '../../utils/constants';
+import { INPUT_CLS, SELECT_CLS } from '../../utils/constants';
 
 interface AssumptionsCardProps {
   sc: Scenario;
@@ -60,7 +60,7 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
             Terminal Value
           </label>
           <div className="space-y-2">
-            <select value={sc.exitAssumptionType} onChange={e => onUpdate({ exitAssumptionType: e.target.value })} className={INPUT_CLS}>
+            <select value={sc.exitAssumptionType} onChange={e => onUpdate({ exitAssumptionType: e.target.value })} className={SELECT_CLS}>
               <option value="Multiple">Exit Multiple</option>
               <option value="Yield">Exit Yield (%)</option>
               {sc.dcfMethod !== 'Basic DCF' && <option value="Perpetuity Growth">Growth in Perpetuity (%)</option>}

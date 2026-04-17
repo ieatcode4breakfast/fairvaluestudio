@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Calculator, DownloadIcon, UploadIcon, ChevronDown, ChevronUp } from '../Icons';
 import { ThemeToggle } from '../ThemeToggle';
 import { User, ValuationMetadata } from '../../types';
+import { SELECT_CLS } from '../../utils/constants';
 
 interface HeaderProps {
   currentUser: User | null;
@@ -146,7 +147,7 @@ export function Header(props: HeaderProps) {
                         props.handleLoadValuation(e.target.value);
                       }
                     }}
-                    className="flex-1 pl-3 pr-10 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors shadow-sm custom-select appearance-none"
+                    className={`${SELECT_CLS} flex-1 !bg-white dark:!bg-slate-800 shadow-sm`}
                   >
                     <option value="NEW" className="font-semibold text-indigo-600 dark:text-indigo-400">✨ New valuation...</option>
                     {[...props.userValuations]
