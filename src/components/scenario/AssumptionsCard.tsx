@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Scenario, Results } from '../../types';
-import { Settings2 } from '../Icons';
+import { Settings2, Search } from '../Icons';
+import { StockSearchModal } from '../modals/StockSearchModal';
 import { NumericFormat } from '../NumericFormat';
 import { INPUT_CLS } from '../../utils/constants';
 
@@ -12,11 +13,21 @@ interface AssumptionsCardProps {
 
 export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps) {
   const maxYears = sc.dcfMethod === 'Basic DCF' ? 10 : 50;
+  const [showStockSearch, setShowStockSearch] = useState(false);
 
   return (
     <div className="p-6">
-      <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
-        <Settings2 className="w-5 h-5 text-slate-400" /> General Assumptions
+      <h2 className="text-lg font-medium mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Settings2 className="w-5 h-5 text-slate-400" /> General Assumptions
+        </div>
+        <button
+          onClick={() => setShowStockSearch(true)}
+          className="p-2 hover:bg-slate-100 rounded transition-colors"
+          title="Search stock price"
+        >
+          <Search className="w-5 h-5 text-slate-400" />
+        </button>
       </h2>
       <div className="space-y-4">
         <div>
@@ -70,6 +81,14 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
           </div>
         </div>
       </div>
+      <StockSearchModal
+        show={showStockSearch}
+        onClose={() => setShowStockSearch(false)}
+        onSelect={(symbol, price) => {
+          onUpdate({ buyPrice: price });
+          setShowStockSearch(false);
+        }}
+      />
     </div>
   );
 }
