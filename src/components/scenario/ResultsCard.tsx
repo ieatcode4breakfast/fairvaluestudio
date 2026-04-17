@@ -15,7 +15,7 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
 
   const mosColor = results.marginOfSafety !== null ? (results.marginOfSafety > 0 ? 'text-emerald-600' : 'text-red-600') : 'text-slate-900';
   const upsideColor = results.upside !== null ? (results.upside > 0 ? 'text-emerald-600' : 'text-red-600') : 'text-slate-900';
-  const irrColor = results.irr && results.irr > (Number(sc.discountRate) || 0) ? 'text-emerald-600' : 'text-slate-900';
+  const irrColor = results.irr && results.irr > (Number(sc.discountRate) || 0) ? 'text-emerald-600' : 'text-slate-900 dark:text-slate-100';
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -27,17 +27,17 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
       <div className="bg-white dark:bg-slate-800 p-6 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 flex flex-col justify-between min-w-0">
         <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Margin of Safety</div>
         <div className={`text-4xl font-light tracking-tight truncate ${mosColor}`}>{formatPercent(results.marginOfSafety)}</div>
-        <div className="text-xs text-slate-400 dark:text-slate-500 mt-2">Discount to Intrinsic Value</div>
+        <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">Discount to Intrinsic Value</div>
       </div>
       <div className="bg-white dark:bg-slate-800 p-6 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 flex flex-col justify-between min-w-0">
         <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Upside</div>
         <div className={`text-4xl font-light tracking-tight truncate ${upsideColor}`}>{formatPercent(results.upside)}</div>
-        <div className="text-xs text-slate-400 dark:text-slate-500 mt-2">Potential return to Intrinsic Value</div>
+        <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">Potential return to Intrinsic Value</div>
       </div>
       <div className="bg-white dark:bg-slate-800 p-6 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 flex flex-col justify-between min-w-0">
         <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Internal Rate of Return (Annual Return)</div>
         <div className={`text-4xl font-light tracking-tight truncate ${irrColor}`}>{formatPercent(results.irr)}</div>
-        <div className="text-xs text-slate-400 dark:text-slate-500 mt-2">At current buy price</div>
+        <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">At current buy price</div>
       </div>
 
       {isSimple && lbl && (
@@ -56,7 +56,7 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
             </button>
           </div>
           <div className="text-4xl font-light tracking-tight text-slate-900 dark:text-slate-100 truncate">{formatPercent(results.impliedGrowth)}</div>
-          <div className="text-xs text-slate-400 dark:text-slate-500 mt-2">Reverse DCF</div>
+          <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">Reverse DCF</div>
         </div>
       )}
     </div>

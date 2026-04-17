@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Calculator, DownloadIcon, UploadIcon, ChevronDown, ChevronUp } from '../Icons';
 import { ThemeToggle } from '../ThemeToggle';
 import { User, ValuationMetadata } from '../../types';
+import { SELECT_CLS } from '../../utils/constants';
 
 interface HeaderProps {
   currentUser: User | null;
@@ -97,8 +98,8 @@ export function Header(props: HeaderProps) {
           </button>
 
           {isHowToUseExpanded && (
-            <div className="p-5 pt-0 border-t border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-              <ul className="list-disc pl-5 space-y-1.5 text-slate-600 dark:text-slate-400 mb-4">
+            <div className="p-4 border-t border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+              <ul className="list-disc pl-5 space-y-4 text-slate-600 dark:text-slate-400 mb-4">
                 <li><strong>Guest vs. Account:</strong> Use the app as a guest and save or load your data by manually downloading/uploading your valuations. Creating an account unlocks automatic cloud saves, real-time cross-device syncing, and the ability to store and manage multiple valuations at once.</li>
                 <li><strong>Choose a Method:</strong> Select "Basic DCF" for a quick estimate or "Advanced DCF" for detailed, multi-phase growth projections.</li>
                 <li><strong>Configure Phases (Advanced):</strong> Click the timeline track to add growth phases. Drag the dots to adjust the years, or double-click/tap to remove them.</li>
@@ -146,7 +147,7 @@ export function Header(props: HeaderProps) {
                         props.handleLoadValuation(e.target.value);
                       }
                     }}
-                    className="flex-1 pl-3 pr-10 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors shadow-sm custom-select appearance-none"
+                    className={`${SELECT_CLS} flex-1 !bg-white dark:!bg-slate-800 shadow-sm`}
                   >
                     <option value="NEW" className="font-semibold text-indigo-600 dark:text-indigo-400">✨ New valuation...</option>
                     {[...props.userValuations]

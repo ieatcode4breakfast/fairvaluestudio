@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Scenario, Results } from '../../types';
-import { Settings2 } from '../Icons';
+import { Settings2, Search } from '../Icons';
+import { StockSearchModal } from '../modals/StockSearchModal';
 import { NumericFormat } from '../NumericFormat';
-import { INPUT_CLS } from '../../utils/constants';
+import { INPUT_CLS, SELECT_CLS } from '../../utils/constants';
 
 interface AssumptionsCardProps {
   sc: Scenario;
@@ -12,20 +13,30 @@ interface AssumptionsCardProps {
 
 export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps) {
   const maxYears = sc.dcfMethod === 'Basic DCF' ? 10 : 50;
+  const [showStockSearch, setShowStockSearch] = useState(false);
 
   return (
     <div className="p-6">
-      <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
-        <Settings2 className="w-5 h-5 text-slate-400" /> General Assumptions
+      <h2 className="text-lg font-medium mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Settings2 className="w-5 h-5 text-slate-400" /> General Assumptions
+        </div>
+        <button
+          onClick={() => setShowStockSearch(true)}
+          className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"
+          title="Search stock price"
+        >
+          <Search className="w-5 h-5 text-slate-400" />
+        </button>
       </h2>
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-600 mb-1">Buy Price ($)</label>
+          <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Buy Price</label>
           <NumericFormat value={sc.buyPrice} onValueChange={v => onUpdate({ buyPrice: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
           <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">Years to Forecast (Max {maxYears})</label>
+            <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Years to Forecast (Max {maxYears})</label>
             <NumericFormat
               value={sc.years}
               onValueChange={v => {
@@ -38,18 +49,18 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">Discount Rate (%)</label>
+            <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Discount Rate (%)</label>
             <NumericFormat value={sc.discountRate} onValueChange={v => onUpdate({ discountRate: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
           </div>
         </div>
 
         {/* Terminal Value */}
         <div>
-          <label className="block text-sm font-medium text-slate-600 mb-1 flex items-center gap-2">
+          <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-2">
             Terminal Value
           </label>
           <div className="space-y-2">
-            <select value={sc.exitAssumptionType} onChange={e => onUpdate({ exitAssumptionType: e.target.value })} className={INPUT_CLS}>
+            <select value={sc.exitAssumptionType} onChange={e => onUpdate({ exitAssumptionType: e.target.value })} className={SELECT_CLS}>
               <option value="Multiple">Exit Multiple</option>
               <option value="Yield">Exit Yield (%)</option>
               {sc.dcfMethod !== 'Basic DCF' && <option value="Perpetuity Growth">Growth in Perpetuity (%)</option>}
@@ -70,6 +81,14 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
           </div>
         </div>
       </div>
+      <StockSearchModal
+        show={showStockSearch}
+        onClose={() => setShowStockSearch(false)}
+        onSelect={(symbol, price) => {
+          onUpdate({ buyPrice: price });
+          setShowStockSearch(false);
+        }}
+      />
     </div>
   );
 }

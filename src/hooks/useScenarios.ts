@@ -105,10 +105,7 @@ export function useScenarios(currentUser: User | null) {
 
   const addScenario = useCallback(() => {
     if (scenarios.length >= MAX_SCENARIOS) return;
-    const activeIndex = scenarios.findIndex(s => s.id === activeScenarioId);
-    const src = activeIndex >= 0 ? scenarios[activeIndex] : scenarios[scenarios.length - 1];
-    const newSc = cloneScenario(src);
-    newSc.scenarioName = `${newSc.scenarioName || 'Untitled'} (Copy)`;
+    const newSc = createDefaultScenario();
     setScenarios([...scenarios, newSc]);
     setActiveScenarioId(newSc.id);
   }, [scenarios, activeScenarioId]);
@@ -147,7 +144,7 @@ export function useScenarios(currentUser: User | null) {
     tabElements.forEach((tab) => {
       const indexAttr = tab.getAttribute('data-tab-index');
       if (!indexAttr) return;
-      
+
       const index = parseInt(indexAttr, 10);
       const rect = tab.getBoundingClientRect();
       const tabCenter = rect.left + rect.width / 2;
@@ -205,7 +202,7 @@ export function useScenarios(currentUser: User | null) {
     currentCleaned,
     isDirty,
     getCleanedScenariosString,
-    
+
     // Actions
     updateScenario,
     deleteScenario,

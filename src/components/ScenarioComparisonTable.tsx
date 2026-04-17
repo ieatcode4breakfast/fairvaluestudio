@@ -51,7 +51,7 @@ export function ScenarioComparisonTable({ scenarios, allResults }: Props) {
                       {sc.scenarioName || `Scenario ${i + 1}`}
                     </td>
                     <td className="p-3 text-sm font-medium text-slate-800 dark:text-slate-300 text-right whitespace-nowrap">
-                      ${iv.toFixed(2)}
+                      {iv.toFixed(2)}
                     </td>
                     <td className={`p-3 text-sm font-medium text-right whitespace-nowrap ${mosColor}`}>
                       {mos.toFixed(1)}%

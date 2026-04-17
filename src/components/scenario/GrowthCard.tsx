@@ -63,7 +63,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
           const e = i === sc.splitYears.length ? valYears : sc.splitYears[i] - 1;
           return (
             <div key={i}>
-              <label className="block text-sm font-medium text-slate-600 mb-1">FCF Growth Rate (Yrs {s}-{e}) (%)</label>
+              <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Growth Rate (Yrs {s}-{e}) (%)</label>
               <NumericFormat
                 value={sc.metricGrowthRates[i]}
                 onValueChange={v => { const n = [...sc.metricGrowthRates]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ metricGrowthRates: n }); }}
@@ -76,7 +76,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
     );
     return (
       <div>
-        <label className="block text-sm font-medium text-slate-600 mb-1">FCF Growth Rate (%)</label>
+        <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Growth Rate (%)</label>
         <NumericFormat
           value={sc.metricGrowthRates[0]}
           onValueChange={v => { const n = [...sc.metricGrowthRates]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ metricGrowthRates: n }); }}
@@ -97,11 +97,11 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
               <h3 className="text-sm font-medium text-slate-800 mb-2">Phase {i + 1} (Yrs {s}-{e})</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">FCF Growth (%)</label>
+                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Growth (%)</label>
                   <NumericFormat value={sc.metricGrowthRatesTotal[i]} onValueChange={v => { const n = [...sc.metricGrowthRatesTotal]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ metricGrowthRatesTotal: n }); }} className={INPUT_CLS} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Share Growth (%)</label>
+                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Share Growth (%)</label>
                   <NumericFormat value={sc.sharesGrowthRates[i]} onValueChange={v => { const n = [...sc.sharesGrowthRates]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ sharesGrowthRates: n }); }} className={INPUT_CLS} />
                 </div>
               </div>
@@ -113,11 +113,11 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">FCF Growth (%)</label>
+          <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Growth (%)</label>
           <NumericFormat value={sc.metricGrowthRatesTotal[0]} onValueChange={v => { const n = [...sc.metricGrowthRatesTotal]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ metricGrowthRatesTotal: n }); }} className={INPUT_CLS} />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Share Growth (%)</label>
+          <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Share Growth (%)</label>
           <NumericFormat value={sc.sharesGrowthRates[0]} onValueChange={v => { const n = [...sc.sharesGrowthRates]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ sharesGrowthRates: n }); }} className={INPUT_CLS} />
         </div>
       </div>
@@ -135,15 +135,15 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
               <h3 className="text-sm font-medium text-slate-800 mb-2">Phase {i + 1} (Yrs {s}-{e})</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Rev Growth (%)</label>
+                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Rev Growth (%)</label>
                   <NumericFormat value={sc.revenueGrowthRates[i]} onValueChange={v => { const n = [...sc.revenueGrowthRates]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ revenueGrowthRates: n }); }} className={INPUT_CLS} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">FCF Margin (%)</label>
+                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Margin (%)</label>
                   <NumericFormat value={sc.finalMargins[i]} onValueChange={v => { const n = [...sc.finalMargins]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ finalMargins: n }); }} className={INPUT_CLS} />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 mb-1">Share Growth (%)</label>
+                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Share Growth (%)</label>
                   <NumericFormat value={sc.sharesGrowthRates[i]} onValueChange={v => { const n = [...sc.sharesGrowthRates]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ sharesGrowthRates: n }); }} className={INPUT_CLS} />
                 </div>
               </div>
@@ -155,15 +155,15 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
     return (
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Rev Growth (%)</label>
+          <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Rev Growth (%)</label>
           <NumericFormat value={sc.revenueGrowthRates[0]} onValueChange={v => { const n = [...sc.revenueGrowthRates]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ revenueGrowthRates: n }); }} className={INPUT_CLS} />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">FCF Margin (%)</label>
+          <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Margin (%)</label>
           <NumericFormat value={sc.finalMargins[0]} onValueChange={v => { const n = [...sc.finalMargins]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ finalMargins: n }); }} className={INPUT_CLS} />
         </div>
         <div>
-          <label className="block text-xs font-medium text-slate-600 mb-1">Share Growth (%)</label>
+          <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Share Growth (%)</label>
           <NumericFormat value={sc.sharesGrowthRates[0]} onValueChange={v => { const n = [...sc.sharesGrowthRates]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ sharesGrowthRates: n }); }} className={INPUT_CLS} />
         </div>
       </div>
@@ -182,11 +182,11 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
           {sc.simpleProjectionMethod === 'Per Share' && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-600 mb-1">{lbl.labelCurrentPerShare} ($)</label>
+                <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.labelCurrentPerShare}</label>
                 <NumericFormat value={sc.simpleCurrentMetricPerShare} onValueChange={v => upd({ simpleCurrentMetricPerShare: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-600 mb-1">{lbl.labelGrowthRate} (%)</label>
+                <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.labelGrowthRate} (%)</label>
                 <NumericFormat value={sc.simpleMetricGrowthRate} onValueChange={v => upd({ simpleMetricGrowthRate: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
               </div>
             </div>
@@ -195,7 +195,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
           {sc.simpleProjectionMethod === 'Metric, Share Count' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-slate-600">Values in Millions</span>
+                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Values in Millions</span>
                 <Toggle checked={sc.simpleInMillions} onChange={() => {
                   const newFlag = !sc.simpleInMillions;
                   upd({
@@ -208,21 +208,21 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Current {lbl.metricName} {sc.simpleInMillions ? '(M)' : ''}</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current {lbl.metricName} {sc.simpleInMillions ? '(M)' : ''}</label>
                   <NumericFormat value={sc.simpleCurrentMetricTotal} onValueChange={v => upd({ simpleCurrentMetricTotal: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">{lbl.metricName} Growth (%)</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.metricName} Growth (%)</label>
                   <NumericFormat value={sc.simpleMetricGrowthRateTotal} onValueChange={v => upd({ simpleMetricGrowthRateTotal: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Shares {sc.simpleInMillions ? '(M)' : ''}</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares {sc.simpleInMillions ? '(M)' : ''}</label>
                   <NumericFormat value={sc.simpleCurrentShares} onValueChange={v => upd({ simpleCurrentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Shares Growth (%)</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares Growth (%)</label>
                   <NumericFormat value={sc.simpleSharesGrowthRate} onValueChange={v => upd({ simpleSharesGrowthRate: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 </div>
               </div>
@@ -232,7 +232,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
           {sc.simpleProjectionMethod === 'Revenue, Metric Margin, Share Count' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-slate-600">Values in Millions</span>
+                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Values in Millions</span>
                 <Toggle checked={sc.simpleInMillions} onChange={() => {
                   const newFlag = !sc.simpleInMillions;
                   upd({
@@ -245,25 +245,25 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Current Revenue {sc.simpleInMillions ? '(M)' : ''}</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current Revenue {sc.simpleInMillions ? '(M)' : ''}</label>
                   <NumericFormat value={sc.simpleCurrentRevenue} onValueChange={v => upd({ simpleCurrentRevenue: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Revenue Growth (%)</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Revenue Growth (%)</label>
                   <NumericFormat value={sc.simpleRevenueGrowthRate} onValueChange={v => upd({ simpleRevenueGrowthRate: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-600 mb-1">Final {lbl.metricName} Margin (%)</label>
+                <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Final {lbl.metricName} Margin (%)</label>
                 <NumericFormat value={sc.simpleFinalMargin} onValueChange={v => upd({ simpleFinalMargin: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Shares {sc.simpleInMillions ? '(M)' : ''}</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares {sc.simpleInMillions ? '(M)' : ''}</label>
                   <NumericFormat value={sc.simpleCurrentShares} onValueChange={v => upd({ simpleCurrentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Shares Growth (%)</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares Growth (%)</label>
                   <NumericFormat value={sc.simpleSharesGrowthRate} onValueChange={v => upd({ simpleSharesGrowthRate: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 </div>
               </div>
@@ -283,7 +283,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
           {sc.projectionMethod === 'Per Share Method' && (
             <div className="mb-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-600 mb-1">Current FCF Per Share ($)</label>
+                <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current FCF Per Share</label>
                 <NumericFormat value={sc.currentMetricPerShare} onValueChange={v => upd({ currentMetricPerShare: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
               </div>
             </div>
@@ -292,7 +292,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
           {sc.projectionMethod === 'Total FCF, Share Count' && (
             <div className="mb-6 space-y-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-slate-600">Values in Millions</span>
+                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Values in Millions</span>
                 <Toggle checked={sc.inMillions} onChange={() => {
                   const newFlag = !sc.inMillions;
                   upd({
@@ -305,11 +305,11 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Current FCF {sc.inMillions ? '(M)' : ''}</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current FCF {sc.inMillions ? '(M)' : ''}</label>
                   <NumericFormat value={sc.currentMetricTotal} onValueChange={v => upd({ currentMetricTotal: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Shares {sc.inMillions ? '(M)' : ''}</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares {sc.inMillions ? '(M)' : ''}</label>
                   <NumericFormat value={sc.currentShares} onValueChange={v => upd({ currentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 </div>
               </div>
@@ -319,7 +319,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
           {sc.projectionMethod === 'Revenue, FCF Margin, Share Count' && (
             <div className="mb-6 space-y-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-slate-600">Values in Millions</span>
+                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Values in Millions</span>
                 <Toggle checked={sc.inMillions} onChange={() => {
                   const newFlag = !sc.inMillions;
                   upd({
@@ -332,11 +332,11 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Current Revenue {sc.inMillions ? '(M)' : ''}</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current Revenue {sc.inMillions ? '(M)' : ''}</label>
                   <NumericFormat value={sc.currentRevenue} onValueChange={v => upd({ currentRevenue: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-600 mb-1">Shares {sc.inMillions ? '(M)' : ''}</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares {sc.inMillions ? '(M)' : ''}</label>
                   <NumericFormat value={sc.currentShares} onValueChange={v => upd({ currentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 </div>
               </div>

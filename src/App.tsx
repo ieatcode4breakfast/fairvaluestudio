@@ -219,7 +219,7 @@ export default function App() {
       setScenarios(defaultSc);
       setActiveScenarioId(defaultSc[0].id);
       setLastSavedState(getCleanedScenariosString(defaultSc));
-      
+
       // We DEFER removing from localStorage until authentication passes
       // This prevents permanent data loss if the user backs out of the login modal completely.
       // However, the useScenarios effect will immediately see the UI change and update 
@@ -274,10 +274,14 @@ export default function App() {
   };
 
   const doResetAll = () => {
-    const defaultSc = loadInitialScenarios();
+    const defaultSc = [createDefaultScenario()];
+    console.log('Resetting scenarios for', currentUser ? 'logged-in' : 'guest', defaultSc);
+    if (!currentUser) {
+      localStorage.removeItem('fairvalue_scenarios');
+    }
     setScenarios(defaultSc);
     setActiveScenarioId(defaultSc[0].id);
-    if (!currentUser) setLastSavedState(getCleanedScenariosString(defaultSc));
+    setLastSavedState(getCleanedScenariosString(defaultSc));
   };
 
   // Copy Scenario handlers
