@@ -23,7 +23,7 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
         </div>
         <button
           onClick={() => setShowStockSearch(true)}
-          className="p-2 hover:bg-slate-100 rounded transition-colors"
+          className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"
           title="Search stock price"
         >
           <Search className="w-5 h-5 text-slate-400" />
@@ -31,12 +31,12 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
       </h2>
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-slate-600 mb-1">Buy Price ($)</label>
+          <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Buy Price</label>
           <NumericFormat value={sc.buyPrice} onValueChange={v => onUpdate({ buyPrice: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
           <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">Years to Forecast (Max {maxYears})</label>
+            <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Years to Forecast (Max {maxYears})</label>
             <NumericFormat
               value={sc.years}
               onValueChange={v => {
@@ -49,14 +49,14 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-600 mb-1">Discount Rate (%)</label>
+            <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Discount Rate (%)</label>
             <NumericFormat value={sc.discountRate} onValueChange={v => onUpdate({ discountRate: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
           </div>
         </div>
 
         {/* Terminal Value */}
         <div>
-          <label className="block text-sm font-medium text-slate-600 mb-1 flex items-center gap-2">
+          <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-2">
             Terminal Value
           </label>
           <div className="space-y-2">
