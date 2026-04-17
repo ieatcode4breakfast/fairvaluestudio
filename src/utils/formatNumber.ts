@@ -4,13 +4,19 @@
  * - Numbers strictly between -1 and 1 return up to 4 significant 
  * digits after their leading zeros, bypassing scientific notation.
  */
-export function formatDynamicDecimal(num: number): string {
+export function formatDynamicDecimal(num: number, useCommas = false): string {
     if (typeof num !== 'number' || isNaN(num)) return '0.00';
     if (num === 0) return '0.00';
 
     const absNum = Math.abs(num);
 
     if (absNum >= 1) {
+        if (useCommas) {
+            return num.toLocaleString(undefined, { 
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2 
+            });
+        }
         // Round normal numbers to 2 decimal places
         return num.toFixed(2);
     } else {

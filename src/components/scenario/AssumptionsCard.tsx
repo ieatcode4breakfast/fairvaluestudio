@@ -30,7 +30,7 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
       key: 'buyPrice',
       label: 'Buy Price',
       value: v,
-      formatted: v,
+      formatted: formatDynamicDecimal(data.price, true),
     });
   }
 
@@ -49,7 +49,7 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
             key: 'simpleCurrentMetricPerShare',
             label: 'Current FCF Per Share',
             value: fv,
-            formatted: fv,
+            formatted: formatDynamicDecimal(v, true),
           });
         }
       } else if (sc.simpleMetricType === 'Net Income (Earnings)') {
@@ -60,7 +60,7 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
             key: 'simpleCurrentMetricPerShare',
             label: 'Current EPS',
             value: fv,
-            formatted: fv,
+            formatted: formatDynamicDecimal(v, true),
           });
         }
       }
@@ -71,18 +71,18 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
         const label = inM ? 'Current FCF (M)' : 'Current FCF';
         const v = inM ? data.freeCashFlowTTM : data.freeCashFlowTTM * 1_000_000;
         const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'simpleCurrentMetricTotal', label, value: fv, formatted: fv });
+        fields.push({ key: 'simpleCurrentMetricTotal', label, value: fv, formatted: formatDynamicDecimal(v, true) });
       } else if (sc.simpleMetricType === 'Net Income (Earnings)' && data.netIncomeTTM !== null) {
         const label = inM ? 'Current Net Income (M)' : 'Current Net Income';
         const v = inM ? data.netIncomeTTM : data.netIncomeTTM * 1_000_000;
         const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'simpleCurrentMetricTotal', label, value: fv, formatted: fv });
+        fields.push({ key: 'simpleCurrentMetricTotal', label, value: fv, formatted: formatDynamicDecimal(v, true) });
       }
       if (data.sharesOutstanding !== null) {
         const label = inM ? 'Shares (M)' : 'Shares';
         const v = inM ? data.sharesOutstanding : data.sharesOutstanding * 1_000_000;
         const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'simpleCurrentShares', label, value: fv, formatted: fv });
+        fields.push({ key: 'simpleCurrentShares', label, value: fv, formatted: formatDynamicDecimal(v, true) });
       }
 
       // ── Basic – Revenue, Metric Margin, Share Count ────────────────────────
@@ -91,13 +91,13 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
         const label = inM ? 'Current Revenue (M)' : 'Current Revenue';
         const v = inM ? data.revenueTTM : data.revenueTTM * 1_000_000;
         const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'simpleCurrentRevenue', label, value: fv, formatted: fv });
+        fields.push({ key: 'simpleCurrentRevenue', label, value: fv, formatted: formatDynamicDecimal(v, true) });
       }
       if (data.sharesOutstanding !== null) {
         const label = inM ? 'Shares (M)' : 'Shares';
         const v = inM ? data.sharesOutstanding : data.sharesOutstanding * 1_000_000;
         const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'simpleCurrentShares', label, value: fv, formatted: fv });
+        fields.push({ key: 'simpleCurrentShares', label, value: fv, formatted: formatDynamicDecimal(v, true) });
       }
     }
 
@@ -114,7 +114,7 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
           key: 'currentMetricPerShare',
           label: 'Current FCF Per Share',
           value: fv,
-          formatted: fv,
+          formatted: formatDynamicDecimal(v, true),
         });
       }
 
@@ -124,13 +124,13 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
         const label = inM ? 'Current FCF (M)' : 'Current FCF';
         const v = inM ? data.freeCashFlowTTM : data.freeCashFlowTTM * 1_000_000;
         const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'currentMetricTotal', label, value: fv, formatted: fv });
+        fields.push({ key: 'currentMetricTotal', label, value: fv, formatted: formatDynamicDecimal(v, true) });
       }
       if (data.sharesOutstanding !== null) {
         const label = inM ? 'Shares (M)' : 'Shares';
         const v = inM ? data.sharesOutstanding : data.sharesOutstanding * 1_000_000;
         const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'currentShares', label, value: fv, formatted: fv });
+        fields.push({ key: 'currentShares', label, value: fv, formatted: formatDynamicDecimal(v, true) });
       }
 
       // Advanced – Revenue, FCF Margin, Share Count
@@ -139,13 +139,13 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
         const label = inM ? 'Current Revenue (M)' : 'Current Revenue';
         const v = inM ? data.revenueTTM : data.revenueTTM * 1_000_000;
         const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'currentRevenue', label, value: fv, formatted: fv });
+        fields.push({ key: 'currentRevenue', label, value: fv, formatted: formatDynamicDecimal(v, true) });
       }
       if (data.sharesOutstanding !== null) {
         const label = inM ? 'Shares (M)' : 'Shares';
         const v = inM ? data.sharesOutstanding : data.sharesOutstanding * 1_000_000;
         const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'currentShares', label, value: fv, formatted: fv });
+        fields.push({ key: 'currentShares', label, value: fv, formatted: formatDynamicDecimal(v, true) });
       }
     }
   }
