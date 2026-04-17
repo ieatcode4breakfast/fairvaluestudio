@@ -52,11 +52,17 @@ export function StockDataPreviewModal({ show, symbol, fields, onApply, onClose }
                     </button>
                 </div>
 
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
                     Available data for{' '}
                     <span className="font-semibold text-slate-700 dark:text-slate-200">{symbol}</span>.
                     {' '}Choose what to load.
                 </p>
+                <div className="flex items-center gap-1.5 mb-6 px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 rounded-md">
+                    <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-pulse" />
+                    <p className="text-[10px] font-medium uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+                        Live AI Search Grounded
+                    </p>
+                </div>
 
                 {/* Field list */}
                 {fields.length === 0 ? (

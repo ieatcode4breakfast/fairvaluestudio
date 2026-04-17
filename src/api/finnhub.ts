@@ -125,8 +125,20 @@ export async function getStockFundamentals(symbol: string): Promise<FinnhubFunda
                 sharesOutstanding = round(m.sharesOutstanding, 3);
             } else if (Array.isArray(s.sharesOutstanding) && s.sharesOutstanding.length > 0) {
                 sharesOutstanding = round(s.sharesOutstanding[0].v, 3);
+            } else {
+                // LAST FALLBACK: Derive from Market Cap / Price
+                const mCap = m.marketCapitalization ?? m.marketCap;
+                if (typeof mCap === 'number' && mCap > 0 && price !== null && price > 0) {
+                    sharesOutstanding = round(mCap / price, 3);
+                    console.log(`[Finnhub] Derived sharesOutstanding (${sharesOutstanding}M) from marketCap (${mCap}) / price (${price})`);
+                }
             }
 
+            // Diagnostic Logs
+            console.log(`[Finnhub] Metrics keys found:`, Object.keys(m));
+            if (d.series?.quarterly) console.log(`[Finnhub] Series quarterly keys found:`, Object.keys(d.series.quarterly));
+
+            // ... (rest of the logic remains robust)
             // 2. REVENUE TTM
             if (typeof m.revenueTTM === 'number' && m.revenueTTM > 0) {
                 revenueTTM = round(m.revenueTTM, 2);
@@ -177,6 +189,6 @@ export async function getStockFundamentals(symbol: string): Promise<FinnhubFunda
         }
     }
 
-    console.log('[Finnhub] final fundamentals:', { price, revenueTTM, freeCashFlowTTM, netIncomeTTM, sharesOutstanding });
+    console.log('[Finnhub] final fundamentals:', { symbol, price, revenueTTM, freeCashFlowTTM, netIncomeTTM, sharesOutstanding });
     return { price, revenueTTM, freeCashFlowTTM, netIncomeTTM, sharesOutstanding };
-}
+}
