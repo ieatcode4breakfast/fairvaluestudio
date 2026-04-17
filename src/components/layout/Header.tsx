@@ -98,8 +98,8 @@ export function Header(props: HeaderProps) {
           </button>
 
           {isHowToUseExpanded && (
-            <div className="p-5 pt-0 border-t border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-              <ul className="list-disc pl-5 space-y-1.5 text-slate-600 dark:text-slate-400 mb-4">
+            <div className="p-4 border-t border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+              <ul className="list-disc pl-5 space-y-4 text-slate-600 dark:text-slate-400 mb-4">
                 <li><strong>Guest vs. Account:</strong> Use the app as a guest and save or load your data by manually downloading/uploading your valuations. Creating an account unlocks automatic cloud saves, real-time cross-device syncing, and the ability to store and manage multiple valuations at once.</li>
                 <li><strong>Choose a Method:</strong> Select "Basic DCF" for a quick estimate or "Advanced DCF" for detailed, multi-phase growth projections.</li>
                 <li><strong>Configure Phases (Advanced):</strong> Click the timeline track to add growth phases. Drag the dots to adjust the years, or double-click/tap to remove them.</li>
