@@ -33,6 +33,7 @@ export function ScenarioComparisonTable({ scenarios, allResults }: Props) {
                 <th className="p-3 text-right">Intrinsic Value</th>
                 <th className="p-3 text-right">Margin of Safety</th>
                 <th className="p-3 text-right">Upside</th>
+                <th className="p-3 text-right">IRR</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -41,9 +42,11 @@ export function ScenarioComparisonTable({ scenarios, allResults }: Props) {
                 const iv = res?.intrinsicValueTotal ?? 0;
                 const mos = res?.marginOfSafety ?? 0;
                 const upside = res?.upside ?? 0;
+                const irr = res?.irr ?? 0;
 
                 const mosColor = mos > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400';
                 const upsideColor = upside > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400';
+                const irrColor = irr > (Number(sc.discountRate) || 0) ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-800 dark:text-slate-300';
 
                 return (
                   <tr key={sc.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/50 transition-colors">
@@ -58,6 +61,9 @@ export function ScenarioComparisonTable({ scenarios, allResults }: Props) {
                     </td>
                     <td className={`p-3 text-sm font-medium text-right whitespace-nowrap ${upsideColor}`}>
                       {upside > 0 ? '+' : ''}{upside.toFixed(1)}%
+                    </td>
+                    <td className={`p-3 text-sm font-medium text-right whitespace-nowrap ${irrColor}`}>
+                      {irr.toFixed(1)}%
                     </td>
                   </tr>
                 );

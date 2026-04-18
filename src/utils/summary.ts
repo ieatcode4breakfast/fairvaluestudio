@@ -107,7 +107,6 @@ export function buildSummaryText(sc: Scenario, res: Results, index: number) {
       `Intrinsic Value: ${formatCurrency(res.intrinsicValueTotal)}\n` +
       `Margin of Safety: ${formatPercent(res.marginOfSafety)}\n` +
       `Upside: ${formatPercent(res.upside)}\n` +
-      `IRR: ${formatPercent(res.irr)}\n` +
       `IRR: ${formatPercent(res.irr)}\n\n` +
       `[ Breakdown ]\n` +
       `${lbl.labelProjectedFinal} (Year ${valYears}): ${formatCurrency(res.finalMetricPerShare)}\n` +

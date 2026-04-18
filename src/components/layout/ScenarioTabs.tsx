@@ -28,7 +28,7 @@ function ScenarioReorderItem({ sc, isActive, onSelect }: ReorderItemProps) {
       value={sc}
       dragListener={false}
       dragControls={dragControls}
-      className={`flex items-center gap-2 p-2 rounded-lg border transition-colors ${
+      className={`flex items-center gap-2 py-1 px-2 rounded-lg border transition-colors ${
         isActive 
           ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800' 
           : 'bg-white dark:bg-slate-800 border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50'
@@ -87,9 +87,10 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
             {!isOpen ? (
               <motion.div
                 key="select"
-                initial={{ opacity: 0, y: -5 }}
+                initial={{ opacity: 0, y: -2 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 5 }}
+                exit={{ opacity: 0, y: 2 }}
+                transition={{ duration: 0.1 }}
                 onClick={handleOpen}
                 className={`${SELECT_CLS} !bg-white dark:!bg-slate-800 shadow-sm flex items-center cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors group`}
               >
@@ -110,9 +111,10 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
 
                 <motion.div
                   key="reorder"
-                  initial={{ opacity: 0, y: 5 }}
+                  initial={{ opacity: 0, y: 2 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
+                  exit={{ opacity: 0, y: -2 }}
+                  transition={{ duration: 0.1 }}
                   className="absolute top-0 left-0 w-full z-20 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
                 >
                   <div className="p-1">
