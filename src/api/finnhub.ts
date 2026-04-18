@@ -14,16 +14,15 @@ export interface StockSearchResult {
 }
 
 /**
- * Raw financials fetched for a symbol. All monetary values are in millions (Finnhub standard).
+ * Raw financials fetched for a symbol.
  */
 export interface FinnhubFundamentals {
     price: number | null;
+    reportingPeriod?: { year: number; quarter: number } | null;
 }
 
 /**
  * Search for stocks by ticker or company name.
- * @param query Search string (e.g., "MSFT" or "Microsoft")
- * @returns Array of matching stocks
  */
 export async function searchStocks(query: string): Promise<StockSearchResult[]> {
     if (!query.trim()) return [];
@@ -45,8 +44,6 @@ export async function searchStocks(query: string): Promise<StockSearchResult[]> 
 
 /**
  * Fetch the current stock price for a given ticker symbol.
- * @param symbol Stock ticker (e.g., "MSFT")
- * @returns Current price (c field) or null if unavailable
  */
 export async function getStockPrice(symbol: string): Promise<number | null> {
     try {
@@ -57,7 +54,6 @@ export async function getStockPrice(symbol: string): Promise<number | null> {
             throw new Error(`Finnhub quote failed: ${response.status}`);
         }
         const data = await response.json();
-        // c = current price, may be 0 for invalid symbol
         return data.c ?? null;
     } catch (error) {
         console.error('Failed to fetch stock price:', error);
@@ -66,11 +62,28 @@ export async function getStockPrice(symbol: string): Promise<number | null> {
 }
 
 /**
- * Fetch stock price from Finnhub.
- * Returns null for price if unavailable.
+ * Fetch stock price and latest reporting period from Finnhub in parallel.
+ * Returns null for price/period if unavailable.
  */
 export async function getStockFundamentals(symbol: string): Promise<FinnhubFundamentals> {
-    const price = await getStockPrice(symbol);
-    console.log('[Finnhub] final fundamentals:', { symbol, price });
-    return { price };
+    try {
+        const [price, financials] = await Promise.all([
+            getStockPrice(symbol),
+            fetch(`${BASE_URL}/stock/metric?symbol=${symbol}&metric=all&token=${API_KEY}`)
+                .then(r => r.ok ? r.json() : null)
+                .catch(() => null)
+        ]);
+
+        let reportingPeriod = null;
+        if (financials?.series?.quarterly?.eps?.[0]) {
+            const latest = financials.series.quarterly.eps[0];
+            reportingPeriod = { year: latest.year, quarter: latest.quarter };
+        }
+
+        console.log('[Finnhub] final fundamentals:', { symbol, price, reportingPeriod });
+        return { price, reportingPeriod };
+    } catch (error) {
+        console.error('Failed to fetch stock fundamentals:', error);
+        return { price: null, reportingPeriod: null };
+    }
 }

@@ -16,6 +16,8 @@ export interface TTMData {
     earningsPerShare: number;
     currency: string;
     asOfDate: string;
+    fiscalYear: number;
+    fiscalQuarter: number;
 }
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
@@ -58,13 +60,19 @@ export async function getAIUsageStatus(userId: string): Promise<{ count: number,
 
 /**
  * Fetches TTM financial data for a specific stock including per-share metrics.
- * Uses the current date in the prompt to ensure AI grounding is up-to-date.
  * @param ticker - The stock symbol (e.g., "AAPL")
  * @param companyName - The full name of the company (e.g., "Apple Inc.")
  * @param exchange - Optional exchange name (e.g., "NASDAQ")
  * @param userId - Optional ID of the user performing the search
+ * @param targetPeriod - The most recent reporting period found on Finnhub
  */
-export async function fetchTTMData(ticker: string, companyName: string, exchange?: string, userId?: string): Promise<TTMData> {
+export async function fetchTTMData(
+    ticker: string, 
+    companyName: string, 
+    exchange?: string, 
+    userId?: string,
+    targetPeriod?: { year: number, quarter: number } | null
+): Promise<TTMData> {
     if (!API_KEY) {
         throw new Error('VITE_OPENROUTER_API_KEY is not defined in .env.local');
     }
@@ -80,46 +88,61 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
         }
     }
 
-    // ── 1. Cache Check (Server-Side Filtered via View) ─────────────────────
+    // ── 1. Cache Check (Data-Driven) ────────────────────────────────────────
     try {
         const { data: cached, error: cacheError } = await supabase
-            .from('ai_search_cache_fresh')
+            .from('ai_search_cache')
             .select('*')
             .eq('ticker', uppercaseTicker)
             .single();
 
-        if (cached && !cacheError) {
-            console.log(`[OpenRouter] Cache HIT (Server-Side Verified) for ${uppercaseTicker}`);
+        if (cached && !cacheError && targetPeriod) {
+            // Check if our cache is up-to-date with Finnhub's reported period
+            const cacheFiscalYear = Number(cached.fiscal_year);
+            const cacheFiscalQuarter = Number(cached.fiscal_quarter);
             
-            // Log the search even if it was a cache hit (for usage tracking)
-            if (userId) {
-                supabase.from('ai_search_logs').insert({
-                    user_id: userId,
-                    ticker: uppercaseTicker,
-                    company_name: cached.company_name,
-                    model_id: 'database-cache',
-                    prompt_tokens: 0,
-                    completion_tokens: 0,
-                    total_tokens: 0,
-                    response_json: cached,
-                    status: 'success'
-                }).then(({ error }) => {
-                    if (error) console.error('[OpenRouter] Failed to log cache hit:', error);
-                });
-            }
+            const isUpToDate = cacheFiscalYear > targetPeriod.year || 
+                              (cacheFiscalYear === targetPeriod.year && cacheFiscalQuarter >= targetPeriod.quarter);
 
-            return {
-                ticker: uppercaseTicker,
-                companyName: cached.company_name,
-                revenue: Number(cached.revenue),
-                freeCashFlow: Number(cached.free_cash_flow),
-                netIncome: Number(cached.net_income),
-                sharesOutstanding: Number(cached.shares_outstanding),
-                freeCashFlowPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.free_cash_flow) / Number(cached.shares_outstanding) : 0,
-                earningsPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.net_income) / Number(cached.shares_outstanding) : 0,
-                currency: cached.currency || 'USD',
-                asOfDate: cached.last_updated.split('T')[0],
-            };
+            if (isUpToDate) {
+                console.log(`[OpenRouter] Cache HIT (${cacheFiscalYear} Q${cacheFiscalQuarter}) for ${uppercaseTicker}`);
+                
+                // Log the search even if it was a cache hit (for usage tracking)
+                if (userId) {
+                    supabase.from('ai_search_logs').insert({
+                        user_id: userId,
+                        ticker: uppercaseTicker,
+                        company_name: cached.company_name,
+                        model_id: 'database-cache',
+                        prompt_tokens: 0,
+                        completion_tokens: 0,
+                        total_tokens: 0,
+                        response_json: cached,
+                        status: 'success'
+                    }).then(({ error }) => {
+                        if (error) console.error('[OpenRouter] Failed to log cache hit:', error);
+                    });
+                }
+
+                return {
+                    ticker: uppercaseTicker,
+                    companyName: cached.company_name,
+                    revenue: Number(cached.revenue),
+                    freeCashFlow: Number(cached.free_cash_flow),
+                    netIncome: Number(cached.net_income),
+                    sharesOutstanding: Number(cached.shares_outstanding),
+                    freeCashFlowPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.free_cash_flow) / Number(cached.shares_outstanding) : 0,
+                    earningsPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.net_income) / Number(cached.shares_outstanding) : 0,
+                    currency: cached.currency || 'USD',
+                    asOfDate: cached.last_updated.split('T')[0],
+                    fiscalYear: cacheFiscalYear,
+                    fiscalQuarter: cacheFiscalQuarter,
+                };
+            } else {
+                console.log(`[OpenRouter] Cache STALE (${cacheFiscalYear} Q${cacheFiscalQuarter} < Finnhub ${targetPeriod.year} Q${targetPeriod.quarter}) for ${uppercaseTicker}`);
+            }
+        } else if (cached && !cacheError && !targetPeriod) {
+            console.log(`[OpenRouter] Finnhub reporting period missing. Forcing fresh AI fetch for ${uppercaseTicker}.`);
         }
     } catch (err) {
         console.warn('[OpenRouter] Cache check failed, proceeding with fresh fetch:', err);
@@ -136,17 +159,18 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
     PERFORM AN EXHAUSTIVE DEEP SEARCH for the most recent Trailing Twelve Months (TTM) financial data for:
     ${context}
 
-    You must find and return exactly these 4 metrics in a flat JSON format with these exact keys:
+    Return EXACTLY these metrics in a flat JSON format:
     - "revenue": Net revenue (TTM)
     - "freeCashFlow": Operating Cash Flow minus CAPEX (TTM)
     - "netIncome": GAAP Net Income (TTM)
     - "sharesOutstanding": Total Diluted Shares Outstanding (Latest available)
     - "currency": The reported currency (e.g., "USD")
+    - "fiscalYear": The fiscal year this data belongs to (e.g., 2024). Use the company's specific fiscal calendar.
+    - "fiscalQuarter": The fiscal quarter the TTM period ends on (1, 2, 3, or 4).
 
     Constraints:
     - If a direct TTM figure is not stated, manually sum the last 4 reported quarters (10-Q).
-    - All numeric values must be raw numbers (no "B" or "M" suffixes).
-    - IMPORTANT: DOUBLE-CHECK YOUR SCALE. Ensure billions are returned as billions (e.g., $5.2B should be 5200000000, NOT 52000000).
+    - Ensure billions are returned as raw billions (e.g., 5200000000).
     - Return ONLY the JSON object. No prose.
   `;
 
@@ -164,7 +188,7 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
                 messages: [
                     { 
                         role: 'system', 
-                        content: 'You are a professional financial data extractor. Your goal is to provide 100% accurate, grounded financial data for valuation models. You ALWAYS return a single JSON object. If a metric is missing from the first source, you MUST keep searching through filings, earnings call transcripts, or investor relations pages until you find it or can calculate it from quarterly data.' 
+                        content: 'You are a professional financial data extractor. Use the most recent company filings. Return the Fiscal Year and Quarter accurately based on the company\'s specific reporting calendar.' 
                     },
                     { role: 'user', content: prompt }
                 ],
@@ -180,7 +204,6 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
         const data = await response.json();
         let content = data.choices[0].message.content;
         
-        // Clean up markdown code blocks if present
         if (content.includes('```json')) {
             content = content.split('```json')[1].split('```')[0];
         } else if (content.includes('```')) {
@@ -193,6 +216,8 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
         const freeCashFlow = Number(parsedData.freeCashFlow);
         const netIncome = Number(parsedData.netIncome);
         const shares = Number(parsedData.sharesOutstanding);
+        const fiscalYear = Number(parsedData.fiscalYear);
+        const fiscalQuarter = Number(parsedData.fiscalQuarter);
 
         const result: TTMData = {
             ticker: uppercaseTicker,
@@ -205,11 +230,12 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
             earningsPerShare: shares > 0 ? netIncome / shares : 0,
             currency: parsedData.currency || 'USD',
             asOfDate: currentDate,
+            fiscalYear,
+            fiscalQuarter,
         };
 
         // ── 3. Post-Fetch: Log Usage and Update Cache ────────────────────────
         
-        // Log successful usage asynchronously
         if (userId) {
             const usageData = data.usage || {};
             supabase.from('ai_search_logs').insert({
@@ -227,7 +253,6 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
             });
         }
 
-        // Update global cache asynchronously (to the main table)
         supabase.from('ai_search_cache').upsert({
             ticker: uppercaseTicker,
             company_name: companyName,
@@ -236,6 +261,8 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
             net_income: netIncome,
             shares_outstanding: shares,
             currency: parsedData.currency || 'USD',
+            fiscal_year: fiscalYear,
+            fiscal_quarter: fiscalQuarter,
             last_updated: new Date().toISOString()
         }).then(({ error }) => {
             if (error) console.error('[OpenRouter] Failed to update global cache:', error);

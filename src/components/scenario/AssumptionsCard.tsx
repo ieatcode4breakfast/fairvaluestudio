@@ -58,6 +58,7 @@ export function AssumptionsCard({
   const [pendingCompanyName, setPendingCompanyName] = useState('');
   const [pendingAssetType, setPendingAssetType] = useState<string | undefined>();
   const [pendingExchange, setPendingExchange] = useState<string | undefined>();
+  const [pendingReportingPeriod, setPendingReportingPeriod] = useState<{ year: number; quarter: number } | null>(null);
   const [previewFields, setPreviewFields] = useState<DataField[]>([]);
 
   // Called when the user selects a ticker in StockSearchModal.
@@ -69,6 +70,7 @@ export function AssumptionsCard({
     setPendingCompanyName(companyName);
     setPendingAssetType(assetType);
     setPendingExchange(exchange);
+    setPendingReportingPeriod(data.reportingPeriod || null);
     setPreviewFields(fields);
     setShowStockSearch(false);
     setShowPreview(true);
@@ -91,12 +93,7 @@ export function AssumptionsCard({
     // Set highlights for all successfully applied fields
     onSetHighlights(enabledKeys);
 
-    setShowPreview(false);
-    setPreviewFields([]);
-    setPendingSymbol('');
-    setPendingCompanyName('');
-    setPendingAssetType(undefined);
-    setPendingExchange(undefined);
+    handlePreviewClose();
   };
 
   const handlePreviewClose = () => {
@@ -106,6 +103,7 @@ export function AssumptionsCard({
     setPendingCompanyName('');
     setPendingAssetType(undefined);
     setPendingExchange(undefined);
+    setPendingReportingPeriod(null);
   };
 
   return (
@@ -199,6 +197,7 @@ export function AssumptionsCard({
         exchange={pendingExchange}
         inMillions={sc.inMillions}
         fields={previewFields}
+        reportingPeriod={pendingReportingPeriod}
         onApply={handleApply}
         onClose={handlePreviewClose}
         isGuest={!currentUser}

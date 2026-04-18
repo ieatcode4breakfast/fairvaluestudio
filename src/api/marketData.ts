@@ -10,6 +10,7 @@ export interface StockSearchResult {
 
 export interface UnifiedFundamentals {
     price: number | null;
+    reportingPeriod?: { year: number; quarter: number } | null;
 }
 
 /**

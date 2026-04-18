@@ -22,13 +22,14 @@ interface StockDataPreviewModalProps {
     onClose: () => void;
     isGuest?: boolean;
     userId?: string;
+    reportingPeriod?: { year: number; quarter: number } | null;
 }
 
 const SUPPORTED_TYPES = ['Common Stock', 'Equity', 'STK', 'ADR', 'REIT'];
 const PREFERRED_EXCHANGES = ['Nasdaq', 'NYSE', 'TSX', 'TSXV', 'LSE', 'ASX'];
 
 export function StockDataPreviewModal({
-    show, symbol, companyName, assetType, exchange, inMillions, fields, onApply, onClose, isGuest, userId
+    show, symbol, companyName, assetType, exchange, inMillions, fields, onApply, onClose, isGuest, userId, reportingPeriod
 }: StockDataPreviewModalProps) {
     const [enabled, setEnabled] = useState<Record<string, boolean>>({});
     const [isFetchingAI, setIsFetchingAI] = useState(false);
@@ -59,7 +60,7 @@ export function StockDataPreviewModal({
     if (!show) return null;
 
     const allFields = [...fields, ...aiFields];
-    const anyEnabled = Object.values(allFields).some(f => enabled[f.key]);
+    const anyEnabled = allFields.some(f => enabled[f.key]);
 
     // Validation Logic
     const typeLabel = assetType || 'Unknown';
@@ -69,9 +70,6 @@ export function StockDataPreviewModal({
     const isSupportedType = SUPPORTED_TYPES.some(t =>
         typeLabel.toLowerCase().includes(t.toLowerCase())
     );
-    const isPreferredExchange = PREFERRED_EXCHANGES.some(e =>
-        exchangeLabel.toUpperCase().includes(e.toUpperCase())
-    );
 
     const canUseAI = (isSupportedType || !assetType) && !isETF && !isGuest;
 
@@ -80,9 +78,9 @@ export function StockDataPreviewModal({
         setIsFetchingAI(true);
         setAiError(null);
         try {
-            const data = await fetchTTMData(symbol, companyName, exchange, userId);
+            // Pass the reportingPeriod to handle smart caching
+            const data = await fetchTTMData(symbol, companyName, exchange, userId, reportingPeriod);
 
-            // Formatting helper to ensure numeric values are rounded to sane precision
             const round = (v: number) => parseFloat(formatDynamicDecimal(v));
             const s = (v: number) => round(inMillions ? v / 1_000_000 : v);
 
@@ -108,7 +106,6 @@ export function StockDataPreviewModal({
             setAiError(err.message || 'Failed to fetch AI data');
         } finally {
             setIsFetchingAI(false);
-            // Refresh usage status
             if (userId) {
                 getAIUsageStatus(userId).then(status => {
                     setUsageCount(status.count);
@@ -178,6 +175,19 @@ export function StockDataPreviewModal({
                 {/* AI Trigger Section */}
                 {!isGuest && (
                     <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600">
+                        {reportingPeriod && (
+                            <div className="mb-3 flex items-center gap-2 justify-center py-1 px-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg border border-indigo-100 dark:border-indigo-800/50">
+                                <div className="text-indigo-600 dark:text-indigo-400">
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <p className="text-[10px] font-semibold text-indigo-700 dark:text-indigo-300 uppercase tracking-tight">
+                                    Latest Reported: {reportingPeriod.year} Q{reportingPeriod.quarter}
+                                </p>
+                            </div>
+                        )}
+
                         {!canUseAI ? (
                             <div className="py-2 text-center">
                                 <p className="text-sm font-medium text-slate-400 dark:text-slate-500 italic">
@@ -203,19 +213,6 @@ export function StockDataPreviewModal({
                                         Quota: {Math.max(0, usageLimit - usageCount)} of {usageLimit} searches remaining today
                                     </p>
                                 </div>
-
-                                {!isPreferredExchange && exchange && (
-                                    <div className="flex items-center gap-1.5 justify-center px-2">
-                                        <div className="flex-shrink-0">
-                                            <svg className="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.21 0 2.128-1.333 1.514-2.394L13.514 6.394c-.614-1.061-2.314-1.061-2.928 0L3.086 17.606c-.614 1.061.304 2.394 1.514 2.394z" />
-                                            </svg>
-                                        </div>
-                                        <p className="text-[10px] text-amber-600 dark:text-amber-500 font-medium">
-                                            Minor exchange: AI accuracy may vary.
-                                        </p>
-                                    </div>
-                                )}
                             </div>
                         ) : isFetchingAI ? (
                             <div className="flex flex-col items-center justify-center py-2">
@@ -227,19 +224,13 @@ export function StockDataPreviewModal({
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                                 </svg>
-                                <span className="text-xs font-semibold">Available Current Financial Data Loaded</span>
+                                <span className="text-xs font-semibold">Financial Data Loaded</span>
                             </div>
                         )}
 
                         {aiError && (
                             <p className="text-xs text-red-500 mt-2 text-center">{aiError}</p>
                         )}
-
-                        <div className="mt-3 flex items-center justify-center text-center">
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal text-center">
-                                ⚠️ AI can make mistakes. Please double-check accuracy.
-                            </p>
-                        </div>
                     </div>
                 )}
 
@@ -251,7 +242,7 @@ export function StockDataPreviewModal({
                     >
                         Cancel
                     </button>
-                    {fields.length > 0 && (
+                    {(fields.length > 0 || aiFields.length > 0) && (
                         <button
                             onClick={handleApply}
                             disabled={!anyEnabled}
