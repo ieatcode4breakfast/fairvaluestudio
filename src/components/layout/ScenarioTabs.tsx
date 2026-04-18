@@ -40,8 +40,12 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
 
             let shiftClass = "";
             if (props.draggedTabIndex !== null && props.dragOverIndex !== null && !isDragged) {
-              if (index >= props.dragOverIndex && index < props.draggedTabIndex) shiftClass = "translate-x-4";
-              if (index <= props.dragOverIndex && index > props.draggedTabIndex) shiftClass = "-translate-x-4";
+              if (index >= props.dragOverIndex && index < props.draggedTabIndex) {
+                shiftClass = "translate-x-[136px] sm:translate-x-[184px]";
+              }
+              if (index <= props.dragOverIndex && index > props.draggedTabIndex) {
+                shiftClass = "-translate-x-[136px] sm:-translate-x-[184px]";
+              }
             }
 
             return (
@@ -53,12 +57,12 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
                 onDragStart={(e) => props.handleDragStart(e, index)}
                 onDragEnd={props.handleDragEnd}
                 onClick={() => props.setActiveScenarioId(sc.id)}
-                className={`flex items-center justify-center w-10 h-10 flex-shrink-0 rounded-xl text-sm font-medium transition-all duration-200 border cursor-grab active:cursor-grabbing ${shiftClass} ${isActive
+                className={`flex items-center justify-start h-10 w-32 sm:w-44 flex-shrink-0 rounded-xl text-sm font-medium transition-all duration-200 border cursor-grab active:cursor-grabbing ${shiftClass} ${isActive
                   ? 'bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-600 shadow-sm'
                   : 'bg-slate-200/60 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-transparent hover:bg-white dark:hover:bg-slate-700 hover:text-slate-700 dark:hover:text-slate-300 hover:border-slate-200 dark:hover:border-slate-600'
-                  } ${isDragged ? 'opacity-20 scale-75 border-dashed border-indigo-300 dark:border-indigo-500' : 'opacity-100'} ${isDropSuccess ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 shadow-md scale-110' : ''}`}
+                  } ${isDragged ? 'opacity-20 scale-75 border-dashed border-indigo-300 dark:border-indigo-500' : 'opacity-100'} ${isDropSuccess ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700 text-green-700 dark:text-green-300 shadow-md scale-105' : ''}`}
               >
-                {index + 1}
+                <span className="truncate px-3">{sc.scenarioName || 'Untitled'}</span>
               </button>
             );
           })}
