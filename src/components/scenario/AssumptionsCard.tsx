@@ -50,23 +50,29 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
   // Data preview modal
   const [showPreview, setShowPreview] = useState(false);
   const [pendingSymbol, setPendingSymbol] = useState('');
+  const [pendingCompanyName, setPendingCompanyName] = useState('');
   const [previewFields, setPreviewFields] = useState<DataField[]>([]);
 
   // Called when the user selects a ticker in StockSearchModal.
   // sc is already current at the time the search button was clicked,
   // so computeFields correctly reflects the active scenario config.
-  const handleStockSelect = (symbol: string, data: UnifiedFundamentals) => {
+  const handleStockSelect = (symbol: string, companyName: string, data: UnifiedFundamentals) => {
     const fields = computeFields(sc, data);
     setPendingSymbol(symbol);
+    setPendingCompanyName(companyName);
     setPreviewFields(fields);
     setShowStockSearch(false);
     setShowPreview(true);
   };
 
   // Called when the user hits Apply in the preview modal.
-  const handleApply = (enabledKeys: string[]) => {
+  const handleApply = (enabledKeys: string[], aiFields: DataField[] = []) => {
     const changes: Partial<Scenario> = {};
-    previewFields.forEach(field => {
+    
+    // Merge standard preview fields and AI fields
+    const allFields = [...previewFields, ...aiFields];
+    
+    allFields.forEach(field => {
       if (enabledKeys.includes(field.key)) {
         (changes as any)[field.key] = field.value;
       }
@@ -78,6 +84,7 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
     setShowPreview(false);
     setPreviewFields([]);
     setPendingSymbol('');
+    setPendingCompanyName('');
   };
 
   const handlePreviewClose = () => {
@@ -172,6 +179,8 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
       <StockDataPreviewModal
         show={showPreview}
         symbol={pendingSymbol}
+        companyName={pendingCompanyName}
+        inMillions={sc.inMillions}
         fields={previewFields}
         onApply={handleApply}
         onClose={handlePreviewClose}
