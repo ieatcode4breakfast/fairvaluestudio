@@ -37,36 +37,46 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
     const uppercaseTicker = ticker.toUpperCase();
     const currentDate = new Date().toISOString().split('T')[0];
 
-    // ── 1. Cache Check ──────────────────────────────────────────────────────
+    // ── 1. Cache Check (Server-Side Filtered via View) ─────────────────────
     try {
         const { data: cached, error: cacheError } = await supabase
-            .from('ai_search_cache')
+            .from('ai_search_cache_fresh')
             .select('*')
             .eq('ticker', uppercaseTicker)
             .single();
 
         if (cached && !cacheError) {
-            const lastUpdated = new Date(cached.last_updated);
-            const now = new Date();
-            const hoursSinceUpdate = (now.getTime() - lastUpdated.getTime()) / (1000 * 60 * 60);
-
-            // If the cache is less than 24 hours old, return it instantly
-            if (hoursSinceUpdate < 24) {
-                console.log(`[OpenRouter] Cache HIT for ${uppercaseTicker} (${Math.round(hoursSinceUpdate)}h old)`);
-                return {
+            console.log(`[OpenRouter] Cache HIT (Server-Side Verified) for ${uppercaseTicker}`);
+            
+            // Log the search even if it was a cache hit (for usage tracking)
+            if (userId) {
+                supabase.from('ai_search_logs').insert({
+                    user_id: userId,
                     ticker: uppercaseTicker,
-                    companyName: cached.company_name,
-                    revenue: Number(cached.revenue),
-                    freeCashFlow: Number(cached.free_cash_flow),
-                    netIncome: Number(cached.net_income),
-                    sharesOutstanding: Number(cached.shares_outstanding),
-                    freeCashFlowPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.free_cash_flow) / Number(cached.shares_outstanding) : 0,
-                    earningsPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.net_income) / Number(cached.shares_outstanding) : 0,
-                    currency: cached.currency || 'USD',
-                    asOfDate: cached.last_updated.split('T')[0],
-                };
+                    company_name: cached.company_name,
+                    model_id: 'database-cache',
+                    prompt_tokens: 0,
+                    completion_tokens: 0,
+                    total_tokens: 0,
+                    response_json: cached,
+                    status: 'success'
+                }).then(({ error }) => {
+                    if (error) console.error('[OpenRouter] Failed to log cache hit:', error);
+                });
             }
-            console.log(`[OpenRouter] Cache STALE for ${uppercaseTicker} (${Math.round(hoursSinceUpdate)}h old). Fetching fresh data...`);
+
+            return {
+                ticker: uppercaseTicker,
+                companyName: cached.company_name,
+                revenue: Number(cached.revenue),
+                freeCashFlow: Number(cached.free_cash_flow),
+                netIncome: Number(cached.net_income),
+                sharesOutstanding: Number(cached.shares_outstanding),
+                freeCashFlowPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.free_cash_flow) / Number(cached.shares_outstanding) : 0,
+                earningsPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.net_income) / Number(cached.shares_outstanding) : 0,
+                currency: cached.currency || 'USD',
+                asOfDate: cached.last_updated.split('T')[0],
+            };
         }
     } catch (err) {
         console.warn('[OpenRouter] Cache check failed, proceeding with fresh fetch:', err);
@@ -174,7 +184,7 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
             });
         }
 
-        // Update global cache asynchronously
+        // Update global cache asynchronously (to the main table)
         supabase.from('ai_search_cache').upsert({
             ticker: uppercaseTicker,
             company_name: companyName,
