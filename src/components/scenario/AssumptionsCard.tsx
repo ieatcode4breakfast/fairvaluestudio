@@ -202,6 +202,7 @@ export function AssumptionsCard({
         onApply={handleApply}
         onClose={handlePreviewClose}
         isGuest={!currentUser}
+        userId={currentUser?.id}
       />
     </div>
   );

@@ -3,6 +3,8 @@
  * Independent module to fetch TTM financial data using AI.
  */
 
+import { supabase } from '../lib/supabase';
+
 export interface TTMData {
     ticker: string;
     companyName: string;
@@ -25,8 +27,9 @@ const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
  * @param ticker - The stock symbol (e.g., "AAPL")
  * @param companyName - The full name of the company (e.g., "Apple Inc.")
  * @param exchange - Optional exchange name (e.g., "NASDAQ")
+ * @param userId - Optional ID of the user performing the search
  */
-export async function fetchTTMData(ticker: string, companyName: string, exchange?: string): Promise<TTMData> {
+export async function fetchTTMData(ticker: string, companyName: string, exchange?: string, userId?: string): Promise<TTMData> {
     if (!API_KEY) {
         throw new Error('VITE_OPENROUTER_API_KEY is not defined in .env.local');
     }
@@ -102,7 +105,7 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
         const netIncome = Number(parsedData.netIncome);
         const shares = Number(parsedData.sharesOutstanding);
 
-        return {
+        const result: TTMData = {
             ticker: ticker.toUpperCase(),
             companyName,
             revenue,
@@ -114,6 +117,26 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
             currency: parsedData.currency || 'USD',
             asOfDate: currentDate, // Use the same date generated at the start
         };
+
+        // Log successful usage asynchronously to avoid blocking the UI
+        if (userId) {
+            const usageData = data.usage || {};
+            supabase.from('ai_search_logs').insert({
+                user_id: userId,
+                ticker: ticker.toUpperCase(),
+                company_name: companyName,
+                model_id: data.model || 'perplexity/sonar-pro-search',
+                prompt_tokens: usageData.prompt_tokens || 0,
+                completion_tokens: usageData.completion_tokens || 0,
+                total_tokens: usageData.total_tokens || 0,
+                response_json: parsedData,
+                status: 'success'
+            }).then(({ error }) => {
+                if (error) console.error('[OpenRouter] Failed to log usage:', error);
+            });
+        }
+
+        return result;
     } catch (error) {
         console.error('Error fetching TTM data via AI:', error);
         throw error;

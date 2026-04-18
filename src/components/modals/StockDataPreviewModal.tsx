@@ -21,13 +21,14 @@ interface StockDataPreviewModalProps {
     onApply: (enabledKeys: string[], extraFields?: DataField[]) => void;
     onClose: () => void;
     isGuest?: boolean;
+    userId?: string;
 }
 
 const SUPPORTED_TYPES = ['Common Stock', 'Equity', 'STK', 'ADR', 'REIT'];
 const PREFERRED_EXCHANGES = ['Nasdaq', 'NYSE', 'TSX', 'TSXV', 'LSE', 'ASX'];
 
 export function StockDataPreviewModal({
-    show, symbol, companyName, assetType, exchange, inMillions, fields, onApply, onClose, isGuest
+    show, symbol, companyName, assetType, exchange, inMillions, fields, onApply, onClose, isGuest, userId
 }: StockDataPreviewModalProps) {
     const [enabled, setEnabled] = useState<Record<string, boolean>>({});
     const [isFetchingAI, setIsFetchingAI] = useState(false);
@@ -69,7 +70,7 @@ export function StockDataPreviewModal({
         setIsFetchingAI(true);
         setAiError(null);
         try {
-            const data = await fetchTTMData(symbol, companyName, exchange);
+            const data = await fetchTTMData(symbol, companyName, exchange, userId);
 
             // Formatting helper to ensure numeric values are rounded to sane precision
             const round = (v: number) => parseFloat(formatDynamicDecimal(v));

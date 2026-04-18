@@ -234,15 +234,23 @@ export default function App() {
 
   const doCreateValuation = async (loadSample: boolean) => {
     if (!newValuationName.trim()) return;
-    let initialScenarios = loadSample ? getSampleScenarios() : loadInitialScenarios();
 
-    // If there's a pending copy scenario, bundle it into the initial scenarios
+    let initialScenarios: Scenario[];
+
+    // 1. If we have a pending copy, it becomes the SOLE scenario in the new valuation
     if (pendingCopyScenarioRef.current) {
       const { cloneScenario } = await import('./utils/scenario');
       const copied = cloneScenario(pendingCopyScenarioRef.current);
       copied.scenarioName = `${pendingCopyScenarioRef.current.scenarioName || 'Untitled'} (Copy)`;
-      initialScenarios = [...initialScenarios, copied];
+      initialScenarios = [copied];
       pendingCopyScenarioRef.current = null;
+    } 
+    // 2. Otherwise, load either the sample set or a fresh blank scenario
+    else if (loadSample) {
+      initialScenarios = getSampleScenarios();
+    } 
+    else {
+      initialScenarios = [createDefaultScenario()];
     }
 
     const newId = await handleCreateNewValuation(newValuationName, initialScenarios);
