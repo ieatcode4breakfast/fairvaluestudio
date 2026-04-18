@@ -18,36 +18,41 @@ export function createDefaultScenario(): Scenario {
     exitYield: '',
     perpetuityGrowthRate: '',
 
-    // ── Basic DCF fields ──
+    // ── Basic DCF fields (Growth assumptions only) ──
     simpleProjectionMethod: 'Per Share',
     simpleMetricType: 'Free Cash Flow',
     simpleCustomMetric: '',
-    simpleCurrentMetricPerShare: '',
     simpleMetricGrowthRate: '',
-    simpleCurrentMetricTotal: '',
     simpleMetricGrowthRateTotal: '',
-    simpleCurrentRevenue: '',
     simpleRevenueGrowthRate: '',
     simpleFinalMargin: '',
-    simpleCurrentShares: '',
     simpleSharesGrowthRate: '',
-    simpleInMillions: true,
 
-    // ── Advanced DCF fields ──
+    // ── Isolated Metric fields (Basic DCF) ──
+    niCurrentMetricPerShare: '',
+    niCurrentMetricTotal: '',
+    niFinalMargin: '',
+    customCurrentMetricPerShare: '',
+    customCurrentMetricTotal: '',
+    customFinalMargin: '',
+
+    // ── Advanced DCF fields (Growth assumptions only) ──
     splitYears: [],
     hoverYear: null,
     draggingIndex: null,
     projectionMethod: 'Per Share Method',
-    currentMetricPerShare: '',
     metricGrowthRates:      ['', '', '', '', '', '', '', '', '', ''],
-    currentMetricTotal: '',
     metricGrowthRatesTotal: ['', '', '', '', '', '', '', '', '', ''],
-    currentRevenue: '',
     revenueGrowthRates:     ['', '', '', '', '', '', '', '', '', ''],
     finalMargins:           ['', '', '', '', '', '', '', '', '', ''],
-    inMillions: true,
-    currentShares: '',
     sharesGrowthRates:      ['', '', '', '', '', '', '', '', '', ''],
+
+    // ── Unified "Current" fields ──
+    currentMetricPerShare: '',
+    currentMetricTotal: '',
+    currentRevenue: '',
+    currentShares: '',
+    inMillions: true,
 
     // ── UI state ──
     showResetConfirm: false,
