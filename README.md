@@ -10,9 +10,9 @@ FairValue Studio is a powerful, yet intuitive multi-scenario valuation tool desi
 
 1. **Open the app** at the link above.
 2. **Choose a valuation method** (Basic DCF for quick estimates, Advanced DCF for detailed multi-phase projections).
-3. **Search for a stock** using the search icon (magnifying glass) to fetch live price and financial data.
+3. **Search for a stock** using the search icon (magnifying glass) to fetch live price data (or full TTM financials with an account).
 4. **Adjust assumptions** like growth rates, margins, and discount rates.
-5. **Add scenarios** using the tabs to compare different assumptions (Base, Bear, Bull cases).
+5. **Add scenarios** using the **Scenario Selector** to compare different assumptions (Base, Bear, Bull cases).
 6. **Review results** including intrinsic value, margin of safety, and yearly breakdown.
 7. **Save your work** by creating an account (auto-sync) or downloading a JSON file.
 
@@ -35,7 +35,7 @@ Instead of manually typing numbers, you can pull real‑time market data directl
 - Select the stock from the results to fetch its current price.
 - Click **“Apply Data”** to fill the “Buy Price” field.
 
-**✨ AI‑Powered Financial Data** – For stocks listed on major exchanges, you can click the **“Search Current Financial Data (AI)”** button inside the data preview modal. The AI will search through filings, earnings transcripts, and investor relations pages to retrieve Trailing Twelve Month (TTM) figures for revenue, free cash flow, net income, and shares outstanding. These numbers are automatically formatted and ready to use in your projections.
+**✨ AI‑Powered Financial Data (Account Required)** – If you are logged in, you can click the **“Search Current Financial Data (AI)”** button inside the data preview modal. The AI will search through filings, earnings transcripts, and investor relations pages to retrieve Trailing Twelve Month (TTM) figures for revenue, free cash flow, net income, and shares outstanding. These numbers are automatically formatted and ready to use in your projections.
 
 ### 3. Set Your Assumptions
 The “Assumptions” card lets you control the core inputs of your model:
@@ -64,8 +64,9 @@ Each phase can have its own growth rate and margin inputs, letting you model com
 ### 6. Compare Multiple Scenarios
 A single valuation can hold up to **10 different scenarios** (e.g., Base Case, Bear Case, Bull Case). 
 
-- **Add a scenario** – Click the **“＋ New Scenario”** tab at the top.
-- **Switch between scenarios** – Click any tab to view its inputs and results.
+- **Add a scenario** – Click the **“＋”** icon next to the Scenarios selector.
+- **Switch between scenarios** – Open the **Scenarios dropdown** and click the name of the scenario you want to view.
+- **Reorder scenarios** – Open the dropdown and use the **vertical grip handle (⋮⋮)** on the left to drag scenarios into your preferred order.
 - **Duplicate a scenario** – Click the duplicate icon (two overlapping squares) inside a scenario’s meta card to create a copy, then tweak a few assumptions for sensitivity analysis.
 - **Delete a scenario** – Click the trash icon (only allowed when more than one scenario exists).
 
@@ -77,7 +78,7 @@ The **Scenario Comparison Table** (visible when you have at least two scenarios)
 - Upload a previously saved `.json` file (upload icon) to restore your work.
 
 #### Account Mode (Recommended)
-- **Create a free account** to unlock automatic cloud saves, real‑time cross‑device syncing, and the ability to store multiple valuations.
+- **Create a free account** to unlock AI-powered financial data (TTM), automatic cloud saves, real‑time cross‑device syncing, and the ability to store multiple valuations.
 - After signing up, your guest valuation can be migrated to your new account with one click.
 - Use the **Valuations dropdown** in the header to create, rename, delete, or switch between different valuation projects.
 - All changes are auto‑saved as you type.
@@ -98,7 +99,7 @@ This “pro tip” lets you get a qualitative sanity check from any AI assistant
 
 - **Multi‑Scenario Modeling** – Compare up to 10 different assumption sets side‑by‑side.
 - **Live Stock Search** – Fetch real‑time prices and company details via Finnhub and RapidAPI.
-- **AI‑Driven Financial Data** – Retrieve TTM revenue, FCF, net income, and shares outstanding using OpenRouter’s deep‑search AI.
+- **AI‑Driven Financial Data** – Retrieve TTM revenue, FCF, net income, and shares outstanding using OpenRouter’s deep‑search AI (Account required).
 - **Two Valuation Methods** – Basic DCF for quick estimates, Advanced DCF with draggable growth phases.
 - **Three Projection Strategies** – Per‑share, total FCF with share count, and revenue‑margin build.
 - **Cloud Sync & Auto‑Save** – Seamless saving across devices when logged in.
@@ -123,10 +124,10 @@ If you are **logged in**, your work is automatically synced to the cloud. You ca
 The stock search works for equities listed on major exchanges worldwide (NASDAQ, NYSE, TSX, TSXV, LSE, ASX, etc.). AI financial data is most reliable for stocks on NASDAQ and NYSE.
 
 ### Why doesn’t the AI data button appear for some stocks?
-The AI search is disabled for ETFs, mutual funds, and certain asset types where TTM financials aren’t applicable. It also shows a warning for minor exchanges where data availability may be limited.
+The AI search requires an account and is disabled for ETFs, mutual funds, and certain asset types where TTM financials aren’t applicable. It also shows a warning for minor exchanges where data availability may be limited.
 
 ### How many scenarios can I have?
-Each valuation supports up to 10 scenarios. You can create, duplicate, reorder (drag‑and‑drop), and delete scenarios as needed.
+Each valuation supports up to 10 scenarios. You can create, duplicate, and delete scenarios as needed. To reorder them, use the **vertical grip handle** inside the Scenarios dropdown.
 
 ### Can I share my valuation with someone else?
 Yes. Download your valuation as a JSON file and send it to another person. They can upload it into their own FairValue Studio session (guest or logged‑in) and see exactly the same scenarios and results.
