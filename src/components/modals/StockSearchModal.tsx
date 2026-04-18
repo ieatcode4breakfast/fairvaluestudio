@@ -72,14 +72,9 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
         setSelectingSymbol(symbol);
         setError(null);
         try {
-            // Fetch both in parallel for efficiency
-            const [data, aiData] = await Promise.all([
-                getStockFundamentals(symbol),
-                getAIFundamentals(symbol).catch(err => {
-                    console.error('[StockSearch] AI fetch failed:', err);
-                    return null;
-                })
-            ]);
+            // Fetch Finnhub fundamentals only (AI search disabled for now)
+            const data = await getStockFundamentals(symbol);
+            const aiData = null;
 
             if (data.price === null) {
                 setError('Could not retrieve a current price for this symbol.');
@@ -88,13 +83,13 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
             }
 
             // Merge AI data into the fundamentals if available
-            // AI data is prioritized for fundamentals as it's grounded in real-time web search
+            // Finnhub data is prioritized for fundamentals as it's more reliable, AI data is used as fallback
             const mergedData: FinnhubFundamentals = {
                 ...data,
-                revenueTTM: aiData?.revenueTTM ?? data.revenueTTM,
-                netIncomeTTM: aiData?.netIncomeTTM ?? data.netIncomeTTM,
-                freeCashFlowTTM: aiData?.freeCashFlowTTM ?? data.freeCashFlowTTM,
-                sharesOutstanding: aiData?.sharesOutstanding ?? data.sharesOutstanding,
+                revenueTTM: data.revenueTTM ?? aiData?.revenueTTM ?? null,
+                netIncomeTTM: data.netIncomeTTM ?? aiData?.netIncomeTTM ?? null,
+                freeCashFlowTTM: data.freeCashFlowTTM ?? aiData?.freeCashFlowTTM ?? null,
+                sharesOutstanding: data.sharesOutstanding ?? aiData?.sharesOutstanding ?? null,
             };
 
             // Parent closes this modal and opens the preview modal
