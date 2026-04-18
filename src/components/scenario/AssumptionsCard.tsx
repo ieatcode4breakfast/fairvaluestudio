@@ -5,7 +5,7 @@ import { StockSearchModal } from '../modals/StockSearchModal';
 import { StockDataPreviewModal, DataField } from '../modals/StockDataPreviewModal';
 import { NumericFormat } from '../NumericFormat';
 import { INPUT_CLS, SELECT_CLS } from '../../utils/constants';
-import { FinnhubFundamentals } from '../../api/finnhub';
+import { UnifiedFundamentals } from '../../api/marketData';
 import { formatDynamicDecimal } from '../../utils/formatNumber';
 
 interface AssumptionsCardProps {
@@ -20,7 +20,7 @@ interface AssumptionsCardProps {
 // Respects the current inMillions / simpleInMillions flag so labels and values
 // match exactly what is displayed in GrowthCard inputs.
 // ---------------------------------------------------------------------------
-function computeFields(_sc: Scenario, data: FinnhubFundamentals): DataField[] {
+function computeFields(_sc: Scenario, data: UnifiedFundamentals): DataField[] {
   const fields: DataField[] = [];
 
   // ── Buy Price (always present if price was fetched) ──────────────────────
@@ -55,7 +55,7 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
   // Called when the user selects a ticker in StockSearchModal.
   // sc is already current at the time the search button was clicked,
   // so computeFields correctly reflects the active scenario config.
-  const handleStockSelect = (symbol: string, data: FinnhubFundamentals) => {
+  const handleStockSelect = (symbol: string, data: UnifiedFundamentals) => {
     const fields = computeFields(sc, data);
     setPendingSymbol(symbol);
     setPreviewFields(fields);
