@@ -5,7 +5,7 @@ import { searchStocks, StockSearchResult, getStockFundamentals, UnifiedFundament
 interface StockSearchModalProps {
     show: boolean;
     onClose: () => void;
-    onSelect: (symbol: string, data: UnifiedFundamentals) => void;
+    onSelect: (symbol: string, companyName: string, data: UnifiedFundamentals) => void;
 }
 
 export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalProps) {
@@ -80,8 +80,12 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
                 return;
             }
 
+            // Find the company name from results
+            const stock = results.find(r => r.symbol === symbol);
+            const companyName = stock ? stock.description : symbol;
+
             // Parent closes this modal and opens the preview modal
-            onSelect(symbol, data);
+            onSelect(symbol, companyName, data);
         } catch (err) {
             console.error('Data fetch error:', err);
             setError('Failed to load data. Please try again.');
