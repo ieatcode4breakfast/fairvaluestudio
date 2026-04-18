@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Reorder, AnimatePresence, motion } from 'motion/react';
+import { Reorder, AnimatePresence, motion, useDragControls } from 'motion/react';
 import { PlusIcon, RotateCcw, List, Check, GripVertical } from '../Icons';
 import { Scenario } from '../../types';
 import { MAX_SCENARIOS } from '../../utils/constants';
@@ -12,6 +12,34 @@ interface ScenarioTabsProps {
   onReorder: (newOrder: Scenario[]) => void;
   addScenario: () => void;
   onResetAll: () => void;
+}
+
+interface ReorderItemProps {
+  sc: Scenario;
+}
+
+function ScenarioReorderItem({ sc }: ReorderItemProps) {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item
+      value={sc}
+      dragListener={false}
+      dragControls={dragControls}
+      className="flex items-center gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg border border-transparent"
+    >
+      <div 
+        onPointerDown={(e) => dragControls.start(e)}
+        className="cursor-grab active:cursor-grabbing p-1 text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
+        style={{ touchAction: 'none' }}
+      >
+        <GripVertical className="w-4 h-4 shrink-0" />
+      </div>
+      <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate select-none">
+        {sc.scenarioName || 'Untitled'}
+      </span>
+    </Reorder.Item>
+  );
 }
 
 export function ScenarioTabs(props: ScenarioTabsProps) {
@@ -37,7 +65,7 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
         <label htmlFor="scenario-select" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
           Scenarios
         </label>
-        
+
         <div className="flex items-center gap-2">
           {props.scenarios.length < MAX_SCENARIOS && !isSorting && (
             <button
@@ -102,16 +130,7 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
                     className="flex flex-col gap-1"
                   >
                     {tempOrder.map((sc) => (
-                      <Reorder.Item
-                        key={sc.id}
-                        value={sc}
-                        className="flex items-center gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg border border-transparent hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-grab active:cursor-grabbing transition-colors"
-                      >
-                        <GripVertical className="w-4 h-4 text-slate-400 shrink-0" />
-                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
-                          {sc.scenarioName || 'Untitled'}
-                        </span>
-                      </Reorder.Item>
+                      <ScenarioReorderItem key={sc.id} sc={sc} />
                     ))}
                   </Reorder.Group>
                 </div>
@@ -123,11 +142,10 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
         <button
           onClick={handleToggleSorting}
           title={isSorting ? "Finish Reordering" : "Reorder Scenarios"}
-          className={`shrink-0 flex items-center justify-center w-11 h-11 rounded-lg transition-all shadow-sm border ${
-            isSorting 
-              ? 'bg-indigo-600 text-white border-indigo-500 hover:bg-indigo-700' 
+          className={`shrink-0 flex items-center justify-center w-11 h-11 rounded-lg transition-all shadow-sm border ${isSorting
+              ? 'bg-indigo-600 text-white border-indigo-500 hover:bg-indigo-700'
               : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:border-slate-200 dark:hover:border-slate-600 hover:text-indigo-600 dark:hover:text-indigo-400 border-slate-200 dark:border-slate-700'
-          }`}
+            }`}
         >
           {isSorting ? <Check className="w-5 h-5" /> : <List className="w-5 h-5" />}
         </button>
