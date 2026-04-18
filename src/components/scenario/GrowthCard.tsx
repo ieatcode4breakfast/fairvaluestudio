@@ -66,7 +66,14 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
               <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Growth Rate (Yrs {s}-{e}) (%)</label>
               <NumericFormat
                 value={sc.metricGrowthRates[i]}
-                onValueChange={v => { const n = [...sc.metricGrowthRates]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ metricGrowthRates: n }); }}
+                onValueChange={v => {
+                  const val = v.floatValue === undefined ? '' : v.floatValue;
+                  const n = [...sc.metricGrowthRates];
+                  n[i] = val;
+                  const changes: Partial<Scenario> = { metricGrowthRates: n };
+                  if (i === 0) changes.simpleMetricGrowthRate = val;
+                  upd(changes);
+                }}
                 className={INPUT_CLS}
               />
             </div>
@@ -79,7 +86,12 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
         <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Growth Rate (%)</label>
         <NumericFormat
           value={sc.metricGrowthRates[0]}
-          onValueChange={v => { const n = [...sc.metricGrowthRates]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ metricGrowthRates: n }); }}
+          onValueChange={v => {
+            const val = v.floatValue === undefined ? '' : v.floatValue;
+            const n = [...sc.metricGrowthRates];
+            n[0] = val;
+            upd({ metricGrowthRates: n, simpleMetricGrowthRate: val });
+          }}
           className={INPUT_CLS}
         />
       </div>
@@ -98,11 +110,25 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Growth (%)</label>
-                  <NumericFormat value={sc.metricGrowthRatesTotal[i]} onValueChange={v => { const n = [...sc.metricGrowthRatesTotal]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ metricGrowthRatesTotal: n }); }} className={INPUT_CLS} />
+                  <NumericFormat value={sc.metricGrowthRatesTotal[i]} onValueChange={v => {
+                    const val = v.floatValue === undefined ? '' : v.floatValue;
+                    const n = [...sc.metricGrowthRatesTotal];
+                    n[i] = val;
+                    const changes: Partial<Scenario> = { metricGrowthRatesTotal: n };
+                    if (i === 0) changes.simpleMetricGrowthRateTotal = val;
+                    upd(changes);
+                  }} className={INPUT_CLS} />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Share Growth (%)</label>
-                  <NumericFormat value={sc.sharesGrowthRates[i]} onValueChange={v => { const n = [...sc.sharesGrowthRates]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ sharesGrowthRates: n }); }} className={INPUT_CLS} />
+                  <NumericFormat value={sc.sharesGrowthRates[i]} onValueChange={v => {
+                    const val = v.floatValue === undefined ? '' : v.floatValue;
+                    const n = [...sc.sharesGrowthRates];
+                    n[i] = val;
+                    const changes: Partial<Scenario> = { sharesGrowthRates: n };
+                    if (i === 0) changes.simpleSharesGrowthRate = val;
+                    upd(changes);
+                  }} className={INPUT_CLS} />
                 </div>
               </div>
             </div>
@@ -114,11 +140,21 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
         <div>
           <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Growth (%)</label>
-          <NumericFormat value={sc.metricGrowthRatesTotal[0]} onValueChange={v => { const n = [...sc.metricGrowthRatesTotal]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ metricGrowthRatesTotal: n }); }} className={INPUT_CLS} />
+          <NumericFormat value={sc.metricGrowthRatesTotal[0]} onValueChange={v => {
+            const val = v.floatValue === undefined ? '' : v.floatValue;
+            const n = [...sc.metricGrowthRatesTotal];
+            n[0] = val;
+            upd({ metricGrowthRatesTotal: n, simpleMetricGrowthRateTotal: val });
+          }} className={INPUT_CLS} />
         </div>
         <div>
           <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Share Growth (%)</label>
-          <NumericFormat value={sc.sharesGrowthRates[0]} onValueChange={v => { const n = [...sc.sharesGrowthRates]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ sharesGrowthRates: n }); }} className={INPUT_CLS} />
+          <NumericFormat value={sc.sharesGrowthRates[0]} onValueChange={v => {
+            const val = v.floatValue === undefined ? '' : v.floatValue;
+            const n = [...sc.sharesGrowthRates];
+            n[0] = val;
+            upd({ sharesGrowthRates: n, simpleSharesGrowthRate: val });
+          }} className={INPUT_CLS} />
         </div>
       </div>
     );
@@ -136,15 +172,36 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
                 <div>
                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Rev Growth (%)</label>
-                  <NumericFormat value={sc.revenueGrowthRates[i]} onValueChange={v => { const n = [...sc.revenueGrowthRates]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ revenueGrowthRates: n }); }} className={INPUT_CLS} />
+                  <NumericFormat value={sc.revenueGrowthRates[i]} onValueChange={v => {
+                    const val = v.floatValue === undefined ? '' : v.floatValue;
+                    const n = [...sc.revenueGrowthRates];
+                    n[i] = val;
+                    const changes: Partial<Scenario> = { revenueGrowthRates: n };
+                    if (i === 0) changes.simpleRevenueGrowthRate = val;
+                    upd(changes);
+                  }} className={INPUT_CLS} />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Margin (%)</label>
-                  <NumericFormat value={sc.finalMargins[i]} onValueChange={v => { const n = [...sc.finalMargins]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ finalMargins: n }); }} className={INPUT_CLS} />
+                  <NumericFormat value={sc.finalMargins[i]} onValueChange={v => {
+                    const val = v.floatValue === undefined ? '' : v.floatValue;
+                    const n = [...sc.finalMargins];
+                    n[i] = val;
+                    const changes: Partial<Scenario> = { finalMargins: n };
+                    if (i === 0) changes.simpleFinalMargin = val;
+                    upd(changes);
+                  }} className={INPUT_CLS} />
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Share Growth (%)</label>
-                  <NumericFormat value={sc.sharesGrowthRates[i]} onValueChange={v => { const n = [...sc.sharesGrowthRates]; n[i] = v.floatValue === undefined ? '' : v.floatValue; upd({ sharesGrowthRates: n }); }} className={INPUT_CLS} />
+                  <NumericFormat value={sc.sharesGrowthRates[i]} onValueChange={v => {
+                    const val = v.floatValue === undefined ? '' : v.floatValue;
+                    const n = [...sc.sharesGrowthRates];
+                    n[i] = val;
+                    const changes: Partial<Scenario> = { sharesGrowthRates: n };
+                    if (i === 0) changes.simpleSharesGrowthRate = val;
+                    upd(changes);
+                  }} className={INPUT_CLS} />
                 </div>
               </div>
             </div>
@@ -156,15 +213,30 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
         <div>
           <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Rev Growth (%)</label>
-          <NumericFormat value={sc.revenueGrowthRates[0]} onValueChange={v => { const n = [...sc.revenueGrowthRates]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ revenueGrowthRates: n }); }} className={INPUT_CLS} />
+          <NumericFormat value={sc.revenueGrowthRates[0]} onValueChange={v => {
+            const val = v.floatValue === undefined ? '' : v.floatValue;
+            const n = [...sc.revenueGrowthRates];
+            n[0] = val;
+            upd({ revenueGrowthRates: n, simpleRevenueGrowthRate: val });
+          }} className={INPUT_CLS} />
         </div>
         <div>
           <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Margin (%)</label>
-          <NumericFormat value={sc.finalMargins[0]} onValueChange={v => { const n = [...sc.finalMargins]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ finalMargins: n }); }} className={INPUT_CLS} />
+          <NumericFormat value={sc.finalMargins[0]} onValueChange={v => {
+            const val = v.floatValue === undefined ? '' : v.floatValue;
+            const n = [...sc.finalMargins];
+            n[0] = val;
+            upd({ finalMargins: n, simpleFinalMargin: val });
+          }} className={INPUT_CLS} />
         </div>
         <div>
           <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Share Growth (%)</label>
-          <NumericFormat value={sc.sharesGrowthRates[0]} onValueChange={v => { const n = [...sc.sharesGrowthRates]; n[0] = v.floatValue === undefined ? '' : v.floatValue; upd({ sharesGrowthRates: n }); }} className={INPUT_CLS} />
+          <NumericFormat value={sc.sharesGrowthRates[0]} onValueChange={v => {
+            const val = v.floatValue === undefined ? '' : v.floatValue;
+            const n = [...sc.sharesGrowthRates];
+            n[0] = val;
+            upd({ sharesGrowthRates: n, simpleSharesGrowthRate: val });
+          }} className={INPUT_CLS} />
         </div>
       </div>
     );
@@ -173,104 +245,167 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
   return (
     <>
       {/* ── SIMPLE: Growth section ── */}
-      {isSimple && lbl && (
-        <div className="p-6 relative">
-          <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-slate-400" /> Growth
-          </h2>
+      {isSimple && lbl && (() => {
+        // ── Field Selection Logic ──
+        let keyPerShare: keyof Scenario = 'currentMetricPerShare';
+        let keyTotal:    keyof Scenario = 'currentMetricTotal';
+        let keyMargin:   keyof Scenario = 'simpleFinalMargin';
 
-          {sc.simpleProjectionMethod === 'Per Share' && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.labelCurrentPerShare}</label>
-                <NumericFormat value={sc.simpleCurrentMetricPerShare} onValueChange={v => upd({ simpleCurrentMetricPerShare: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.labelGrowthRate} (%)</label>
-                <NumericFormat value={sc.simpleMetricGrowthRate} onValueChange={v => upd({ simpleMetricGrowthRate: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
-              </div>
-            </div>
-          )}
+        if (sc.simpleMetricType === 'Net Income (Earnings)') {
+          keyPerShare = 'niCurrentMetricPerShare';
+          keyTotal    = 'niCurrentMetricTotal';
+          keyMargin   = 'niFinalMargin';
+        } else if (sc.simpleMetricType === 'Custom') {
+          keyPerShare = 'customCurrentMetricPerShare';
+          keyTotal    = 'customCurrentMetricTotal';
+          keyMargin   = 'customFinalMargin';
+        }
 
-          {sc.simpleProjectionMethod === 'Metric, Share Count' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Values in Millions</span>
-                <Toggle checked={sc.simpleInMillions} onChange={() => {
-                  const newFlag = !sc.simpleInMillions;
-                  upd({
-                    simpleInMillions: newFlag,
-                    simpleCurrentMetricTotal: convertMillions(sc.simpleCurrentMetricTotal, sc.simpleInMillions, newFlag),
-                    simpleCurrentShares: convertMillions(sc.simpleCurrentShares, sc.simpleInMillions, newFlag),
-                    simpleCurrentRevenue: convertMillions(sc.simpleCurrentRevenue, sc.simpleInMillions, newFlag),
-                  });
-                }} />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
-                <div>
-                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current {lbl.metricName} {sc.simpleInMillions ? '(M)' : ''}</label>
-                  <NumericFormat value={sc.simpleCurrentMetricTotal} onValueChange={v => upd({ simpleCurrentMetricTotal: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.metricName} Growth (%)</label>
-                  <NumericFormat value={sc.simpleMetricGrowthRateTotal} onValueChange={v => upd({ simpleMetricGrowthRateTotal: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
-                <div>
-                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares {sc.simpleInMillions ? '(M)' : ''}</label>
-                  <NumericFormat value={sc.simpleCurrentShares} onValueChange={v => upd({ simpleCurrentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares Growth (%)</label>
-                  <NumericFormat value={sc.simpleSharesGrowthRate} onValueChange={v => upd({ simpleSharesGrowthRate: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
-                </div>
-              </div>
-            </div>
-          )}
+        return (
+          <div className="p-6 relative">
+            <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-slate-400" /> Growth
+            </h2>
 
-          {sc.simpleProjectionMethod === 'Revenue, Metric Margin, Share Count' && (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Values in Millions</span>
-                <Toggle checked={sc.simpleInMillions} onChange={() => {
-                  const newFlag = !sc.simpleInMillions;
-                  upd({
-                    simpleInMillions: newFlag,
-                    simpleCurrentMetricTotal: convertMillions(sc.simpleCurrentMetricTotal, sc.simpleInMillions, newFlag),
-                    simpleCurrentShares: convertMillions(sc.simpleCurrentShares, sc.simpleInMillions, newFlag),
-                    simpleCurrentRevenue: convertMillions(sc.simpleCurrentRevenue, sc.simpleInMillions, newFlag),
-                  });
-                }} />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+            {sc.simpleProjectionMethod === 'Per Share' && (
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current Revenue {sc.simpleInMillions ? '(M)' : ''}</label>
-                  <NumericFormat value={sc.simpleCurrentRevenue} onValueChange={v => upd({ simpleCurrentRevenue: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.labelCurrentPerShare}</label>
+                  <NumericFormat value={sc[keyPerShare] as any} onValueChange={v => upd({ [keyPerShare]: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Revenue Growth (%)</label>
-                  <NumericFormat value={sc.simpleRevenueGrowthRate} onValueChange={v => upd({ simpleRevenueGrowthRate: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.labelGrowthRate} (%)</label>
+                  <NumericFormat value={sc.simpleMetricGrowthRate} onValueChange={v => {
+                    const val = v.floatValue === undefined ? '' : v.floatValue;
+                    const changes: Partial<Scenario> = { simpleMetricGrowthRate: val };
+                    if (sc.simpleMetricType === 'Free Cash Flow') {
+                      const n = [...sc.metricGrowthRates];
+                      n[0] = val;
+                      changes.metricGrowthRates = n;
+                    }
+                    upd(changes);
+                  }} className={INPUT_CLS} />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Final {lbl.metricName} Margin (%)</label>
-                <NumericFormat value={sc.simpleFinalMargin} onValueChange={v => upd({ simpleFinalMargin: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+            )}
+
+            {sc.simpleProjectionMethod === 'Metric, Share Count' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Values in Millions</span>
+                  <Toggle checked={sc.inMillions} onChange={() => {
+                    const newFlag = !sc.inMillions;
+                    upd({
+                      inMillions: newFlag,
+                      [keyTotal]:      convertMillions(sc[keyTotal] as any, sc.inMillions, newFlag),
+                      currentShares:   convertMillions(sc.currentShares, sc.inMillions, newFlag),
+                      currentRevenue:  convertMillions(sc.currentRevenue, sc.inMillions, newFlag),
+                    });
+                  }} />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current {lbl.metricName} {sc.inMillions ? '(M)' : ''}</label>
+                    <NumericFormat value={sc[keyTotal] as any} onValueChange={v => upd({ [keyTotal]: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.metricName} Growth (%)</label>
+                    <NumericFormat value={sc.simpleMetricGrowthRateTotal} onValueChange={v => {
+                      const val = v.floatValue === undefined ? '' : v.floatValue;
+                      const changes: Partial<Scenario> = { simpleMetricGrowthRateTotal: val };
+                      if (sc.simpleMetricType === 'Free Cash Flow') {
+                        const n = [...sc.metricGrowthRatesTotal];
+                        n[0] = val;
+                        changes.metricGrowthRatesTotal = n;
+                      }
+                      upd(changes);
+                    }} className={INPUT_CLS} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares {sc.inMillions ? '(M)' : ''}</label>
+                    <NumericFormat value={sc.currentShares} onValueChange={v => upd({ currentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares Growth (%)</label>
+                    <NumericFormat value={sc.simpleSharesGrowthRate} onValueChange={v => {
+                      const val = v.floatValue === undefined ? '' : v.floatValue;
+                      const n = [...sc.sharesGrowthRates];
+                      n[0] = val;
+                      upd({ simpleSharesGrowthRate: val, sharesGrowthRates: n });
+                    }} className={INPUT_CLS} />
+                  </div>
+                </div>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+            )}
+
+            {sc.simpleProjectionMethod === 'Revenue, Metric Margin, Share Count' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Values in Millions</span>
+                  <Toggle checked={sc.inMillions} onChange={() => {
+                    const newFlag = !sc.inMillions;
+                    upd({
+                      inMillions: newFlag,
+                      [keyTotal]:      convertMillions(sc[keyTotal] as any, sc.inMillions, newFlag),
+                      currentShares:   convertMillions(sc.currentShares, sc.inMillions, newFlag),
+                      currentRevenue:  convertMillions(sc.currentRevenue, sc.inMillions, newFlag),
+                    });
+                  }} />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current Revenue {sc.inMillions ? '(M)' : ''}</label>
+                    <NumericFormat value={sc.currentRevenue} onValueChange={v => upd({ currentRevenue: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Revenue Growth (%)</label>
+                    <NumericFormat value={sc.simpleRevenueGrowthRate} onValueChange={v => {
+                      const val = v.floatValue === undefined ? '' : v.floatValue;
+                      const changes: Partial<Scenario> = { simpleRevenueGrowthRate: val };
+                      if (sc.simpleMetricType === 'Free Cash Flow') {
+                        const n = [...sc.revenueGrowthRates];
+                        n[0] = val;
+                        changes.revenueGrowthRates = n;
+                      }
+                      upd(changes);
+                    }} className={INPUT_CLS} />
+                  </div>
+                </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares {sc.simpleInMillions ? '(M)' : ''}</label>
-                  <NumericFormat value={sc.simpleCurrentShares} onValueChange={v => upd({ simpleCurrentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Final {lbl.metricName} Margin (%)</label>
+                  <NumericFormat value={sc[keyMargin] as any} onValueChange={v => {
+                    const val = v.floatValue === undefined ? '' : v.floatValue;
+                    const changes: Partial<Scenario> = { [keyMargin]: val };
+                    if (sc.simpleMetricType === 'Free Cash Flow') {
+                      const n = [...sc.finalMargins];
+                      n[0] = val;
+                      changes.finalMargins = n;
+                    }
+                    upd(changes);
+                  }} className={INPUT_CLS} />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares Growth (%)</label>
-                  <NumericFormat value={sc.simpleSharesGrowthRate} onValueChange={v => upd({ simpleSharesGrowthRate: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares {sc.inMillions ? '(M)' : ''}</label>
+                    <NumericFormat value={sc.currentShares} onValueChange={v => upd({ currentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares Growth (%)</label>
+                    <NumericFormat value={sc.simpleSharesGrowthRate} onValueChange={v => {
+                      const val = v.floatValue === undefined ? '' : v.floatValue;
+                      const n = [...sc.sharesGrowthRates];
+                      n[0] = val;
+                      upd({ simpleSharesGrowthRate: val, sharesGrowthRates: n });
+                    }} className={INPUT_CLS} />
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        );
+      })()}
 
       {/* ── ADVANCED: Growth section ── */}
       {!isSimple && (

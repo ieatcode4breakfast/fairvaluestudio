@@ -13,10 +13,10 @@ export function loadInitialScenarios(): Scenario[] {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        const capped = parsed.slice(0, MAX_SCENARIOS);
+          const capped = parsed.slice(0, MAX_SCENARIOS);
         return capped.map(item => {
           const base = createDefaultScenario();
-          return {
+          const migrated: any = {
             ...base,
             ...item,
             splitYears: Array.isArray(item.splitYears) ? [...item.splitYears] : base.splitYears,
@@ -30,6 +30,25 @@ export function loadInitialScenarios(): Scenario[] {
             showResetConfirm: false,
             showYearlyBreakdown: false,
           };
+
+          // ── Migration Logic ──
+          if (item.simpleCurrentMetricPerShare !== undefined && (item.currentMetricPerShare === '' || item.currentMetricPerShare === undefined)) {
+            migrated.currentMetricPerShare = item.simpleCurrentMetricPerShare;
+          }
+          if (item.simpleCurrentMetricTotal !== undefined && (item.currentMetricTotal === '' || item.currentMetricTotal === undefined)) {
+            migrated.currentMetricTotal = item.simpleCurrentMetricTotal;
+          }
+          if (item.simpleCurrentRevenue !== undefined && (item.currentRevenue === '' || item.currentRevenue === undefined)) {
+            migrated.currentRevenue = item.simpleCurrentRevenue;
+          }
+          if (item.simpleCurrentShares !== undefined && (item.currentShares === '' || item.currentShares === undefined)) {
+            migrated.currentShares = item.simpleCurrentShares;
+          }
+          if (item.simpleInMillions !== undefined) {
+             migrated.inMillions = item.simpleInMillions;
+          }
+
+          return migrated as Scenario;
         }) as Scenario[];
       }
     }

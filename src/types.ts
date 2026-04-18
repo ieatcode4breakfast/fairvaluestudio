@@ -15,16 +15,19 @@ export interface Scenario {
   simpleProjectionMethod: string;
   simpleMetricType: string;
   simpleCustomMetric: string;
-  simpleCurrentMetricPerShare: number | string | '';
   simpleMetricGrowthRate: number | string | '';
-  simpleCurrentMetricTotal: number | string | '';
   simpleMetricGrowthRateTotal: number | string | '';
-  simpleCurrentRevenue: number | string | '';
   simpleRevenueGrowthRate: number | string | '';
   simpleFinalMargin: number | string | '';
-  simpleCurrentShares: number | string | '';
   simpleSharesGrowthRate: number | string | '';
-  simpleInMillions: boolean;
+
+  // ── Isolated Metric fields (Basic DCF) ──
+  niCurrentMetricPerShare: number | string | '';
+  niCurrentMetricTotal: number | string | '';
+  niFinalMargin: number | string | '';
+  customCurrentMetricPerShare: number | string | '';
+  customCurrentMetricTotal: number | string | '';
+  customFinalMargin: number | string | '';
 
   splitYears: number[];
   hoverYear: number | null;

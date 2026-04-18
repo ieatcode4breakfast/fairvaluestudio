@@ -36,22 +36,38 @@ export function buildSummaryText(sc: Scenario, res: Results, index: number) {
   if (sc.dcfMethod === 'Basic DCF') {
     const lbl = getSimpleLabels(sc);
     let methodInputs = '';
+
+    // ── Field Selection Logic ──
+    let metricPerShare: number | string | '' = sc.currentMetricPerShare;
+    let metricTotal:    number | string | '' = sc.currentMetricTotal;
+    let metricMargin:   number | string | '' = sc.simpleFinalMargin;
+
+    if (sc.simpleMetricType === 'Net Income (Earnings)') {
+      metricPerShare = sc.niCurrentMetricPerShare;
+      metricTotal    = sc.niCurrentMetricTotal;
+      metricMargin   = sc.niFinalMargin;
+    } else if (sc.simpleMetricType === 'Custom') {
+      metricPerShare = sc.customCurrentMetricPerShare;
+      metricTotal    = sc.customCurrentMetricTotal;
+      metricMargin   = sc.customFinalMargin;
+    }
+
     if (sc.simpleProjectionMethod === 'Per Share') {
       methodInputs =
-        `${lbl.labelCurrentPerShare}: ${formatCurrency(Number(sc.simpleCurrentMetricPerShare) || 0)}\n` +
+        `${lbl.labelCurrentPerShare}: ${formatCurrency(Number(metricPerShare) || 0)}\n` +
         `${lbl.labelGrowthRate}: ${sc.simpleMetricGrowthRate}%\n`;
     } else if (sc.simpleProjectionMethod === 'Metric, Share Count') {
       methodInputs =
-        `Current ${lbl.metricName}: ${formatCurrency(Number(sc.simpleCurrentMetricTotal) || 0)}${sc.simpleInMillions ? ' M' : ''}\n` +
+        `Current ${lbl.metricName}: ${formatCurrency(Number(metricTotal) || 0)}${sc.inMillions ? ' M' : ''}\n` +
         `${lbl.metricName} Growth Rate: ${sc.simpleMetricGrowthRateTotal}%\n` +
-        `Shares: ${sc.simpleCurrentShares}${sc.simpleInMillions ? ' M' : ''}\n` +
+        `Shares: ${sc.currentShares}${sc.inMillions ? ' M' : ''}\n` +
         `Shares Growth: ${sc.simpleSharesGrowthRate}%\n`;
     } else {
       methodInputs =
-        `Current Revenue: ${formatCurrency(Number(sc.simpleCurrentRevenue) || 0)}${sc.simpleInMillions ? ' M' : ''}\n` +
+        `Current Revenue: ${formatCurrency(Number(sc.currentRevenue) || 0)}${sc.inMillions ? ' M' : ''}\n` +
         `Revenue Growth: ${sc.simpleRevenueGrowthRate}%\n` +
-        `Final ${lbl.metricName} Margin: ${sc.simpleFinalMargin}%\n` +
-        `Shares: ${sc.simpleCurrentShares}${sc.simpleInMillions ? ' M' : ''}\n` +
+        `Final ${lbl.metricName} Margin: ${metricMargin}%\n` +
+        `Shares: ${sc.currentShares}${sc.inMillions ? ' M' : ''}\n` +
         `Shares Growth: ${sc.simpleSharesGrowthRate}%\n`;
     }
 
