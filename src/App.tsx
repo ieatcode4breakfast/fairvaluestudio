@@ -46,7 +46,7 @@ export default function App() {
   const {
     scenarios, setScenarios, activeScenarioId, setActiveScenarioId, lastSavedState, setLastSavedState,
     currentCleaned, isDirty, updateScenario, addScenario, duplicateScenario, getCleanedScenariosString, deleteScenario,
-    draggedTabIndex, dragOverIndex, dropSuccessIndex, showReorderToast, handleDragStart, handleDragOver, handleDrop, handleDragEnd
+    onReorder, showReorderToast
   } = useScenarios(currentUser);
 
   const {
@@ -470,23 +470,15 @@ export default function App() {
         />
 
         {(!currentUser || (currentUser && userValuations.length > 0)) && (
-          <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-3xl shadow-lg border-y border-x-0 md:border-x border-slate-200 dark:border-slate-700 overflow-hidden" onDragOver={(e) => handleDragOver(e, tabsContainerRef.current)} onDrop={handleDrop}>
+          <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-3xl shadow-lg border-y border-x-0 md:border-x border-slate-200 dark:border-slate-700 overflow-hidden">
             <div className="bg-slate-50/80 dark:bg-slate-900/50 px-4 md:px-6 py-4 border-b border-slate-200 dark:border-slate-700">
               <ScenarioTabs
                 scenarios={scenarios}
                 activeScenarioId={activeScenarioId}
                 setActiveScenarioId={setActiveScenarioId}
-                draggedTabIndex={draggedTabIndex}
-                dragOverIndex={dragOverIndex}
-                dropSuccessIndex={dropSuccessIndex}
-                handleDragStart={handleDragStart}
-                handleDragOver={handleDragOver}
-                handleDrop={handleDrop}
-                handleDragEnd={handleDragEnd}
+                onReorder={onReorder}
                 addScenario={addScenario}
-                duplicateScenario={duplicateScenario}
                 onResetAll={() => setShowResetAllConfirm(true)}
-                tabsContainerRef={tabsContainerRef}
               />
             </div>
 
