@@ -24,11 +24,16 @@ const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
  * Uses the current date in the prompt to ensure AI grounding is up-to-date.
  * @param ticker - The stock symbol (e.g., "AAPL")
  * @param companyName - The full name of the company (e.g., "Apple Inc.")
+ * @param exchange - Optional exchange name (e.g., "NASDAQ")
  */
-export async function fetchTTMData(ticker: string, companyName: string): Promise<TTMData> {
+export async function fetchTTMData(ticker: string, companyName: string, exchange?: string): Promise<TTMData> {
     if (!API_KEY) {
         throw new Error('VITE_OPENROUTER_API_KEY is not defined in .env.local');
     }
+
+    console.log(`[OpenRouter] Fetching TTM data for ${companyName} (${ticker})${exchange ? ` on ${exchange}` : ''}...`);
+
+    const context = exchange ? `${companyName} (${ticker}) listed on the ${exchange}` : `${companyName} (${ticker})`;
 
     // Get the current date first to include it in the prompt
     const currentDate = new Date().toISOString().split('T')[0];
@@ -37,8 +42,7 @@ export async function fetchTTMData(ticker: string, companyName: string): Promise
     Today's date is ${currentDate}.
     
     PERFORM AN EXHAUSTIVE DEEP SEARCH for the most recent Trailing Twelve Months (TTM) financial data for:
-    Company Name: ${companyName}
-    Ticker: ${ticker}
+    ${context}
 
     You must find and return exactly these 4 metrics in a flat JSON format with these exact keys:
     - "revenue": Net revenue (TTM)

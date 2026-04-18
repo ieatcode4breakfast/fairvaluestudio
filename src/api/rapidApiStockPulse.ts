@@ -9,6 +9,8 @@ const BASE_URL = `https://${API_HOST}`;
 export interface StockSearchResult {
     symbol: string;
     description: string;
+    type?: string;
+    exchange?: string;
 }
 
 export interface StockPulseFundamentals {
@@ -42,7 +44,9 @@ export async function searchStocks(query: string): Promise<StockSearchResult[]> 
         // We use shortname or longname for the description
         return (data.quotes || []).map((q: any) => ({
             symbol: q.symbol,
-            description: q.shortname || q.longname || q.symbol
+            description: q.shortname || q.longname || q.symbol,
+            type: q.quoteType,
+            exchange: q.exchDisp
         }));
     } catch (error) {
         console.error('Failed to search stocks (RapidAPI):', error);

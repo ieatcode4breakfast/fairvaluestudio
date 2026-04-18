@@ -10,6 +10,7 @@ export interface StockSearchResult {
     description: string;
     displaySymbol?: string;
     type?: string;
+    exchange?: string;
 }
 
 /**
