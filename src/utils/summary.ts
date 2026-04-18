@@ -108,7 +108,7 @@ export function buildSummaryText(sc: Scenario, res: Results, index: number) {
       `Margin of Safety: ${formatPercent(res.marginOfSafety)}\n` +
       `Upside: ${formatPercent(res.upside)}\n` +
       `IRR: ${formatPercent(res.irr)}\n` +
-      `Implied Growth Rate: ${formatPercent(res.impliedGrowth)}\n\n` +
+      `IRR: ${formatPercent(res.irr)}\n\n` +
       `[ Breakdown ]\n` +
       `${lbl.labelProjectedFinal} (Year ${valYears}): ${formatCurrency(res.finalMetricPerShare)}\n` +
       `Terminal Value: ${formatCurrency(res.terminalValuePerShare)}\n` +

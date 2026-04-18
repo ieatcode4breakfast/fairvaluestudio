@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calculator, DownloadIcon, UploadIcon, ChevronDown, ChevronUp } from '../Icons';
 import { ThemeToggle } from '../ThemeToggle';
 import { User, ValuationMetadata } from '../../types';
@@ -33,6 +33,14 @@ interface HeaderProps {
 
 export function Header(props: HeaderProps) {
   const [isHowToUseExpanded, setIsHowToUseExpanded] = useState(false);
+  const [isIconOnly, setIsIconOnly] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsIconOnly(window.innerWidth < 1280); // xl breakpoint
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
   return (
     <>
       <div className="px-4 md:px-0">
@@ -200,6 +208,7 @@ export function Header(props: HeaderProps) {
                 props.setShowDownloadModal(true);
               }}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-600 shadow-sm transition-all cursor-pointer"
+              title={isIconOnly ? "Download Valuation" : undefined}
             >
               <DownloadIcon className="w-4 h-4" />
               <span className="hidden xl:inline">Download Valuation</span>
@@ -207,6 +216,7 @@ export function Header(props: HeaderProps) {
             <button
               onClick={() => props.setShowUploadModal(true)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border shadow-sm transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-600 cursor-pointer"
+              title={isIconOnly ? "Upload Valuation" : undefined}
             >
               <UploadIcon className="w-4 h-4" />
               <span className="hidden xl:inline">Upload Valuation</span>

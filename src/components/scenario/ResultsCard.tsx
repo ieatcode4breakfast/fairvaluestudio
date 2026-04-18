@@ -1,7 +1,6 @@
 import React from 'react';
 import { Results, Scenario } from '../../types';
 import { formatCurrency, formatPercent } from '../../utils/helpers';
-import { InfoIcon } from '../Icons';
 import { getSimpleLabels } from '../../utils/summary';
 
 interface ResultsCardProps {
@@ -39,26 +38,6 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
         <div className={`text-4xl font-light tracking-tight truncate ${irrColor}`}>{formatPercent(results.irr)}</div>
         <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">At current buy price</div>
       </div>
-
-      {isSimple && lbl && (
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 flex flex-col justify-between min-w-0">
-          <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1">
-            Implied Growth Rate
-            <button type="button" className="group relative focus:outline-none">
-              <InfoIcon className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 cursor-help" />
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 p-2 bg-slate-800 dark:bg-slate-900 text-white dark:text-slate-200 text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 group-focus:opacity-100 transition-opacity pointer-events-none z-10">
-                {sc.simpleProjectionMethod === 'Per Share'
-                  ? `The constant per-share growth rate required to justify the current buy price.`
-                  : sc.simpleProjectionMethod === 'Metric, Share Count'
-                    ? `The constant ${lbl.metricName.toLowerCase()} growth rate required to justify the current buy price.`
-                    : `The constant revenue growth rate required to justify the current buy price.`}
-              </div>
-            </button>
-          </div>
-          <div className="text-4xl font-light tracking-tight text-slate-900 dark:text-slate-100 truncate">{formatPercent(results.impliedGrowth)}</div>
-          <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">Reverse DCF</div>
-        </div>
-      )}
     </div>
   );
 }
