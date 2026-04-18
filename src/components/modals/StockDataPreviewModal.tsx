@@ -69,15 +69,16 @@ export function StockDataPreviewModal({
         try {
             const data = await fetchTTMData(symbol, companyName, exchange);
 
-            // Scaling helper
-            const s = (v: number) => inMillions ? v / 1_000_000 : v;
+            // Formatting helper to ensure numeric values are rounded to sane precision
+            const round = (v: number) => parseFloat(formatDynamicDecimal(v));
+            const s = (v: number) => round(inMillions ? v / 1_000_000 : v);
 
             const newFields: DataField[] = [
                 { key: 'currentRevenue', label: 'Revenue (TTM)', value: s(data.revenue), formatted: formatDynamicDecimal(s(data.revenue), true) },
                 { key: 'currentMetricTotal', label: 'Free Cash Flow (TTM)', value: s(data.freeCashFlow), formatted: formatDynamicDecimal(s(data.freeCashFlow), true) },
-                { key: 'currentMetricPerShare', label: 'FCF Per Share (TTM)', value: data.freeCashFlowPerShare, formatted: formatDynamicDecimal(data.freeCashFlowPerShare, true) },
+                { key: 'currentMetricPerShare', label: 'FCF Per Share (TTM)', value: round(data.freeCashFlowPerShare), formatted: formatDynamicDecimal(data.freeCashFlowPerShare, true) },
                 { key: 'niCurrentMetricTotal', label: 'Net Income (TTM)', value: s(data.netIncome), formatted: formatDynamicDecimal(s(data.netIncome), true) },
-                { key: 'niCurrentMetricPerShare', label: 'Earnings Per Share (TTM)', value: data.earningsPerShare, formatted: formatDynamicDecimal(data.earningsPerShare, true) },
+                { key: 'niCurrentMetricPerShare', label: 'Earnings Per Share (TTM)', value: round(data.earningsPerShare), formatted: formatDynamicDecimal(data.earningsPerShare, true) },
                 { key: 'currentShares', label: 'Shares Outstanding', value: s(data.sharesOutstanding), formatted: formatDynamicDecimal(s(data.sharesOutstanding), true) },
             ];
 

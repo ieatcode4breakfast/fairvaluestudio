@@ -12,9 +12,13 @@ interface GrowthCardProps {
   onUpdate: (changes: Partial<Scenario>) => void;
   ignoreTrackClickUntil: number;
   setIgnoreTrackClickUntil: (time: number) => void;
+  highlightedKeys: Set<string>;
+  onClearHighlight: (key: string) => void;
 }
 
-export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrackClickUntil }: GrowthCardProps) {
+export function GrowthCard({ 
+  sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrackClickUntil, highlightedKeys, onClearHighlight 
+}: GrowthCardProps) {
   const upd = onUpdate;
   const valYears = Number(sc.years) || 0;
   const isSimple = sc.dcfMethod === 'Basic DCF';
@@ -271,7 +275,15 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.labelCurrentPerShare}</label>
-                  <NumericFormat value={sc[keyPerShare] as any} onValueChange={v => upd({ [keyPerShare]: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                  <NumericFormat 
+                    value={sc[keyPerShare] as any} 
+                    onValueChange={v => upd({ [keyPerShare]: v.floatValue === undefined ? '' : v.floatValue } as Partial<Scenario>)} 
+                    className={highlightedKeys.has(keyPerShare as string)
+                      ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
+                      : INPUT_CLS
+                    }
+                    onFocus={() => onClearHighlight(keyPerShare as string)}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.labelGrowthRate} (%)</label>
@@ -298,15 +310,23 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
                     upd({
                       inMillions: newFlag,
                       [keyTotal]:      convertMillions(sc[keyTotal] as any, sc.inMillions, newFlag),
-                      currentShares:   convertMillions(sc.currentShares, sc.inMillions, newFlag),
-                      currentRevenue:  convertMillions(sc.currentRevenue, sc.inMillions, newFlag),
-                    });
+                      currentShares:   convertMillions(sc.currentShares as any, sc.inMillions, newFlag),
+                      currentRevenue:  convertMillions(sc.currentRevenue as any, sc.inMillions, newFlag),
+                    } as any);
                   }} />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                   <div>
                     <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current {lbl.metricName} {sc.inMillions ? '(M)' : ''}</label>
-                    <NumericFormat value={sc[keyTotal] as any} onValueChange={v => upd({ [keyTotal]: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                    <NumericFormat 
+                      value={sc[keyTotal] as any} 
+                      onValueChange={v => upd({ [keyTotal]: v.floatValue === undefined ? '' : v.floatValue } as Partial<Scenario>)} 
+                      className={highlightedKeys.has(keyTotal as string)
+                        ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
+                        : INPUT_CLS
+                      }
+                      onFocus={() => onClearHighlight(keyTotal as string)}
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.metricName} Growth (%)</label>
@@ -325,7 +345,15 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                   <div>
                     <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares {sc.inMillions ? '(M)' : ''}</label>
-                    <NumericFormat value={sc.currentShares} onValueChange={v => upd({ currentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                    <NumericFormat 
+                      value={sc.currentShares} 
+                      onValueChange={v => upd({ currentShares: v.floatValue === undefined ? '' : v.floatValue })} 
+                      className={highlightedKeys.has('currentShares')
+                        ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
+                        : INPUT_CLS
+                      }
+                      onFocus={() => onClearHighlight('currentShares')}
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares Growth (%)</label>
@@ -349,15 +377,23 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
                     upd({
                       inMillions: newFlag,
                       [keyTotal]:      convertMillions(sc[keyTotal] as any, sc.inMillions, newFlag),
-                      currentShares:   convertMillions(sc.currentShares, sc.inMillions, newFlag),
-                      currentRevenue:  convertMillions(sc.currentRevenue, sc.inMillions, newFlag),
-                    });
+                      currentShares:   convertMillions(sc.currentShares as any, sc.inMillions, newFlag),
+                      currentRevenue:  convertMillions(sc.currentRevenue as any, sc.inMillions, newFlag),
+                    } as any);
                   }} />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                   <div>
                     <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current Revenue {sc.inMillions ? '(M)' : ''}</label>
-                    <NumericFormat value={sc.currentRevenue} onValueChange={v => upd({ currentRevenue: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                    <NumericFormat 
+                      value={sc.currentRevenue} 
+                      onValueChange={v => upd({ currentRevenue: v.floatValue === undefined ? '' : v.floatValue })} 
+                      className={highlightedKeys.has('currentRevenue')
+                        ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
+                        : INPUT_CLS
+                      }
+                      onFocus={() => onClearHighlight('currentRevenue')}
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Revenue Growth (%)</label>
@@ -369,7 +405,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
                         n[0] = val;
                         changes.revenueGrowthRates = n;
                       }
-                      upd(changes);
+                      upd(changes as any);
                     }} className={INPUT_CLS} />
                   </div>
                 </div>
@@ -377,7 +413,7 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
                   <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Final {lbl.metricName} Margin (%)</label>
                   <NumericFormat value={sc[keyMargin] as any} onValueChange={v => {
                     const val = v.floatValue === undefined ? '' : v.floatValue;
-                    const changes: Partial<Scenario> = { [keyMargin]: val };
+                    const changes: any = { [keyMargin]: val };
                     if (sc.simpleMetricType === 'Free Cash Flow') {
                       const n = [...sc.finalMargins];
                       n[0] = val;
@@ -389,7 +425,15 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                   <div>
                     <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares {sc.inMillions ? '(M)' : ''}</label>
-                    <NumericFormat value={sc.currentShares} onValueChange={v => upd({ currentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                    <NumericFormat 
+                      value={sc.currentShares} 
+                      onValueChange={v => upd({ currentShares: v.floatValue === undefined ? '' : v.floatValue })} 
+                      className={highlightedKeys.has('currentShares')
+                        ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
+                        : INPUT_CLS
+                      }
+                      onFocus={() => onClearHighlight('currentShares')}
+                    />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares Growth (%)</label>
@@ -419,7 +463,15 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
             <div className="mb-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current FCF Per Share</label>
-                <NumericFormat value={sc.currentMetricPerShare} onValueChange={v => upd({ currentMetricPerShare: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                <NumericFormat 
+                  value={sc.currentMetricPerShare} 
+                  onValueChange={v => upd({ currentMetricPerShare: v.floatValue === undefined ? '' : v.floatValue })} 
+                  className={highlightedKeys.has('currentMetricPerShare')
+                    ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
+                    : INPUT_CLS
+                  }
+                  onFocus={() => onClearHighlight('currentMetricPerShare')}
+                />
               </div>
             </div>
           )}
@@ -432,20 +484,36 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
                   const newFlag = !sc.inMillions;
                   upd({
                     inMillions: newFlag,
-                    currentMetricTotal: convertMillions(sc.currentMetricTotal, sc.inMillions, newFlag),
-                    currentShares: convertMillions(sc.currentShares, sc.inMillions, newFlag),
-                    currentRevenue: convertMillions(sc.currentRevenue, sc.inMillions, newFlag),
+                    currentMetricTotal: convertMillions(sc.currentMetricTotal as any, sc.inMillions, newFlag),
+                    currentShares: convertMillions(sc.currentShares as any, sc.inMillions, newFlag),
+                    currentRevenue: convertMillions(sc.currentRevenue as any, sc.inMillions, newFlag),
                   });
                 }} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
                   <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current FCF {sc.inMillions ? '(M)' : ''}</label>
-                  <NumericFormat value={sc.currentMetricTotal} onValueChange={v => upd({ currentMetricTotal: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                  <NumericFormat 
+                    value={sc.currentMetricTotal} 
+                    onValueChange={v => upd({ currentMetricTotal: v.floatValue === undefined ? '' : v.floatValue })} 
+                    className={highlightedKeys.has('currentMetricTotal')
+                      ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
+                      : INPUT_CLS
+                    }
+                    onFocus={() => onClearHighlight('currentMetricTotal')}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares {sc.inMillions ? '(M)' : ''}</label>
-                  <NumericFormat value={sc.currentShares} onValueChange={v => upd({ currentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                  <NumericFormat 
+                    value={sc.currentShares} 
+                    onValueChange={v => upd({ currentShares: v.floatValue === undefined ? '' : v.floatValue })} 
+                    className={highlightedKeys.has('currentShares')
+                      ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
+                      : INPUT_CLS
+                    }
+                    onFocus={() => onClearHighlight('currentShares')}
+                  />
                 </div>
               </div>
             </div>
@@ -459,20 +527,36 @@ export function GrowthCard({ sc, onUpdate, ignoreTrackClickUntil, setIgnoreTrack
                   const newFlag = !sc.inMillions;
                   upd({
                     inMillions: newFlag,
-                    currentMetricTotal: convertMillions(sc.currentMetricTotal, sc.inMillions, newFlag),
-                    currentShares: convertMillions(sc.currentShares, sc.inMillions, newFlag),
-                    currentRevenue: convertMillions(sc.currentRevenue, sc.inMillions, newFlag),
+                    currentMetricTotal: convertMillions(sc.currentMetricTotal as any, sc.inMillions, newFlag),
+                    currentShares: convertMillions(sc.currentShares as any, sc.inMillions, newFlag),
+                    currentRevenue: convertMillions(sc.currentRevenue as any, sc.inMillions, newFlag),
                   });
                 }} />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
                   <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current Revenue {sc.inMillions ? '(M)' : ''}</label>
-                  <NumericFormat value={sc.currentRevenue} onValueChange={v => upd({ currentRevenue: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                  <NumericFormat 
+                    value={sc.currentRevenue} 
+                    onValueChange={v => upd({ currentRevenue: v.floatValue === undefined ? '' : v.floatValue })} 
+                    className={highlightedKeys.has('currentRevenue')
+                      ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
+                      : INPUT_CLS
+                    }
+                    onFocus={() => onClearHighlight('currentRevenue')}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Shares {sc.inMillions ? '(M)' : ''}</label>
-                  <NumericFormat value={sc.currentShares} onValueChange={v => upd({ currentShares: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
+                  <NumericFormat 
+                    value={sc.currentShares} 
+                    onValueChange={v => upd({ currentShares: v.floatValue === undefined ? '' : v.floatValue })} 
+                    className={highlightedKeys.has('currentShares')
+                      ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
+                      : INPUT_CLS
+                    }
+                    onFocus={() => onClearHighlight('currentShares')}
+                  />
                 </div>
               </div>
             </div>

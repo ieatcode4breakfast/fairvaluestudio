@@ -19,6 +19,20 @@ interface ScenarioPanelProps {
 
 export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, onDuplicate, results }: ScenarioPanelProps) {
   const [ignoreTrackClickUntil, setIgnoreTrackClickUntil] = useState(0);
+  const [highlightedKeys, setHighlightedKeys] = useState<Set<string>>(new Set());
+
+  const handleSetHighlights = (keys: string[]) => {
+    setHighlightedKeys(new Set(keys));
+  };
+
+  const handleClearHighlight = (key: string) => {
+    setHighlightedKeys(prev => {
+      if (!prev.has(key)) return prev;
+      const next = new Set(prev);
+      next.delete(key);
+      return next;
+    });
+  };
 
   const canDelete = totalScenarios > 1;
 
@@ -59,6 +73,9 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
             sc={sc}
             results={results}
             onUpdate={handleUpdate}
+            highlightedKeys={highlightedKeys}
+            onSetHighlights={handleSetHighlights}
+            onClearHighlight={handleClearHighlight}
           />
         </div>
 
@@ -69,6 +86,8 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
             onUpdate={handleUpdate}
             ignoreTrackClickUntil={ignoreTrackClickUntil}
             setIgnoreTrackClickUntil={setIgnoreTrackClickUntil}
+            highlightedKeys={highlightedKeys}
+            onClearHighlight={handleClearHighlight}
           />
         </div>
       </div>

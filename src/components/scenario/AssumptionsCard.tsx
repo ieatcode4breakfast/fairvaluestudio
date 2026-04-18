@@ -12,6 +12,9 @@ interface AssumptionsCardProps {
   sc: Scenario;
   results: Results;
   onUpdate: (changes: Partial<Scenario>) => void;
+  highlightedKeys: Set<string>;
+  onSetHighlights: (keys: string[]) => void;
+  onClearHighlight: (key: string) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -25,12 +28,12 @@ function computeFields(_sc: Scenario, data: UnifiedFundamentals): DataField[] {
 
   // ── Buy Price (always present if price was fetched) ──────────────────────
   if (data.price !== null) {
-    const v = formatDynamicDecimal(data.price);
+    const roundedPrice = parseFloat(formatDynamicDecimal(data.price));
     fields.push({
       key: 'buyPrice',
       label: 'Buy Price',
-      value: v,
-      formatted: formatDynamicDecimal(data.price, true),
+      value: roundedPrice,
+      formatted: formatDynamicDecimal(roundedPrice, true),
     });
   }
 
@@ -40,12 +43,13 @@ function computeFields(_sc: Scenario, data: UnifiedFundamentals): DataField[] {
 // ---------------------------------------------------------------------------
 // AssumptionsCard
 // ---------------------------------------------------------------------------
-export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps) {
+export function AssumptionsCard({ 
+  sc, results, onUpdate, highlightedKeys, onSetHighlights, onClearHighlight 
+}: AssumptionsCardProps) {
   const maxYears = sc.dcfMethod === 'Basic DCF' ? 10 : 50;
 
   // Stock search modal
   const [showStockSearch, setShowStockSearch] = useState(false);
-  const [buyPriceHighlighted, setBuyPriceHighlighted] = useState(false);
 
   // Data preview modal
   const [showPreview, setShowPreview] = useState(false);
@@ -82,9 +86,10 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
       }
     });
     onUpdate(changes);
-    if (enabledKeys.includes('buyPrice')) {
-      setBuyPriceHighlighted(true);
-    }
+    
+    // Set highlights for all successfully applied fields
+    onSetHighlights(enabledKeys);
+
     setShowPreview(false);
     setPreviewFields([]);
     setPendingSymbol('');
@@ -122,11 +127,11 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
           <NumericFormat
             value={sc.buyPrice}
             onValueChange={v => onUpdate({ buyPrice: v.floatValue === undefined ? '' : v.floatValue })}
-            className={buyPriceHighlighted
+            className={highlightedKeys.has('buyPrice')
               ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
               : INPUT_CLS
             }
-            onFocus={() => setBuyPriceHighlighted(false)}
+            onFocus={() => onClearHighlight('buyPrice')}
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
