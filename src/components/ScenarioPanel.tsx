@@ -15,9 +15,10 @@ interface ScenarioPanelProps {
   onDelete: (id: number) => void;
   onDuplicate: (id: number) => void;
   results: Results;
+  currentUser: any;
 }
 
-export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, onDuplicate, results }: ScenarioPanelProps) {
+export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, onDuplicate, results, currentUser }: ScenarioPanelProps) {
   const [ignoreTrackClickUntil, setIgnoreTrackClickUntil] = useState(0);
   const [highlightedKeys, setHighlightedKeys] = useState<Set<string>>(new Set());
 
@@ -76,6 +77,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
             highlightedKeys={highlightedKeys}
             onSetHighlights={handleSetHighlights}
             onClearHighlight={handleClearHighlight}
+            currentUser={currentUser}
           />
         </div>
 

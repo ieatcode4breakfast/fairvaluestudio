@@ -491,6 +491,7 @@ export default function App() {
               onDelete={deleteScenario}
               onDuplicate={handleCopyScenario}
               results={activeResults}
+              currentUser={currentUser}
             />
           </div>
         )}

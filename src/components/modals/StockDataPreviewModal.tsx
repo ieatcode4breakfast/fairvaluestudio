@@ -20,13 +20,14 @@ interface StockDataPreviewModalProps {
     fields: DataField[];
     onApply: (enabledKeys: string[], extraFields?: DataField[]) => void;
     onClose: () => void;
+    isGuest?: boolean;
 }
 
 const SUPPORTED_TYPES = ['Common Stock', 'Equity', 'STK', 'ADR', 'REIT'];
 const PREFERRED_EXCHANGES = ['Nasdaq', 'NYSE', 'TSX', 'TSXV', 'LSE', 'ASX'];
 
 export function StockDataPreviewModal({
-    show, symbol, companyName, assetType, exchange, inMillions, fields, onApply, onClose
+    show, symbol, companyName, assetType, exchange, inMillions, fields, onApply, onClose, isGuest
 }: StockDataPreviewModalProps) {
     const [enabled, setEnabled] = useState<Record<string, boolean>>({});
     const [isFetchingAI, setIsFetchingAI] = useState(false);
@@ -61,9 +62,10 @@ export function StockDataPreviewModal({
         exchangeLabel.toUpperCase().includes(e.toUpperCase())
     );
 
-    const canUseAI = (isSupportedType || !assetType) && !isETF;
+    const canUseAI = (isSupportedType || !assetType) && !isETF && !isGuest;
 
     const handleFetchAI = async () => {
+        if (isGuest) return;
         setIsFetchingAI(true);
         setAiError(null);
         try {
@@ -156,59 +158,61 @@ export function StockDataPreviewModal({
                 )}
 
                 {/* AI Trigger Section */}
-                <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600">
-                    {!canUseAI ? (
-                        <div className="py-2 text-center">
-                            <p className="text-sm font-medium text-slate-400 dark:text-slate-500 italic">
-                                AI search is not available for {isETF ? 'ETFs/Funds' : 'this asset type'}.
+                {!isGuest && (
+                    <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600">
+                        {!canUseAI ? (
+                            <div className="py-2 text-center">
+                                <p className="text-sm font-medium text-slate-400 dark:text-slate-500 italic">
+                                    AI search is not available for {isETF ? 'ETFs/Funds' : 'this asset type'}.
+                                </p>
+                            </div>
+                        ) : aiFields.length === 0 && !isFetchingAI ? (
+                            <div className="space-y-3">
+                                <button
+                                    onClick={handleFetchAI}
+                                    className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
+                                >
+                                    <span>✨ Search Current Financial Data (AI)</span>
+                                </button>
+
+                                {!isPreferredExchange && exchange && (
+                                    <div className="flex items-center gap-1.5 justify-center px-2">
+                                        <div className="flex-shrink-0">
+                                            <svg className="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.21 0 2.128-1.333 1.514-2.394L13.514 6.394c-.614-1.061-2.314-1.061-2.928 0L3.086 17.606c-.614 1.061.304 2.394 1.514 2.394z" />
+                                            </svg>
+                                        </div>
+                                        <p className="text-[10px] text-amber-600 dark:text-amber-500 font-medium">
+                                            Minor exchange: AI accuracy may vary.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        ) : isFetchingAI ? (
+                            <div className="flex flex-col items-center justify-center py-2">
+                                <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-2" />
+                                <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium animate-pulse">Deep-searching filings & transcripts...</p>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 justify-center py-1">
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span className="text-xs font-semibold">Available Current Financial Data Loaded</span>
+                            </div>
+                        )}
+
+                        {aiError && (
+                            <p className="text-xs text-red-500 mt-2 text-center">{aiError}</p>
+                        )}
+
+                        <div className="mt-3 flex items-center justify-center text-center">
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal text-center">
+                                ⚠️ AI can make mistakes. Please double-check accuracy.
                             </p>
                         </div>
-                    ) : aiFields.length === 0 && !isFetchingAI ? (
-                        <div className="space-y-3">
-                            <button
-                                onClick={handleFetchAI}
-                                className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
-                            >
-                                <span>✨ Search Current Financial Data (AI)</span>
-                            </button>
-
-                            {!isPreferredExchange && exchange && (
-                                <div className="flex items-center gap-1.5 justify-center px-2">
-                                    <div className="flex-shrink-0">
-                                        <svg className="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.21 0 2.128-1.333 1.514-2.394L13.514 6.394c-.614-1.061-2.314-1.061-2.928 0L3.086 17.606c-.614 1.061.304 2.394 1.514 2.394z" />
-                                        </svg>
-                                    </div>
-                                    <p className="text-[10px] text-amber-600 dark:text-amber-500 font-medium">
-                                        Minor exchange: AI accuracy may vary.
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    ) : isFetchingAI ? (
-                        <div className="flex flex-col items-center justify-center py-2">
-                            <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-2" />
-                            <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium animate-pulse">Deep-searching filings & transcripts...</p>
-                        </div>
-                    ) : (
-                        <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 justify-center py-1">
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                            </svg>
-                            <span className="text-xs font-semibold">Available Current Financial Data Loaded</span>
-                        </div>
-                    )}
-
-                    {aiError && (
-                        <p className="text-xs text-red-500 mt-2 text-center">{aiError}</p>
-                    )}
-
-                    <div className="mt-3 flex items-center justify-center text-center">
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal text-center">
-                            ⚠️ AI can make mistakes. Please double-check accuracy.
-                        </p>
                     </div>
-                </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex gap-3 justify-end">

@@ -15,6 +15,7 @@ interface AssumptionsCardProps {
   highlightedKeys: Set<string>;
   onSetHighlights: (keys: string[]) => void;
   onClearHighlight: (key: string) => void;
+  currentUser: any;
 }
 
 // ---------------------------------------------------------------------------
@@ -44,7 +45,7 @@ function computeFields(_sc: Scenario, data: UnifiedFundamentals): DataField[] {
 // AssumptionsCard
 // ---------------------------------------------------------------------------
 export function AssumptionsCard({ 
-  sc, results, onUpdate, highlightedKeys, onSetHighlights, onClearHighlight 
+  sc, results, onUpdate, highlightedKeys, onSetHighlights, onClearHighlight, currentUser 
 }: AssumptionsCardProps) {
   const maxYears = sc.dcfMethod === 'Basic DCF' ? 10 : 50;
 
@@ -200,6 +201,7 @@ export function AssumptionsCard({
         fields={previewFields}
         onApply={handleApply}
         onClose={handlePreviewClose}
+        isGuest={!currentUser}
       />
     </div>
   );
