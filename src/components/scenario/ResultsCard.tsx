@@ -34,7 +34,7 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
         <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">Potential return to Intrinsic Value</div>
       </div>
       <div className="bg-white dark:bg-slate-800 p-6 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 flex flex-col justify-between min-w-0">
-        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">Internal Rate of Return (Annual Return)</div>
+        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2 select-text">Internal Rate of Return (Annual Return)</div>
         <div className={`text-4xl font-light tracking-tight truncate select-text ${irrColor}`}>{formatPercent(results.irr)}</div>
         <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">At current buy price</div>
       </div>
