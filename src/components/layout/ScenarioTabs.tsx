@@ -28,26 +28,24 @@ function ScenarioReorderItem({ sc, isActive, onSelect }: ReorderItemProps) {
       value={sc}
       dragListener={false}
       dragControls={dragControls}
-      className={`flex items-center gap-2 py-1 px-2 rounded-lg border transition-colors ${
-        isActive 
-          ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800' 
-          : 'bg-white dark:bg-slate-800 border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50'
-      }`}
+      className={`flex items-center gap-2 py-1.25 px-2 rounded-lg border transition-colors ${isActive
+        ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800'
+        : 'bg-white dark:bg-slate-800 border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50'
+        }`}
     >
-      <div 
+      <div
         onPointerDown={(e) => dragControls.start(e)}
         className="cursor-grab active:cursor-grabbing p-1 text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
         style={{ touchAction: 'none' }}
       >
         <GripVertical className="w-4 h-4 shrink-0" />
       </div>
-      <div 
+      <div
         onClick={onSelect}
-        className={`flex-1 min-w-0 text-sm font-medium truncate select-none cursor-pointer transition-colors ${
-          isActive 
-            ? 'text-indigo-700 dark:text-indigo-300' 
-            : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'
-        }`}
+        className={`flex-1 min-w-0 text-sm font-medium truncate select-none cursor-pointer transition-colors ${isActive
+          ? 'text-indigo-700 dark:text-indigo-300'
+          : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'
+          }`}
       >
         {sc.scenarioName || 'Untitled'}
       </div>
@@ -146,24 +144,24 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
 
         {/* Action Buttons right next to the dropdown */}
         <div className="flex items-center gap-2">
-            {props.scenarios.length < MAX_SCENARIOS && (
-              <button
-                onClick={props.addScenario}
-                title="Add Scenario"
-                className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 hover:border-slate-200 dark:hover:border-slate-600 border border-transparent text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm cursor-pointer"
-              >
-                <PlusIcon className="w-4 h-4" />
-              </button>
-            )}
-
+          {props.scenarios.length < MAX_SCENARIOS && (
             <button
-              onClick={props.onResetAll}
-              title="Reset All Scenarios"
+              onClick={props.addScenario}
+              title="Add Scenario"
               className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 hover:border-slate-200 dark:hover:border-slate-600 border border-transparent text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm cursor-pointer"
             >
-              <RotateCcw className="w-4 h-4" />
+              <PlusIcon className="w-4 h-4" />
             </button>
-          </div>
+          )}
+
+          <button
+            onClick={props.onResetAll}
+            title="Reset All Scenarios"
+            className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 hover:border-slate-200 dark:hover:border-slate-600 border border-transparent text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm cursor-pointer"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );
