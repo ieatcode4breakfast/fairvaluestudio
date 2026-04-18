@@ -110,7 +110,7 @@ export function Header(props: HeaderProps) {
           {isHowToUseExpanded && (
             <div className="p-4 border-t border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
               <ul className="list-disc pl-5 space-y-4 text-slate-600 dark:text-slate-400 mb-4">
-                <li><strong>Guest vs. Account:</strong> Use the app as a guest and save or load your data by manually downloading/uploading your valuations. Creating an account unlocks automatic cloud saves, real-time cross-device syncing, and the ability to store and manage multiple valuations at once.</li>
+                <li><strong>Guest vs. Account:</strong> Use the app as a guest and save or load your data by manually downloading/uploading your valuations. Creating an account unlocks automatic cloud saves, real-time cross-device syncing, the ability to store and manage multiple valuations at once, and load current financial data (powered by AI search).</li>
                 <li><strong>Choose a Method:</strong> Select "Basic DCF" for a quick estimate or "Advanced DCF" for detailed, multi-phase growth projections.</li>
                 <li><strong>Configure Phases (Advanced):</strong> Click the timeline track to add growth phases. Drag the dots to adjust the years, or double-click/tap to remove them.</li>
                 <li><strong>Enter Assumptions:</strong> Fill in your estimates for cash flows, growth rates, margins, and discount rates.</li>
@@ -148,70 +148,70 @@ export function Header(props: HeaderProps) {
                   )}
                 </label>
                 <div className="flex items-center w-full gap-2">
-                <div className="relative flex-1 max-w-[400px] sm:max-w-[315px] min-h-[38px]">
-                  {/* Custom Trigger */}
-                  <div
-                    onClick={() => setIsValuationOpen(!isValuationOpen)}
-                    className={`${SELECT_CLS} !bg-white dark:!bg-slate-800 shadow-sm flex items-center justify-start cursor-pointer transition-colors ${isValuationOpen ? 'open' : ''}`}
-                  >
-                    <span className="truncate text-slate-700 dark:text-slate-300">
-                      {props.userValuations.find(v => v.id === props.loadedValuationId)?.valuationName || (
-                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">✨ New valuation...</span>
-                      )}
-                    </span>
-                  </div>
+                  <div className="relative flex-1 max-w-[400px] sm:max-w-[315px] min-h-[38px]">
+                    {/* Custom Trigger */}
+                    <div
+                      onClick={() => setIsValuationOpen(!isValuationOpen)}
+                      className={`${SELECT_CLS} !bg-white dark:!bg-slate-800 shadow-sm flex items-center justify-start cursor-pointer transition-colors ${isValuationOpen ? 'open' : ''}`}
+                    >
+                      <span className="truncate text-slate-700 dark:text-slate-300">
+                        {props.userValuations.find(v => v.id === props.loadedValuationId)?.valuationName || (
+                          <span className="font-semibold text-indigo-600 dark:text-indigo-400">✨ New valuation...</span>
+                        )}
+                      </span>
+                    </div>
 
-                  <AnimatePresence>
-                    {isValuationOpen && (
-                      <>
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          onClick={() => setIsValuationOpen(false)}
-                          className="fixed inset-0 z-10 bg-transparent"
-                        />
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          transition={{ duration: 0.15, ease: "easeOut" }}
-                          className="absolute top-full mt-1.5 left-0 w-full z-20 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
-                        >
-                          <div className="p-1 max-h-[300px] overflow-y-auto">
-                            <div
-                              onClick={() => {
-                                props.setNewValuationName('New Valuation');
-                                props.setShowNewValuationModal(true);
-                                setIsValuationOpen(false);
-                              }}
-                              className="flex items-center px-3 py-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg cursor-pointer transition-colors border border-transparent"
-                            >
-                              ✨ New valuation...
+                    <AnimatePresence>
+                      {isValuationOpen && (
+                        <>
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setIsValuationOpen(false)}
+                            className="fixed inset-0 z-10 bg-transparent"
+                          />
+                          <motion.div
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.15, ease: "easeOut" }}
+                            className="absolute top-full mt-1.5 left-0 w-full z-20 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+                          >
+                            <div className="p-1 max-h-[300px] overflow-y-auto">
+                              <div
+                                onClick={() => {
+                                  props.setNewValuationName('New Valuation');
+                                  props.setShowNewValuationModal(true);
+                                  setIsValuationOpen(false);
+                                }}
+                                className="flex items-center px-3 py-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg cursor-pointer transition-colors border border-transparent"
+                              >
+                                ✨ New valuation...
+                              </div>
+                              {[...props.userValuations]
+                                .sort((a, b) => a.valuationName.localeCompare(b.valuationName))
+                                .map((val) => (
+                                  <div
+                                    key={val.id}
+                                    onClick={() => {
+                                      props.handleLoadValuation(val.id);
+                                      setIsValuationOpen(false);
+                                    }}
+                                    className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-colors border ${val.id === props.loadedValuationId
+                                      ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 border-indigo-100 dark:border-indigo-800'
+                                      : 'text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                                      }`}
+                                  >
+                                    {val.valuationName}
+                                  </div>
+                                ))}
                             </div>
-                            {[...props.userValuations]
-                              .sort((a, b) => a.valuationName.localeCompare(b.valuationName))
-                              .map((val) => (
-                                <div
-                                  key={val.id}
-                                  onClick={() => {
-                                    props.handleLoadValuation(val.id);
-                                    setIsValuationOpen(false);
-                                  }}
-                                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-colors border ${val.id === props.loadedValuationId
-                                    ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 border-indigo-100 dark:border-indigo-800'
-                                    : 'text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50'
-                                    }`}
-                                >
-                                  {val.valuationName}
-                                </div>
-                              ))}
-                          </div>
-                        </motion.div>
-                      </>
-                    )}
-                  </AnimatePresence>
-                </div>
+                          </motion.div>
+                        </>
+                      )}
+                    </AnimatePresence>
+                  </div>
                   {props.loadedValuationId && (
                     <button
                       onClick={() => {
