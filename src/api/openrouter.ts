@@ -78,7 +78,20 @@ export async function fetchTTMData(
     }
 
     const uppercaseTicker = ticker.toUpperCase();
-    const currentDate = new Date().toISOString().split('T')[0];
+
+    // ── 0. Get Server-Side Date (Global Truth) ─────────────────────────────
+    let serverDate = new Date(); // Fallback
+    try {
+        const { data: timeData, error: timeError } = await supabase.rpc('get_server_time');
+        if (timeData && !timeError) {
+            serverDate = new Date(timeData);
+            console.log(`[OpenRouter] Server Time synchronized: ${serverDate.toISOString()}`);
+        }
+    } catch (err) {
+        console.warn('[OpenRouter] Failed to fetch server time, falling back to local clock.');
+    }
+    
+    const currentDate = serverDate.toISOString().split('T')[0];
 
     // ── 0. Usage Limit Check ────────────────────────────────────────────────
     if (userId) {
@@ -263,7 +276,7 @@ export async function fetchTTMData(
             currency: parsedData.currency || 'USD',
             fiscal_year: fiscalYear,
             fiscal_quarter: fiscalQuarter,
-            last_updated: new Date().toISOString()
+            last_updated: serverDate.toISOString()
         }).then(({ error }) => {
             if (error) console.error('[OpenRouter] Failed to update global cache:', error);
         });
