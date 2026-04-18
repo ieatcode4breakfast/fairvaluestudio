@@ -21,8 +21,8 @@ export function DownloadModal({ show, setShow, filename, setFilename, onDownload
           }}
         />
         <div className="flex justify-end gap-3">
-          <button onClick={() => setShow(false)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">Cancel</button>
-          <button onClick={onDownload} className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Save</button>
+          <button onClick={() => setShow(false)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer">Cancel</button>
+          <button onClick={onDownload} className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer">Save</button>
         </div>
       </div>
     </div>
@@ -42,13 +42,13 @@ export function UploadModal({ show, setShow, currentUser, onProceed }: any) {
           }
         </p>
         <div className="flex justify-end gap-3">
-          <button onClick={() => setShow(false)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">Cancel</button>
+          <button onClick={() => setShow(false)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer">Cancel</button>
           <button
             onClick={() => {
               setShow(false);
               onProceed();
             }}
-            className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm ${currentUser ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-red-600 hover:bg-red-700'
+            className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm cursor-pointer ${currentUser ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-red-600 hover:bg-red-700'
               }`}
           >
             Proceed
@@ -78,8 +78,8 @@ export function SaveAsModal({ show, setShow, name, setName, onSave }: any) {
           }}
         />
         <div className="flex justify-end gap-3">
-          <button onClick={() => setShow(false)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">Cancel</button>
-          <button onClick={onSave} className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Save</button>
+          <button onClick={() => setShow(false)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer">Cancel</button>
+          <button onClick={onSave} className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer">Save</button>
         </div>
       </div>
     </div>
@@ -114,14 +114,14 @@ export function NewValuationModal({ show, setShow, name, setName, isSaving, user
               <button
                 onClick={() => onCreateClick(true)}
                 disabled={!name.trim() || isSaving}
-                className="w-full px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50"
+                className="w-full px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 cursor-pointer disabled:cursor-default"
               >
                 {isSaving ? 'Creating...' : 'Load Sample Valuation'}
               </button>
               <button
                 onClick={() => onCreateClick(false)}
                 disabled={!name.trim() || isSaving}
-                className="w-full px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors disabled:opacity-50"
+                className="w-full px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-default"
               >
                 Create Blank
               </button>
@@ -130,14 +130,14 @@ export function NewValuationModal({ show, setShow, name, setName, isSaving, user
             <div className="flex justify-end gap-3 mt-2">
               <button
                 onClick={() => setShow(false)}
-                className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+                className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={() => onCreateClick(false)}
                 disabled={!name.trim() || isSaving}
-                className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 cursor-pointer disabled:cursor-default"
               >
                 {isSaving ? 'Creating...' : 'Create'}
               </button>
@@ -161,13 +161,13 @@ export function DeleteModal({ show, setShow, onDelete }: any) {
         <div className="flex justify-end gap-3">
           <button
             onClick={() => setShow(false)}
-            className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
           >
             Cancel
           </button>
           <button
             onClick={onDelete}
-            className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm"
+            className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-sm cursor-pointer"
           >
             Delete
           </button>
@@ -196,8 +196,8 @@ export function RenameModal({ show, setShow, name, setName, onRename }: any) {
           }}
         />
         <div className="flex justify-end gap-3">
-          <button onClick={() => setShow(false)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">Cancel</button>
-          <button onClick={onRename} className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm">Rename</button>
+          <button onClick={() => setShow(false)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer">Cancel</button>
+          <button onClick={onRename} className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm cursor-pointer">Rename</button>
         </div>
       </div>
     </div>
@@ -212,10 +212,10 @@ export function GenericConfirmModal({ show, setShow, title, description, confirm
         <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">{title}</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{description}</p>
         <div className="flex justify-end gap-3">
-          <button onClick={() => setShow(false)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors">Cancel</button>
+          <button onClick={() => setShow(false)} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer">Cancel</button>
           <button
             onClick={() => { setShow(false); onConfirm(); }}
-            className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm ${confirmClass}`}
+            className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm cursor-pointer ${confirmClass}`}
           >
             {confirmText}
           </button>
@@ -281,14 +281,14 @@ export function RetainGuestModal({ show, name, setName, isSaving, onRetain }: an
         <div className="flex justify-between gap-3">
           <button
             onClick={() => onRetain(false)}
-            className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+            className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
           >
             Discard
           </button>
           <button
             onClick={() => onRetain(true)}
             disabled={!name.trim() || isSaving}
-            className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm disabled:opacity-50 cursor-pointer disabled:cursor-default"
           >
             {isSaving ? 'Saving...' : 'Save'}
           </button>

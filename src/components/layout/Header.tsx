@@ -87,7 +87,7 @@ export function Header(props: HeaderProps) {
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden mb-6">
           <button
             onClick={() => setIsHowToUseExpanded(!isHowToUseExpanded)}
-            className="w-full p-4 flex items-center justify-between bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+            className="w-full p-4 flex items-center justify-between bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
             <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">How to Use</h2>
             {isHowToUseExpanded ? (
@@ -113,7 +113,7 @@ export function Header(props: HeaderProps) {
                 <button
                   onClick={props.onSampleClick}
                   disabled={props.isSaving}
-                  className="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg text-sm font-medium transition-colors border border-indigo-200 dark:border-indigo-800 disabled:opacity-50"
+                  className="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg text-sm font-medium transition-colors border border-indigo-200 dark:border-indigo-800 disabled:opacity-50 cursor-pointer disabled:cursor-default"
                 >
                   {props.isSaving ? 'Saving...' : 'Load Sample Valuation'}
                 </button>
@@ -165,7 +165,7 @@ export function Header(props: HeaderProps) {
                         props.setEditValuationName(props.userValuations.find(v => v.id === props.loadedValuationId)?.valuationName || '');
                         props.setIsRenaming(true);
                       }}
-                      className="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-600 transition-colors shadow-sm whitespace-nowrap"
+                      className="px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-600 transition-colors shadow-sm whitespace-nowrap cursor-pointer"
                       title="Rename Valuation"
                     >
                       Rename
@@ -177,14 +177,14 @@ export function Header(props: HeaderProps) {
               <div className="flex items-center gap-2 w-full sm:w-auto">
                 <button
                   onClick={() => props.setShowSaveAsModal(true)}
-                  className="flex-1 px-4 py-2 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-lg text-sm font-medium hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors shadow-sm whitespace-nowrap"
+                  className="flex-1 px-4 py-2 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-lg text-sm font-medium hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-colors shadow-sm whitespace-nowrap cursor-pointer"
                 >
                   Save As New
                 </button>
                 {props.loadedValuationId && (
                   <button
                     onClick={() => props.setShowDeleteModal(true)}
-                    className="flex-1 px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors border border-red-200 dark:border-red-800"
+                    className="flex-1 px-4 py-2 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg text-sm font-medium hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors border border-red-200 dark:border-red-800 cursor-pointer"
                   >
                     Delete
                   </button>
@@ -199,14 +199,14 @@ export function Header(props: HeaderProps) {
                 props.setDownloadFilename(props.defaultDownloadName);
                 props.setShowDownloadModal(true);
               }}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-600 shadow-sm transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-600 shadow-sm transition-all cursor-pointer"
             >
               <DownloadIcon className="w-4 h-4" />
               <span className="hidden xl:inline">Download Valuation</span>
             </button>
             <button
               onClick={() => props.setShowUploadModal(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border shadow-sm transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-600"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border shadow-sm transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-600 cursor-pointer"
             >
               <UploadIcon className="w-4 h-4" />
               <span className="hidden xl:inline">Upload Valuation</span>

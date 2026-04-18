@@ -148,7 +148,7 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
               <button
                 onClick={props.addScenario}
                 title="Add Scenario"
-                className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 hover:border-slate-200 dark:hover:border-slate-600 border border-transparent text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm"
+                className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 hover:border-slate-200 dark:hover:border-slate-600 border border-transparent text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm cursor-pointer"
               >
                 <PlusIcon className="w-4 h-4" />
               </button>
@@ -157,7 +157,7 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
             <button
               onClick={props.onResetAll}
               title="Reset All Scenarios"
-              className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 hover:border-slate-200 dark:hover:border-slate-600 border border-transparent text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm"
+              className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 hover:border-slate-200 dark:hover:border-slate-600 border border-transparent text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm cursor-pointer"
             >
               <RotateCcw className="w-4 h-4" />
             </button>

@@ -67,7 +67,7 @@ export function AccountModal(props: AccountModalProps) {
             <button
               onClick={handleSave}
               disabled={props.accountSaving}
-              className="px-4 py-2 text-sm font-medium bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm disabled:opacity-50 cursor-pointer disabled:cursor-default"
             >
               {props.accountSaving ? 'Saving...' : 'Update'}
             </button>
@@ -91,7 +91,7 @@ export function AccountModal(props: AccountModalProps) {
             <button
               onClick={handleSave}
               disabled={props.accountSaving}
-              className="px-4 py-2 text-sm font-medium bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm disabled:opacity-50 cursor-pointer disabled:cursor-default"
             >
               {props.accountSaving ? 'Saving...' : 'Update'}
             </button>
@@ -114,7 +114,7 @@ export function AccountModal(props: AccountModalProps) {
               <button
                 type="button"
                 onClick={() => props.setShowAccountNewPassword(!props.showAccountNewPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400 focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400 focus:outline-none cursor-pointer"
               >
                 {props.showAccountNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -133,7 +133,7 @@ export function AccountModal(props: AccountModalProps) {
               <button
                 type="button"
                 onClick={() => props.setShowAccountConfirmPassword(!props.showAccountConfirmPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400 focus:outline-none"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400 focus:outline-none cursor-pointer"
               >
                 {props.showAccountConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
@@ -143,7 +143,7 @@ export function AccountModal(props: AccountModalProps) {
             <button
               onClick={handleSave}
               disabled={props.accountSaving}
-              className="px-4 py-2 text-sm font-medium bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm disabled:opacity-50 cursor-pointer disabled:cursor-default"
             >
               {props.accountSaving ? 'Saving...' : 'Update Password'}
             </button>

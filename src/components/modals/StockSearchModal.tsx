@@ -104,7 +104,7 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
                     <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">Search Stocks</h3>
                     <button
                         onClick={onClose}
-                        className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                        className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
                         aria-label="Close"
                     >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -149,7 +149,7 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
                                     <button
                                         onClick={() => handleSelect(stock.symbol)}
                                         disabled={selectingSymbol !== null}
-                                        className="w-full text-left p-3 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-60 disabled:cursor-wait rounded-lg transition-colors group"
+                                        className="w-full text-left p-3 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-60 disabled:cursor-wait rounded-lg transition-colors group cursor-pointer"
                                     >
                                         <div className="flex items-center justify-between">
                                             <div>
@@ -178,7 +178,7 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
                 <div className="mt-6 flex justify-end">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+                        className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
                     >
                         Cancel
                     </button>

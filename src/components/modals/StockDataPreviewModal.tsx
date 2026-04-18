@@ -111,7 +111,7 @@ export function StockDataPreviewModal({
                     <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">Apply Data</h3>
                     <button
                         onClick={onClose}
-                        className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                        className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
                         aria-label="Close"
                     >
                         <svg className="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -167,7 +167,7 @@ export function StockDataPreviewModal({
                         <div className="space-y-3">
                             <button
                                 onClick={handleFetchAI}
-                                className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm"
+                                className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
                             >
                                 <span>✨ Search Current Financial Data (AI)</span>
                             </button>
@@ -214,7 +214,7 @@ export function StockDataPreviewModal({
                 <div className="flex gap-3 justify-end">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+                        className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
                     >
                         Cancel
                     </button>
@@ -222,7 +222,7 @@ export function StockDataPreviewModal({
                         <button
                             onClick={handleApply}
                             disabled={!anyEnabled}
-                            className="px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                            className="px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors cursor-pointer disabled:cursor-default"
                         >
                             Apply
                         </button>

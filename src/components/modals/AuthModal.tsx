@@ -45,14 +45,14 @@ export function AuthModal(props: AuthModalProps) {
         <div className="flex border-b border-slate-200 dark:border-slate-700 mb-4">
           <button
             onClick={() => { props.setActiveTab('login'); props.setLoginError(''); props.setSignupError(''); }}
-            className={`flex-1 py-2 text-sm font-medium transition-colors ${props.activeTab === 'login' ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+            className={`flex-1 py-2 text-sm font-medium transition-colors cursor-pointer ${props.activeTab === 'login' ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
               }`}
           >
             Log in
           </button>
           <button
             onClick={() => { props.setActiveTab('signup'); props.setLoginError(''); props.setSignupError(''); }}
-            className={`flex-1 py-2 text-sm font-medium transition-colors ${props.activeTab === 'signup' ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+            className={`flex-1 py-2 text-sm font-medium transition-colors cursor-pointer ${props.activeTab === 'signup' ? 'text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
               }`}
           >
             Sign up
@@ -89,7 +89,7 @@ export function AuthModal(props: AuthModalProps) {
                 <button
                   type="button"
                   onClick={() => props.setShowLoginPassword(!props.showLoginPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400 focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400 focus:outline-none cursor-pointer"
                 >
                   {props.showLoginPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -99,8 +99,8 @@ export function AuthModal(props: AuthModalProps) {
               <div className="text-sm text-red-600 dark:text-red-400 mb-4 text-center">{props.loginError}</div>
             )}
             <div className="flex justify-end gap-3">
-              <button onClick={() => { props.setShowLoginModal(false); props.setLoginError(''); props.setLoginEmail(''); props.setLoginPassword(''); }} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-300 transition-colors">Cancel</button>
-              <button onClick={props.handleLogin} className="px-4 py-2 text-sm font-medium bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm">Log In</button>
+              <button onClick={() => { props.setShowLoginModal(false); props.setLoginError(''); props.setLoginEmail(''); props.setLoginPassword(''); }} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-300 transition-colors cursor-pointer">Cancel</button>
+              <button onClick={props.handleLogin} className="px-4 py-2 text-sm font-medium bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm cursor-pointer">Log In</button>
             </div>
           </>
         ) : (
@@ -143,7 +143,7 @@ export function AuthModal(props: AuthModalProps) {
                 <button
                   type="button"
                   onClick={() => props.setShowSignupPassword(!props.showSignupPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400 focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400 focus:outline-none cursor-pointer"
                 >
                   {props.showSignupPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -162,7 +162,7 @@ export function AuthModal(props: AuthModalProps) {
                 <button
                   type="button"
                   onClick={() => props.setShowSignupConfirmPassword(!props.showSignupConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400 focus:outline-none"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-400 focus:outline-none cursor-pointer"
                 >
                   {props.showSignupConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -172,8 +172,8 @@ export function AuthModal(props: AuthModalProps) {
               <div className="text-sm text-red-600 dark:text-red-400 mb-4 text-center">{props.signupError}</div>
             )}
             <div className="flex justify-end gap-3">
-              <button onClick={() => { props.setShowLoginModal(false); props.setSignupError(''); props.setSignupEmail(''); props.setSignupUsername(''); props.setSignupPassword(''); props.setSignupConfirmPassword(''); }} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-300 transition-colors">Cancel</button>
-              <button onClick={props.handleSignup} className="px-4 py-2 text-sm font-medium bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm">Sign Up</button>
+              <button onClick={() => { props.setShowLoginModal(false); props.setSignupError(''); props.setSignupEmail(''); props.setSignupUsername(''); props.setSignupPassword(''); props.setSignupConfirmPassword(''); }} className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-300 transition-colors cursor-pointer">Cancel</button>
+              <button onClick={props.handleSignup} className="px-4 py-2 text-sm font-medium bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors shadow-sm cursor-pointer">Sign Up</button>
             </div>
           </>
         )}
