@@ -16,9 +16,11 @@ interface ScenarioTabsProps {
 
 interface ReorderItemProps {
   sc: Scenario;
+  isActive: boolean;
+  onSelect: () => void;
 }
 
-function ScenarioReorderItem({ sc }: ReorderItemProps) {
+function ScenarioReorderItem({ sc, isActive, onSelect }: ReorderItemProps) {
   const dragControls = useDragControls();
 
   return (
@@ -26,7 +28,11 @@ function ScenarioReorderItem({ sc }: ReorderItemProps) {
       value={sc}
       dragListener={false}
       dragControls={dragControls}
-      className="flex items-center gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg border border-transparent"
+      className={`flex items-center gap-2 p-2 rounded-lg border transition-colors ${
+        isActive 
+          ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800' 
+          : 'bg-white dark:bg-slate-800 border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50'
+      }`}
     >
       <div 
         onPointerDown={(e) => dragControls.start(e)}
@@ -35,9 +41,16 @@ function ScenarioReorderItem({ sc }: ReorderItemProps) {
       >
         <GripVertical className="w-4 h-4 shrink-0" />
       </div>
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate select-none">
+      <div 
+        onClick={onSelect}
+        className={`flex-1 min-w-0 text-sm font-medium truncate select-none cursor-pointer transition-colors ${
+          isActive 
+            ? 'text-indigo-700 dark:text-indigo-300' 
+            : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'
+        }`}
+      >
         {sc.scenarioName || 'Untitled'}
-      </span>
+      </div>
     </Reorder.Item>
   );
 }
@@ -130,7 +143,16 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
                     className="flex flex-col gap-1"
                   >
                     {tempOrder.map((sc) => (
-                      <ScenarioReorderItem key={sc.id} sc={sc} />
+                      <ScenarioReorderItem 
+                        key={sc.id} 
+                        sc={sc} 
+                        isActive={sc.id === props.activeScenarioId}
+                        onSelect={() => {
+                          props.setActiveScenarioId(sc.id);
+                          props.onReorder(tempOrder);
+                          setIsSorting(false);
+                        }}
+                      />
                     ))}
                   </Reorder.Group>
                 </div>
