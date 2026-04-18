@@ -94,7 +94,7 @@ export async function fetchTTMData(
             .from('ai_search_cache')
             .select('*')
             .eq('ticker', uppercaseTicker)
-            .single();
+            .maybeSingle();
 
         if (cached && !cacheError && targetPeriod) {
             // Check if our cache is up-to-date with Finnhub's reported period

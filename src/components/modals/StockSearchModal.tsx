@@ -144,8 +144,8 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
                 <div className="max-h-64 overflow-y-auto">
                     {results.length > 0 ? (
                         <ul className="space-y-2">
-                            {results.map((stock) => (
-                                <li key={stock.symbol}>
+                            {results.map((stock, idx) => (
+                                <li key={`${stock.symbol}-${idx}`}>
                                     <button
                                         onClick={() => handleSelect(stock.symbol)}
                                         disabled={selectingSymbol !== null}
