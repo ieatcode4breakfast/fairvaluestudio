@@ -37,6 +37,7 @@ export function StockDataPreviewModal({
     const [aiFields, setAiFields] = useState<DataField[]>([]);
     const [usageCount, setUsageCount] = useState<number>(0);
     const [usageLimit, setUsageLimit] = useState<number>(5);
+    const [loadedFiscal, setLoadedFiscal] = useState<{ year: number; quarter: number } | null>(null);
 
     // Reset toggles and AI state whenever the field list changes (new stock selected)
     useEffect(() => {
@@ -47,6 +48,7 @@ export function StockDataPreviewModal({
         setAiFields([]);
         setAiError(null);
         setIsFetchingAI(false);
+        setLoadedFiscal(null);
 
         // Fetch usage status for the user
         if (userId) {
@@ -94,6 +96,9 @@ export function StockDataPreviewModal({
             ];
 
             setAiFields(newFields);
+            if (data.fiscalYear && data.fiscalQuarter) {
+                setLoadedFiscal({ year: data.fiscalYear, quarter: data.fiscalQuarter });
+            }
 
             // Pre-toggle new AI fields to ON
             setEnabled(prev => {
@@ -175,19 +180,6 @@ export function StockDataPreviewModal({
                 {/* AI Trigger Section */}
                 {!isGuest && (
                     <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600">
-                        {reportingPeriod && (
-                            <div className="mb-3 flex items-center gap-2 justify-center py-1 px-3 bg-indigo-50 dark:bg-indigo-900/30 rounded-lg border border-indigo-100 dark:border-indigo-800/50">
-                                <div className="text-indigo-600 dark:text-indigo-400">
-                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                </div>
-                                <p className="text-[10px] font-semibold text-indigo-700 dark:text-indigo-300 uppercase tracking-tight">
-                                    Latest Reported: {reportingPeriod.year} Q{reportingPeriod.quarter}
-                                </p>
-                            </div>
-                        )}
-
                         {!canUseAI ? (
                             <div className="py-2 text-center">
                                 <p className="text-sm font-medium text-slate-400 dark:text-slate-500 italic">
@@ -202,12 +194,12 @@ export function StockDataPreviewModal({
                                     className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:text-slate-500 dark:disabled:text-slate-400 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer disabled:cursor-not-allowed"
                                 >
                                     <span>
-                                        {usageCount >= usageLimit 
-                                            ? 'Daily AI Limit Reached' 
-                                            : '✨ Search Current Financial Data (AI)'}
+                                        {usageCount >= usageLimit
+                                            ? 'Daily AI Limit Reached'
+                                            : '✨ AI Query Current Financial Data'}
                                     </span>
                                 </button>
-                                
+
                                 <div className="text-center">
                                     <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
                                         Quota: {Math.max(0, usageLimit - usageCount)} of {usageLimit} searches remaining today
@@ -220,17 +212,37 @@ export function StockDataPreviewModal({
                                 <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium animate-pulse">Deep-searching filings & transcripts...</p>
                             </div>
                         ) : (
-                            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 justify-center py-1">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                </svg>
-                                <span className="text-xs font-semibold">Financial Data Loaded</span>
+                            <div className="text-center py-1">
+                                {loadedFiscal && (
+                                    <div className="mb-3 flex items-center gap-2 justify-center py-1 px-3 bg-indigo-50 dark:bg-indigo-900/40 rounded-lg border border-indigo-100 dark:border-indigo-800/50">
+                                        <div className="text-indigo-600 dark:text-indigo-400">
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                        <p className="text-[11px] font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-tighter">
+                                            Latest Reported: {loadedFiscal.year} Q{loadedFiscal.quarter}
+                                        </p>
+                                    </div>
+                                )}
+                                <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 justify-center">
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span className="text-xs font-semibold">Financial Data Loaded</span>
+                                </div>
                             </div>
                         )}
 
                         {aiError && (
                             <p className="text-xs text-red-500 mt-2 text-center">{aiError}</p>
                         )}
+
+                        <div className="mt-3 flex items-center justify-center text-center">
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal text-center">
+                                ⚠️ AI can make mistakes. Please double-check accuracy.
+                            </p>
+                        </div>
                     </div>
                 )}
 

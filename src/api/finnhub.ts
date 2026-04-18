@@ -77,7 +77,22 @@ export async function getStockFundamentals(symbol: string): Promise<FinnhubFunda
         let reportingPeriod = null;
         if (financials?.series?.quarterly?.eps?.[0]) {
             const latest = financials.series.quarterly.eps[0];
-            reportingPeriod = { year: latest.year, quarter: latest.quarter };
+            let year = latest.year;
+            let quarter = latest.quarter;
+
+            // Fallback: Parse the 'period' date string (e.g. "2024-12-31") if convenience fields are missing
+            if ((!year || !quarter) && latest.period) {
+                const dateParts = latest.period.split('-');
+                if (dateParts.length >= 2) {
+                    year = parseInt(dateParts[0], 10);
+                    const month = parseInt(dateParts[1], 10);
+                    quarter = Math.floor((month - 1) / 3) + 1;
+                }
+            }
+
+            if (year && quarter) {
+                reportingPeriod = { year, quarter };
+            }
         }
 
         console.log('[Finnhub] final fundamentals:', { symbol, price, reportingPeriod });
