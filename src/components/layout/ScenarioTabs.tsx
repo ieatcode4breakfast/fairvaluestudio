@@ -166,6 +166,5 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
         )}
       </div>
     </div>
-    </div>
   );
 }
