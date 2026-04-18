@@ -27,6 +27,7 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
         if (!query.trim()) {
             setResults([]);
             setError(null);
+            setLoading(false);
             return;
         }
 
@@ -129,7 +130,7 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
                 </div>
 
                 {error && (
-                    <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300">
+                    <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-700 dark:text-red-300 text-center">
                         {error}
                     </div>
                 )}
