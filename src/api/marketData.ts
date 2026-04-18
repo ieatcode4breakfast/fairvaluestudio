@@ -4,6 +4,9 @@ import * as rapidApi from './rapidApiStockPulse';
 export interface StockSearchResult {
     symbol: string;
     description: string;
+    displaySymbol?: string;
+    type?: string;
+    exchange?: string;
 }
 
 export interface UnifiedFundamentals {

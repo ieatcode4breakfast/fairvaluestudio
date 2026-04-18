@@ -14,13 +14,20 @@ interface StockDataPreviewModalProps {
     show: boolean;
     symbol: string;
     companyName: string;
+    assetType?: string;
+    exchange?: string;
     inMillions: boolean;
     fields: DataField[];
     onApply: (enabledKeys: string[], extraFields?: DataField[]) => void;
     onClose: () => void;
 }
 
-export function StockDataPreviewModal({ show, symbol, companyName, inMillions, fields, onApply, onClose }: StockDataPreviewModalProps) {
+const SUPPORTED_TYPES = ['Common Stock', 'Equity', 'STK', 'ADR', 'REIT'];
+const PREFERRED_EXCHANGES = ['Nasdaq', 'NYSE', 'TSX', 'TSXV', 'LSE', 'ASX'];
+
+export function StockDataPreviewModal({
+    show, symbol, companyName, assetType, exchange, inMillions, fields, onApply, onClose
+}: StockDataPreviewModalProps) {
     const [enabled, setEnabled] = useState<Record<string, boolean>>({});
     const [isFetchingAI, setIsFetchingAI] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
@@ -42,11 +49,25 @@ export function StockDataPreviewModal({ show, symbol, companyName, inMillions, f
     const allFields = [...fields, ...aiFields];
     const anyEnabled = Object.values(allFields).some(f => enabled[f.key]);
 
+    // Validation Logic
+    const typeLabel = assetType || 'Unknown';
+    const exchangeLabel = exchange || 'Unknown';
+
+    const isETF = typeLabel.toUpperCase().includes('ETF') || typeLabel.toUpperCase().includes('FUND');
+    const isSupportedType = SUPPORTED_TYPES.some(t =>
+        typeLabel.toLowerCase().includes(t.toLowerCase())
+    );
+    const isPreferredExchange = PREFERRED_EXCHANGES.some(e =>
+        exchangeLabel.toUpperCase().includes(e.toUpperCase())
+    );
+
+    const canUseAI = (isSupportedType || !assetType) && !isETF;
+
     const handleFetchAI = async () => {
         setIsFetchingAI(true);
         setAiError(null);
         try {
-            const data = await fetchTTMData(symbol, companyName);
+            const data = await fetchTTMData(symbol, companyName, exchange);
 
             // Scaling helper
             const s = (v: number) => inMillions ? v / 1_000_000 : v;
@@ -99,7 +120,7 @@ export function StockDataPreviewModal({ show, symbol, companyName, inMillions, f
                 </div>
 
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-                    Available price data for{' '}
+                    Available data for{' '}
                     <span className="font-semibold text-slate-700 dark:text-slate-200">{symbol}</span>.
                 </p>
 
@@ -135,13 +156,34 @@ export function StockDataPreviewModal({ show, symbol, companyName, inMillions, f
 
                 {/* AI Trigger Section */}
                 <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600">
-                    {aiFields.length === 0 && !isFetchingAI ? (
-                        <button
-                            onClick={handleFetchAI}
-                            className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm"
-                        >
-                            <span>✨ Search TTM Data (AI)</span>
-                        </button>
+                    {!canUseAI ? (
+                        <div className="py-2 text-center">
+                            <p className="text-sm font-medium text-slate-400 dark:text-slate-500 italic">
+                                AI search is not available for {isETF ? 'ETFs/Funds' : 'this asset type'}.
+                            </p>
+                        </div>
+                    ) : aiFields.length === 0 && !isFetchingAI ? (
+                        <div className="space-y-3">
+                            <button
+                                onClick={handleFetchAI}
+                                className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm"
+                            >
+                                <span>✨ Search Current Financial Data (AI)</span>
+                            </button>
+
+                            {!isPreferredExchange && exchange && (
+                                <div className="flex items-center gap-1.5 justify-center px-2">
+                                    <div className="flex-shrink-0">
+                                        <svg className="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.21 0 2.128-1.333 1.514-2.394L13.514 6.394c-.614-1.061-2.314-1.061-2.928 0L3.086 17.606c-.614 1.061.304 2.394 1.514 2.394z" />
+                                        </svg>
+                                    </div>
+                                    <p className="text-[10px] text-amber-600 dark:text-amber-500 font-medium">
+                                        Minor exchange: AI accuracy may vary.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                     ) : isFetchingAI ? (
                         <div className="flex flex-col items-center justify-center py-2">
                             <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-2" />
@@ -152,7 +194,7 @@ export function StockDataPreviewModal({ show, symbol, companyName, inMillions, f
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
-                            <span className="text-xs font-semibold">Available AI TTM Data Loaded</span>
+                            <span className="text-xs font-semibold">Available Current Financial Data Loaded</span>
                         </div>
                     )}
 

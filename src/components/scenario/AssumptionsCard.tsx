@@ -51,15 +51,19 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
   const [showPreview, setShowPreview] = useState(false);
   const [pendingSymbol, setPendingSymbol] = useState('');
   const [pendingCompanyName, setPendingCompanyName] = useState('');
+  const [pendingAssetType, setPendingAssetType] = useState<string | undefined>();
+  const [pendingExchange, setPendingExchange] = useState<string | undefined>();
   const [previewFields, setPreviewFields] = useState<DataField[]>([]);
 
   // Called when the user selects a ticker in StockSearchModal.
   // sc is already current at the time the search button was clicked,
   // so computeFields correctly reflects the active scenario config.
-  const handleStockSelect = (symbol: string, companyName: string, data: UnifiedFundamentals) => {
+  const handleStockSelect = (symbol: string, companyName: string, data: UnifiedFundamentals, assetType?: string, exchange?: string) => {
     const fields = computeFields(sc, data);
     setPendingSymbol(symbol);
     setPendingCompanyName(companyName);
+    setPendingAssetType(assetType);
+    setPendingExchange(exchange);
     setPreviewFields(fields);
     setShowStockSearch(false);
     setShowPreview(true);
@@ -85,12 +89,17 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
     setPreviewFields([]);
     setPendingSymbol('');
     setPendingCompanyName('');
+    setPendingAssetType(undefined);
+    setPendingExchange(undefined);
   };
 
   const handlePreviewClose = () => {
     setShowPreview(false);
     setPreviewFields([]);
     setPendingSymbol('');
+    setPendingCompanyName('');
+    setPendingAssetType(undefined);
+    setPendingExchange(undefined);
   };
 
   return (
@@ -180,6 +189,8 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
         show={showPreview}
         symbol={pendingSymbol}
         companyName={pendingCompanyName}
+        assetType={pendingAssetType}
+        exchange={pendingExchange}
         inMillions={sc.inMillions}
         fields={previewFields}
         onApply={handleApply}
