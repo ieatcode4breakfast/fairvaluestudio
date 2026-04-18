@@ -8,7 +8,7 @@ import { MAX_SCENARIOS, TRANSIENT_KEYS } from './utils/constants';
 import { genId } from './utils/genId';
 
 // Custom Utils
-import { createDefaultScenario } from './utils/scenario';
+import { createDefaultScenario, migrateScenario } from './utils/scenario';
 
 // Custom Hooks
 import { loadInitialScenarios, useScenarios } from './hooks/useScenarios';
@@ -366,23 +366,12 @@ export default function App() {
                 }
               } else {
                 const loaded = capped.map((item) => {
-                  const base = loadInitialScenarios()[0];
+                  const migrated = migrateScenario(item);
                   return {
-                    ...base,
-                    ...item,
-                    id: genId(),
-                    splitYears: Array.isArray(item.splitYears) ? [...item.splitYears] : base.splitYears,
-                    metricGrowthRates: Array.isArray(item.metricGrowthRates) ? [...item.metricGrowthRates] : base.metricGrowthRates,
-                    metricGrowthRatesTotal: Array.isArray(item.metricGrowthRatesTotal) ? [...item.metricGrowthRatesTotal] : base.metricGrowthRatesTotal,
-                    revenueGrowthRates: Array.isArray(item.revenueGrowthRates) ? [...item.revenueGrowthRates] : base.revenueGrowthRates,
-                    finalMargins: Array.isArray(item.finalMargins) ? [...item.finalMargins] : base.finalMargins,
-                    sharesGrowthRates: Array.isArray(item.sharesGrowthRates) ? [...item.sharesGrowthRates] : base.sharesGrowthRates,
-                    hoverYear: null,
-                    draggingIndex: null,
-                    showResetConfirm: false,
-                    showYearlyBreakdown: false,
+                    ...migrated,
+                    id: genId(), // Assign new IDs to avoid conflicts with current workspace
                   };
-                }) as Scenario[];
+                });
                 setScenarios(loaded);
                 setActiveScenarioId(loaded[0].id);
                 setLastSavedState(getCleanedScenariosString(loaded));

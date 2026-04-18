@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Scenario } from '../types';
-import { createDefaultScenario, cloneScenario } from '../utils/scenario';
+import { createDefaultScenario, cloneScenario, migrateScenario } from '../utils/scenario';
 import { MAX_SCENARIOS, TRANSIENT_KEYS } from '../utils/constants';
 import { genId } from '../utils/genId';
 import { User } from '../types';
@@ -14,42 +14,7 @@ export function loadInitialScenarios(): Scenario[] {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
           const capped = parsed.slice(0, MAX_SCENARIOS);
-        return capped.map(item => {
-          const base = createDefaultScenario();
-          const migrated: any = {
-            ...base,
-            ...item,
-            splitYears: Array.isArray(item.splitYears) ? [...item.splitYears] : base.splitYears,
-            metricGrowthRates: Array.isArray(item.metricGrowthRates) ? [...item.metricGrowthRates] : base.metricGrowthRates,
-            metricGrowthRatesTotal: Array.isArray(item.metricGrowthRatesTotal) ? [...item.metricGrowthRatesTotal] : base.metricGrowthRatesTotal,
-            revenueGrowthRates: Array.isArray(item.revenueGrowthRates) ? [...item.revenueGrowthRates] : base.revenueGrowthRates,
-            finalMargins: Array.isArray(item.finalMargins) ? [...item.finalMargins] : base.finalMargins,
-            sharesGrowthRates: Array.isArray(item.sharesGrowthRates) ? [...item.sharesGrowthRates] : base.sharesGrowthRates,
-            hoverYear: null,
-            draggingIndex: null,
-            showResetConfirm: false,
-            showYearlyBreakdown: false,
-          };
-
-          // ── Migration Logic ──
-          if (item.simpleCurrentMetricPerShare !== undefined && (item.currentMetricPerShare === '' || item.currentMetricPerShare === undefined)) {
-            migrated.currentMetricPerShare = item.simpleCurrentMetricPerShare;
-          }
-          if (item.simpleCurrentMetricTotal !== undefined && (item.currentMetricTotal === '' || item.currentMetricTotal === undefined)) {
-            migrated.currentMetricTotal = item.simpleCurrentMetricTotal;
-          }
-          if (item.simpleCurrentRevenue !== undefined && (item.currentRevenue === '' || item.currentRevenue === undefined)) {
-            migrated.currentRevenue = item.simpleCurrentRevenue;
-          }
-          if (item.simpleCurrentShares !== undefined && (item.currentShares === '' || item.currentShares === undefined)) {
-            migrated.currentShares = item.simpleCurrentShares;
-          }
-          if (item.simpleInMillions !== undefined) {
-             migrated.inMillions = item.simpleInMillions;
-          }
-
-          return migrated as Scenario;
-        }) as Scenario[];
+        return capped.map(item => migrateScenario(item));
       }
     }
   } catch (err) {
