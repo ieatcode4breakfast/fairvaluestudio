@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Reorder, AnimatePresence, motion, useDragControls } from 'motion/react';
-import { PlusIcon, RotateCcw, List, Check, GripVertical, ChevronDown } from '../Icons';
+import { PlusIcon, RotateCcw, GripVertical, ChevronDown } from '../Icons';
 import { Scenario } from '../../types';
 import { MAX_SCENARIOS } from '../../utils/constants';
 import { SELECT_CLS } from '../../utils/constants';
 
-interface ScenarioTabsProps {
+interface ScenarioSelectorProps {
   scenarios: Scenario[];
   activeScenarioId: number;
   setActiveScenarioId: (id: number) => void;
@@ -14,13 +14,13 @@ interface ScenarioTabsProps {
   onResetAll: () => void;
 }
 
-interface ReorderItemProps {
+interface SelectorItemProps {
   sc: Scenario;
   isActive: boolean;
   onSelect: () => void;
 }
 
-function ScenarioReorderItem({ sc, isActive, onSelect }: ReorderItemProps) {
+function ScenarioSelectorItem({ sc, isActive, onSelect }: SelectorItemProps) {
   const dragControls = useDragControls();
 
   return (
@@ -53,7 +53,7 @@ function ScenarioReorderItem({ sc, isActive, onSelect }: ReorderItemProps) {
   );
 }
 
-export function ScenarioTabs(props: ScenarioTabsProps) {
+export function ScenarioSelector(props: ScenarioSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [tempOrder, setTempOrder] = useState<Scenario[]>([]);
 
@@ -81,22 +81,18 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
       <div className="flex items-center gap-2">
         {/* Main Content Area: Pseudo-Dropdown Trigger or Reorder Overlay */}
         <div className="relative w-full max-w-[400px] sm:max-w-[315px] min-h-[38px]">
-          <AnimatePresence mode="wait">
-            {!isOpen ? (
-              <motion.div
-                key="select"
-                initial={{ opacity: 0, y: -2 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 2 }}
-                transition={{ duration: 0.1 }}
-                onClick={handleOpen}
-                className={`${SELECT_CLS} !bg-white dark:!bg-slate-800 shadow-sm flex items-center cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors group`}
-              >
-                <span className="truncate text-slate-700 dark:text-slate-300">
-                  {activeScenario?.scenarioName || 'Untitled'}
-                </span>
-              </motion.div>
-            ) : (
+          {/* Static Trigger */}
+          <div
+            onClick={isOpen ? handleClose : handleOpen}
+            className={`${SELECT_CLS} !bg-white dark:!bg-slate-800 shadow-sm flex items-center justify-start cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors group ${isOpen ? 'open' : ''}`}
+          >
+            <span className="truncate text-slate-700 dark:text-slate-300">
+              {activeScenario?.scenarioName || 'Untitled'}
+            </span>
+          </div>
+
+          <AnimatePresence>
+            {isOpen && (
               <>
                 {/* Backdrop to close and save */}
                 <motion.div
@@ -109,11 +105,11 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
 
                 <motion.div
                   key="reorder"
-                  initial={{ opacity: 0, y: 2 }}
+                  initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -2 }}
-                  transition={{ duration: 0.1 }}
-                  className="absolute top-0 left-0 w-full z-20 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.15, ease: "easeOut" }}
+                  className="absolute top-full mt-1.5 left-0 w-full z-20 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
                 >
                   <div className="p-1">
                     <Reorder.Group
@@ -123,7 +119,7 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
                       className="flex flex-col gap-1"
                     >
                       {tempOrder.map((sc) => (
-                        <ScenarioReorderItem
+                        <ScenarioSelectorItem
                           key={sc.id}
                           sc={sc}
                           isActive={sc.id === props.activeScenarioId}

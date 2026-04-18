@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { Calculator, DownloadIcon, UploadIcon, ChevronDown, ChevronUp } from '../Icons';
 import { ThemeToggle } from '../ThemeToggle';
 import { User, ValuationMetadata } from '../../types';
@@ -34,6 +35,7 @@ interface HeaderProps {
 export function Header(props: HeaderProps) {
   const [isHowToUseExpanded, setIsHowToUseExpanded] = useState(false);
   const [isIconOnly, setIsIconOnly] = useState(false);
+  const [isValuationOpen, setIsValuationOpen] = useState(false);
 
   useEffect(() => {
     const check = () => setIsIconOnly(window.innerWidth < 1280); // xl breakpoint
@@ -146,27 +148,70 @@ export function Header(props: HeaderProps) {
                   )}
                 </label>
                 <div className="flex items-center w-full gap-2">
-                  <select
-                    value={props.loadedValuationId ?? 'NEW'}
-                    onChange={(e) => {
-                      if (e.target.value === 'NEW') {
-                        props.setNewValuationName('New Valuation');
-                        props.setShowNewValuationModal(true);
-                      } else if (e.target.value) {
-                        props.handleLoadValuation(e.target.value);
-                      }
-                    }}
-                    className={`${SELECT_CLS} flex-1 max-w-[315px] !bg-white dark:!bg-slate-800 shadow-sm`}
+                <div className="relative flex-1 max-w-[400px] sm:max-w-[315px] min-h-[38px]">
+                  {/* Custom Trigger */}
+                  <div
+                    onClick={() => setIsValuationOpen(!isValuationOpen)}
+                    className={`${SELECT_CLS} !bg-white dark:!bg-slate-800 shadow-sm flex items-center justify-start cursor-pointer transition-colors ${isValuationOpen ? 'open' : ''}`}
                   >
-                    <option value="NEW" className="font-semibold text-indigo-600 dark:text-indigo-400">✨ New valuation...</option>
-                    {[...props.userValuations]
-                      .sort((a, b) => a.valuationName.localeCompare(b.valuationName))
-                      .map((val) => (
-                        <option key={val.id} value={val.id}>
-                          {val.valuationName}
-                        </option>
-                      ))}
-                  </select>
+                    <span className="truncate text-slate-700 dark:text-slate-300">
+                      {props.userValuations.find(v => v.id === props.loadedValuationId)?.valuationName || (
+                        <span className="font-semibold text-indigo-600 dark:text-indigo-400">✨ New valuation...</span>
+                      )}
+                    </span>
+                  </div>
+
+                  <AnimatePresence>
+                    {isValuationOpen && (
+                      <>
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          onClick={() => setIsValuationOpen(false)}
+                          className="fixed inset-0 z-10 bg-transparent"
+                        />
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.15, ease: "easeOut" }}
+                          className="absolute top-full mt-1.5 left-0 w-full z-20 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+                        >
+                          <div className="p-1 max-h-[300px] overflow-y-auto">
+                            <div
+                              onClick={() => {
+                                props.setNewValuationName('New Valuation');
+                                props.setShowNewValuationModal(true);
+                                setIsValuationOpen(false);
+                              }}
+                              className="flex items-center px-3 py-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 rounded-lg cursor-pointer transition-colors border border-transparent"
+                            >
+                              ✨ New valuation...
+                            </div>
+                            {[...props.userValuations]
+                              .sort((a, b) => a.valuationName.localeCompare(b.valuationName))
+                              .map((val) => (
+                                <div
+                                  key={val.id}
+                                  onClick={() => {
+                                    props.handleLoadValuation(val.id);
+                                    setIsValuationOpen(false);
+                                  }}
+                                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg cursor-pointer transition-colors border ${val.id === props.loadedValuationId
+                                    ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 border-indigo-100 dark:border-indigo-800'
+                                    : 'text-slate-700 dark:text-slate-300 border-transparent hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                                    }`}
+                                >
+                                  {val.valuationName}
+                                </div>
+                              ))}
+                          </div>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
                   {props.loadedValuationId && (
                     <button
                       onClick={() => {

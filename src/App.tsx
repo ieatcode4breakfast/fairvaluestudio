@@ -20,7 +20,7 @@ import { useAutoSaveSync } from './hooks/useAutoSaveSync';
 import { ScenarioPanel } from './components/ScenarioPanel';
 import { ScenarioComparisonTable } from './components/ScenarioComparisonTable';
 import { Header } from './components/layout/Header';
-import { ScenarioTabs } from './components/layout/ScenarioTabs';
+import { ScenarioSelector } from './components/layout/ScenarioSelector';
 import { AuthModal } from './components/modals/AuthModal';
 import { AccountModal } from './components/modals/AccountModal';
 import { CopyScenarioModal } from './components/modals/CopyScenarioModal';
@@ -39,7 +39,7 @@ import {
 } from './components/modals/WorkspaceModals';
 
 export default function App() {
-  const tabsContainerRef = useRef<HTMLDivElement>(null);
+  const selectorContainerRef = useRef<HTMLDivElement>(null);
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
@@ -472,7 +472,7 @@ export default function App() {
         {(!currentUser || (currentUser && userValuations.length > 0)) && (
           <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-3xl shadow-lg border-y border-x-0 md:border-x border-slate-200 dark:border-slate-700 overflow-hidden">
             <div className="bg-slate-50/80 dark:bg-slate-900/50 px-4 md:px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-              <ScenarioTabs
+              <ScenarioSelector
                 scenarios={scenarios}
                 activeScenarioId={activeScenarioId}
                 setActiveScenarioId={setActiveScenarioId}
