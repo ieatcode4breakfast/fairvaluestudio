@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search } from '../Icons';
 import { searchStocks, StockSearchResult, getStockFundamentals, FinnhubFundamentals } from '../../api/finnhub';
-import { getAIFundamentals } from '../../api/openrouter';
 
 interface StockSearchModalProps {
     show: boolean;
@@ -72,9 +71,7 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
         setSelectingSymbol(symbol);
         setError(null);
         try {
-            // Fetch Finnhub fundamentals only (AI search disabled for now)
             const data = await getStockFundamentals(symbol);
-            const aiData = null;
 
             if (data.price === null) {
                 setError('Could not retrieve a current price for this symbol.');
@@ -82,18 +79,8 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
                 return;
             }
 
-            // Merge AI data into the fundamentals if available
-            // Finnhub data is prioritized for fundamentals as it's more reliable, AI data is used as fallback
-            const mergedData: FinnhubFundamentals = {
-                ...data,
-                revenueTTM: data.revenueTTM ?? aiData?.revenueTTM ?? null,
-                netIncomeTTM: data.netIncomeTTM ?? aiData?.netIncomeTTM ?? null,
-                freeCashFlowTTM: data.freeCashFlowTTM ?? aiData?.freeCashFlowTTM ?? null,
-                sharesOutstanding: data.sharesOutstanding ?? aiData?.sharesOutstanding ?? null,
-            };
-
             // Parent closes this modal and opens the preview modal
-            onSelect(symbol, mergedData);
+            onSelect(symbol, data);
         } catch (err) {
             console.error('Data fetch error:', err);
             setError('Failed to load data. Please try again.');

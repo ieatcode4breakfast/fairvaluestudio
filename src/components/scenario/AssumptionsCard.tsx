@@ -20,7 +20,7 @@ interface AssumptionsCardProps {
 // Respects the current inMillions / simpleInMillions flag so labels and values
 // match exactly what is displayed in GrowthCard inputs.
 // ---------------------------------------------------------------------------
-function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
+function computeFields(_sc: Scenario, data: FinnhubFundamentals): DataField[] {
   const fields: DataField[] = [];
 
   // ── Buy Price (always present if price was fetched) ──────────────────────
@@ -32,122 +32,6 @@ function computeFields(sc: Scenario, data: FinnhubFundamentals): DataField[] {
       value: v,
       formatted: formatDynamicDecimal(data.price, true),
     });
-  }
-
-  const isBasic = sc.dcfMethod === 'Basic DCF';
-
-  if (isBasic) {
-    const inM = sc.simpleInMillions;
-
-    // ── Basic – Per Share ──────────────────────────────────────────────────
-    if (sc.simpleProjectionMethod === 'Per Share') {
-      if (sc.simpleMetricType === 'Free Cash Flow') {
-        if (data.freeCashFlowTTM !== null && data.sharesOutstanding !== null && data.sharesOutstanding > 0) {
-          const v = data.freeCashFlowTTM / data.sharesOutstanding;
-          const fv = formatDynamicDecimal(v);
-          fields.push({
-            key: 'simpleCurrentMetricPerShare',
-            label: 'Current FCF Per Share',
-            value: fv,
-            formatted: formatDynamicDecimal(v, true),
-          });
-        }
-      } else if (sc.simpleMetricType === 'Net Income (Earnings)') {
-        if (data.netIncomeTTM !== null && data.sharesOutstanding !== null && data.sharesOutstanding > 0) {
-          const v = data.netIncomeTTM / data.sharesOutstanding;
-          const fv = formatDynamicDecimal(v);
-          fields.push({
-            key: 'simpleCurrentMetricPerShare',
-            label: 'Current EPS',
-            value: fv,
-            formatted: formatDynamicDecimal(v, true),
-          });
-        }
-      }
-
-      // ── Basic – Metric, Share Count ───────────────────────────────────────
-    } else if (sc.simpleProjectionMethod === 'Metric, Share Count') {
-      if (sc.simpleMetricType === 'Free Cash Flow' && data.freeCashFlowTTM !== null) {
-        const label = inM ? 'Current FCF (M)' : 'Current FCF';
-        const v = inM ? data.freeCashFlowTTM : data.freeCashFlowTTM * 1_000_000;
-        const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'simpleCurrentMetricTotal', label, value: fv, formatted: formatDynamicDecimal(v, true) });
-      } else if (sc.simpleMetricType === 'Net Income (Earnings)' && data.netIncomeTTM !== null) {
-        const label = inM ? 'Current Net Income (M)' : 'Current Net Income';
-        const v = inM ? data.netIncomeTTM : data.netIncomeTTM * 1_000_000;
-        const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'simpleCurrentMetricTotal', label, value: fv, formatted: formatDynamicDecimal(v, true) });
-      }
-      if (data.sharesOutstanding !== null) {
-        const label = inM ? 'Shares (M)' : 'Shares';
-        const v = inM ? data.sharesOutstanding : data.sharesOutstanding * 1_000_000;
-        const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'simpleCurrentShares', label, value: fv, formatted: formatDynamicDecimal(v, true) });
-      }
-
-      // ── Basic – Revenue, Metric Margin, Share Count ────────────────────────
-    } else if (sc.simpleProjectionMethod === 'Revenue, Metric Margin, Share Count') {
-      if (data.revenueTTM !== null) {
-        const label = inM ? 'Current Revenue (M)' : 'Current Revenue';
-        const v = inM ? data.revenueTTM : data.revenueTTM * 1_000_000;
-        const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'simpleCurrentRevenue', label, value: fv, formatted: formatDynamicDecimal(v, true) });
-      }
-      if (data.sharesOutstanding !== null) {
-        const label = inM ? 'Shares (M)' : 'Shares';
-        const v = inM ? data.sharesOutstanding : data.sharesOutstanding * 1_000_000;
-        const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'simpleCurrentShares', label, value: fv, formatted: formatDynamicDecimal(v, true) });
-      }
-    }
-
-  } else {
-    // ── Advanced DCF ────────────────────────────────────────────────────────
-    const inM = sc.inMillions;
-
-    // Advanced – Per Share Method
-    if (sc.projectionMethod === 'Per Share Method') {
-      if (data.freeCashFlowTTM !== null && data.sharesOutstanding !== null && data.sharesOutstanding > 0) {
-        const v = data.freeCashFlowTTM / data.sharesOutstanding;
-        const fv = formatDynamicDecimal(v);
-        fields.push({
-          key: 'currentMetricPerShare',
-          label: 'Current FCF Per Share',
-          value: fv,
-          formatted: formatDynamicDecimal(v, true),
-        });
-      }
-
-      // Advanced – Total FCF, Share Count
-    } else if (sc.projectionMethod === 'Total FCF, Share Count') {
-      if (data.freeCashFlowTTM !== null) {
-        const label = inM ? 'Current FCF (M)' : 'Current FCF';
-        const v = inM ? data.freeCashFlowTTM : data.freeCashFlowTTM * 1_000_000;
-        const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'currentMetricTotal', label, value: fv, formatted: formatDynamicDecimal(v, true) });
-      }
-      if (data.sharesOutstanding !== null) {
-        const label = inM ? 'Shares (M)' : 'Shares';
-        const v = inM ? data.sharesOutstanding : data.sharesOutstanding * 1_000_000;
-        const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'currentShares', label, value: fv, formatted: formatDynamicDecimal(v, true) });
-      }
-
-      // Advanced – Revenue, FCF Margin, Share Count
-    } else if (sc.projectionMethod === 'Revenue, FCF Margin, Share Count') {
-      if (data.revenueTTM !== null) {
-        const label = inM ? 'Current Revenue (M)' : 'Current Revenue';
-        const v = inM ? data.revenueTTM : data.revenueTTM * 1_000_000;
-        const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'currentRevenue', label, value: fv, formatted: formatDynamicDecimal(v, true) });
-      }
-      if (data.sharesOutstanding !== null) {
-        const label = inM ? 'Shares (M)' : 'Shares';
-        const v = inM ? data.sharesOutstanding : data.sharesOutstanding * 1_000_000;
-        const fv = formatDynamicDecimal(v);
-        fields.push({ key: 'currentShares', label, value: fv, formatted: formatDynamicDecimal(v, true) });
-      }
-    }
   }
 
   return fields;

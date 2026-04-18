@@ -5,13 +5,13 @@ const BASE_URL = 'https://finnhub.io/api/v1';
 async function test() {
     const symbol = 'T';
     const encoded = encodeURIComponent(symbol);
-    const response = await fetch(`${BASE_URL}/stock/metric?symbol=${encoded}&metric=all&preliminary=true&token=${API_KEY}`);
+    const response = await fetch(`${BASE_URL}/quote?symbol=${encoded}&token=${API_KEY}`);
     if (!response.ok) {
-        console.error('Failed to fetch metrics:', response.status);
+        console.error('Failed to fetch quote:', response.status);
         return;
     }
     const data = await response.json();
-    console.log('Raw metric data for', symbol);
+    console.log('Raw quote data for', symbol);
     console.log(JSON.stringify(data, null, 2));
 }
 

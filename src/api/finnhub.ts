@@ -17,10 +17,6 @@ export interface StockSearchResult {
  */
 export interface FinnhubFundamentals {
     price: number | null;
-    revenueTTM: number | null;        // millions
-    freeCashFlowTTM: number | null;   // millions (can be negative)
-    netIncomeTTM: number | null;      // millions (can be negative)
-    sharesOutstanding: number | null; // millions
 }
 
 /**
@@ -69,132 +65,11 @@ export async function getStockPrice(symbol: string): Promise<number | null> {
 }
 
 /**
- * Fetch stock price + key TTM fundamentals in parallel.
- * Monetary values returned are in millions (Finnhub standard).
- * Returns null for any field that is unavailable or invalid.
+ * Fetch stock price from Finnhub.
+ * Returns null for price if unavailable.
  */
 export async function getStockFundamentals(symbol: string): Promise<FinnhubFundamentals> {
-    const encoded = encodeURIComponent(symbol);
-
-    const [priceRes, metricsRes] = await Promise.allSettled([
-        fetch(`${BASE_URL}/quote?symbol=${encoded}&token=${API_KEY}`),
-        fetch(`${BASE_URL}/stock/metric?symbol=${encoded}&metric=all&preliminary=true&token=${API_KEY}`),
-    ]);
-
-    let price: number | null = null;
-    let revenueTTM: number | null = null;
-    let freeCashFlowTTM: number | null = null;
-    let netIncomeTTM: number | null = null;
-    let sharesOutstanding: number | null = null;
-
-    if (priceRes.status === 'fulfilled' && priceRes.value.ok) {
-        try {
-            const d = await priceRes.value.json();
-            if (typeof d.c === 'number' && d.c > 0) price = d.c;
-        } catch (error) {
-            console.error('[Finnhub] Failed to parse price JSON:', error);
-        }
-    }
-
-    if (metricsRes.status === 'fulfilled' && metricsRes.value.ok) {
-        try {
-            const d = await metricsRes.value.json();
-            const m = d.metric ?? {};
-            const s = d.series?.quarterly ?? {};
-
-            // Helper to round to specified decimal places
-            const round = (num: number, decimals = 2) => {
-                const factor = 10 ** decimals;
-                return Math.round(num * factor) / factor;
-            };
-
-            // Helper to sum last 4 quarters from a series if available
-            const sumLast4 = (seriesArray: any[]) => {
-                if (!Array.isArray(seriesArray) || seriesArray.length < 1) return null;
-                // Sum up to 4 most recent entries
-                const last4 = seriesArray.slice(0, 4);
-                const sum = last4.reduce((acc, curr) => acc + (curr.v || 0), 0);
-                return round(sum, 2);
-            };
-
-            // 1. SHARES OUTSTANDING - Most critical field for derivations
-            // Always prioritize direct share count fields from Finnhub
-            if (typeof m.shareOutstanding === 'number' && m.shareOutstanding > 0) {
-                sharesOutstanding = round(m.shareOutstanding, 3);
-            } else if (typeof m.sharesOutstanding === 'number' && m.sharesOutstanding > 0) {
-                sharesOutstanding = round(m.sharesOutstanding, 3);
-            } else if (Array.isArray(s.sharesOutstanding) && s.sharesOutstanding.length > 0) {
-                sharesOutstanding = round(s.sharesOutstanding[0].v, 3);
-            } else {
-                // LAST FALLBACK: Derive from Market Cap / Price
-                const mCap = m.marketCapitalization ?? m.marketCap;
-                if (typeof mCap === 'number' && mCap > 0 && price !== null && price > 0) {
-                    sharesOutstanding = round(mCap / price, 3);
-                    console.log(`[Finnhub] Derived sharesOutstanding (${sharesOutstanding}M) from marketCap (${mCap}) / price (${price})`);
-                }
-            }
-
-            // Diagnostic Logs
-            console.log(`[Finnhub] Metrics keys found:`, Object.keys(m));
-            if (d.series?.quarterly) console.log(`[Finnhub] Series quarterly keys found:`, Object.keys(d.series.quarterly));
-
-            // ... (rest of the logic remains robust)
-            // 2. REVENUE TTM
-            // More accurate revenue via enterpriseValue / evRevenueTTM
-            if (typeof m.enterpriseValue === 'number' && typeof m.evRevenueTTM === 'number' && m.evRevenueTTM > 0) {
-                revenueTTM = round(m.enterpriseValue / m.evRevenueTTM, 2);
-            } else if (typeof m.revenueTTM === 'number' && m.revenueTTM > 0) {
-                revenueTTM = round(m.revenueTTM, 2);
-            } else {
-                // Fallback A: Sum series
-                const sumRev = sumLast4(s.revenue);
-                if (sumRev !== null) {
-                    revenueTTM = sumRev;
-                } else if (typeof m.revenuePerShareTTM === 'number' && sharesOutstanding !== null) {
-                    // Fallback B: Derived (risky but better than nothing)
-                    revenueTTM = round(m.revenuePerShareTTM * sharesOutstanding, 2);
-                }
-            }
-
-            // 3. NET INCOME TTM
-            if (typeof m.netIncomeTTM === 'number') {
-                netIncomeTTM = round(m.netIncomeTTM, 2);
-            } else {
-                const sumNI = sumLast4(s.netIncome) || sumLast4(s.netProfitAfterTaxes);
-                if (sumNI !== null) {
-                    netIncomeTTM = sumNI;
-                } else if (typeof m.epsTTM === 'number' && sharesOutstanding !== null) {
-                    netIncomeTTM = round(m.epsTTM * sharesOutstanding, 2);
-                } else if (typeof m.netProfitMarginTTM === 'number' && revenueTTM !== null) {
-                    // Derived from revenue and net profit margin
-                    netIncomeTTM = round(revenueTTM * m.netProfitMarginTTM / 100, 2);
-                }
-            }
-
-            // 4. FREE CASH FLOW TTM
-            if (typeof m.freeCashFlowTTM === 'number') {
-                freeCashFlowTTM = round(m.freeCashFlowTTM, 2);
-            } else {
-                // Try manual FCF calculation from series: (Operating CF - Capex)
-                const opCF = sumLast4(s.operatingCashFlow) || sumLast4(s.cashFlowFromOperatingActivities);
-                const capex = sumLast4(s.capex) || sumLast4(s.capitalExpenditure) || 0;
-
-                if (opCF !== null) {
-                    freeCashFlowTTM = round(opCF - Math.abs(capex), 2);
-                } else {
-                    // Fallback B: Derived from per-share
-                    const cfps = m.freeCashFlowPerShareTTM ?? m.cashFlowPerShareTTM;
-                    if (typeof cfps === 'number' && sharesOutstanding !== null) {
-                        freeCashFlowTTM = round(cfps * sharesOutstanding, 2);
-                    }
-                }
-            }
-
-        } catch (error) {
-            console.error('[Finnhub] Failed to parse metric JSON:', error);
-        }
-    }
-
-    console.log('[Finnhub] final fundamentals:', { symbol, price, revenueTTM, freeCashFlowTTM, netIncomeTTM, sharesOutstanding });
-    return { price, revenueTTM, freeCashFlowTTM, netIncomeTTM, sharesOutstanding };
+    const price = await getStockPrice(symbol);
+    console.log('[Finnhub] final fundamentals:', { symbol, price });
+    return { price };
 }
