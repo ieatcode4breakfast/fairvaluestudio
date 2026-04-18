@@ -203,14 +203,9 @@ export function StockDataPreviewModal({
                         <p className="text-xs text-red-500 mt-2 text-center">{aiError}</p>
                     )}
 
-                    <div className="mt-3 flex items-center justify-center gap-1.5">
-                        <div className="flex-shrink-0">
-                            <svg className="w-3.5 h-3.5 text-amber-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M8.257 3.099c.365-.796 1.485-.796 1.85 0l6.023 11.701c.33.741-.213 1.584-1.03 1.584H4.897c-.817 0-1.36-.843-1.03-1.584l6.022-11.701zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                            </svg>
-                        </div>
-                        <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal italic">
-                            AI can make mistakes. Please double-check accuracy.
+                    <div className="mt-3 flex items-center justify-center text-center">
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal text-center">
+                            ⚠️ AI can make mistakes. Please double-check accuracy.
                         </p>
                     </div>
                 </div>
