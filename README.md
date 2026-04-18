@@ -4,69 +4,144 @@ FairValue Studio is a powerful, yet intuitive multi-scenario valuation tool desi
 
 **Try the app live:** [https://fairvaluestudio.vercel.app/](https://fairvaluestudio.vercel.app/)
 
-This guide will walk you through how to use the app effectively.
+---
+
+## 🚀 Quick Start
+
+1. **Open the app** at the link above.
+2. **Choose a valuation method** (Basic DCF for quick estimates, Advanced DCF for detailed multi-phase projections).
+3. **Search for a stock** using the search icon (magnifying glass) to fetch live price and financial data.
+4. **Adjust assumptions** like growth rates, margins, and discount rates.
+5. **Add scenarios** using the tabs to compare different assumptions (Base, Bear, Bull cases).
+6. **Review results** including intrinsic value, margin of safety, and yearly breakdown.
+7. **Save your work** by creating an account (auto-sync) or downloading a JSON file.
 
 ---
 
-## 🚀 Getting Started
+## 📖 Step-by-Step Tutorial
 
-You can start using FairValue Studio immediately at [https://fairvaluestudio.vercel.app/](https://fairvaluestudio.vercel.app/)
+### 1. Choose a Valuation Method
+FairValue Studio offers two distinct approaches:
 
-When you open the app, you are immediately dropped into a new **Valuation**.
+- **Basic DCF (Quick Estimate)** – Perfect for back‑of‑the‑napkin math. It applies a constant growth rate over your forecast period and discounts the final value back to today. Use this when you want a fast intrinsic value check or to find the implied growth rate priced into the current stock price.
 
-A single "Valuation" can hold up to **10 different Scenarios** (e.g., Base Case, Bear Case, Bull Case). You can add new scenarios using the tabs near the top of the interface. This makes it effortless to compare how sensitive a stock's intrinsic value is to your different growth assumptions. 
+- **Advanced DCF (Detailed Forecasting)** – Ideal for detailed multi‑phase forecasting where growth rates change over time. It discounts every yearly cash flow and the terminal value separately. When you set the forecast years to 3 or more, a draggable **Growth Phases** track appears, letting you define up to 10 distinct growth stages.
 
-If you are logged into your account, your valuations are continuously **auto-saved** to the cloud. If you are using the app as a guest, creating an account will automatically migrate your guest valuation to your new account.
+### 2. Load Stock Data
+Instead of manually typing numbers, you can pull real‑time market data directly into your model:
+
+- Click the **search icon** (magnifying glass) in the “Assumptions” card.
+- Type a ticker (e.g., `MSFT`) or company name.
+- Select the stock from the results to fetch its current price.
+- Click **“Apply Data”** to fill the “Buy Price” field.
+
+**✨ AI‑Powered Financial Data** – For stocks listed on major exchanges, you can click the **“Search Current Financial Data (AI)”** button inside the data preview modal. The AI will search through filings, earnings transcripts, and investor relations pages to retrieve Trailing Twelve Month (TTM) figures for revenue, free cash flow, net income, and shares outstanding. These numbers are automatically formatted and ready to use in your projections.
+
+### 3. Set Your Assumptions
+The “Assumptions” card lets you control the core inputs of your model:
+
+- **Buy Price** – The current stock price (can be auto‑filled from the stock search).
+- **Years to Forecast** – How far out you project cash flows.
+- **Discount Rate** – Your required rate of return.
+- **Exit Assumption** – Choose between an exit multiple or a perpetuity growth rate to calculate the terminal value.
+
+### 4. Project Cash Flows (Three Approaches)
+You aren’t limited to just plugging in a single cash‑flow number. FairValue Studio gives you three bottom‑up projection strategies:
+
+1. **Per Share Method** – The simplest. Project growth directly on a per‑share basis (e.g., FCF Per Share).
+2. **Total FCF & Share Count** – Input total company cash flows (in millions/billions) and combine it with a projected share‑change percentage. This lets you model the effects of share buybacks or dilution over time.
+3. **Revenue & Margin Build** – The most detailed approach. Project total revenue growth, apply a targeted final FCF margin, and factor in share‑count changes. Perfect for currently unprofitable companies that you expect to scale into profitability.
+
+### 5. Use Growth Phases (Advanced DCF Only)
+If you selected Advanced DCF and set “Years to Forecast” to 3 or more, a purple **Growth Phases** track appears below the projection method.
+
+- **Add a phase** – Click anywhere on the track to drop a split marker.
+- **Adjust timing** – Drag the circular markers left/right to change how long each growth phase lasts.
+- **Remove a phase** – Double‑click (or double‑tap) a marker to delete it.
+
+Each phase can have its own growth rate and margin inputs, letting you model complex growth trajectories (e.g., rapid growth for 3 years, moderate for 5 years, then stable maturity).
+
+### 6. Compare Multiple Scenarios
+A single valuation can hold up to **10 different scenarios** (e.g., Base Case, Bear Case, Bull Case). 
+
+- **Add a scenario** – Click the **“＋ New Scenario”** tab at the top.
+- **Switch between scenarios** – Click any tab to view its inputs and results.
+- **Duplicate a scenario** – Click the duplicate icon (two overlapping squares) inside a scenario’s meta card to create a copy, then tweak a few assumptions for sensitivity analysis.
+- **Delete a scenario** – Click the trash icon (only allowed when more than one scenario exists).
+
+The **Scenario Comparison Table** (visible when you have at least two scenarios) shows a side‑by‑side summary of key outputs, making it easy to see how different assumptions affect intrinsic value, margin of safety, and IRR.
+
+### 7. Save, Load, and Share Your Work
+#### Guest Mode
+- Your valuation is stored **locally in your browser**. You can download it as a `.json` file at any time (click the download icon in the header).
+- Upload a previously saved `.json` file (upload icon) to restore your work.
+
+#### Account Mode (Recommended)
+- **Create a free account** to unlock automatic cloud saves, real‑time cross‑device syncing, and the ability to store multiple valuations.
+- After signing up, your guest valuation can be migrated to your new account with one click.
+- Use the **Valuations dropdown** in the header to create, rename, delete, or switch between different valuation projects.
+- All changes are auto‑saved as you type.
+
+### 8. Validate Your Assumptions with AI
+At the bottom of the app you’ll find a **Text Summary** block that condenses your entire valuation (including all scenarios) into a clean, formatted text.
+
+- Click **“Copy Text”** to copy the summary to your clipboard.
+- Paste it into ChatGPT, Claude, or Gemini alongside a prompt like:
+
+  > “Here is my DCF model for [Ticker]. Please analyze my assumptions for Revenue Growth and Terminal Multiple. Are they realistic given the company’s historical performance and current macroeconomic environment?”
+
+This “pro tip” lets you get a qualitative sanity check from any AI assistant in seconds.
 
 ---
 
-## 🛠 Which Method Should I Choose?
+## ✨ Key Features at a Glance
 
-FairValue Studio offers two distinct valuation methods to fit your needs, selectable via the top side-panel dropdown.
-
-### 1. Basic DCF (Quick Estimate)
-The **Basic DCF** method is designed for speed. Rather than projecting year-by-year cash flows, this method applies a constant growth rate to reach a projected final value at the end of your forecast period. 
-
-*   **Best for**: "Back-of-the-napkin" math, quick intrinsic value checks, or finding the "Implied Growth Rate" (what the market is pricing in at the current buy price).
-*   **How it works**: It treats the exit price at your final year as the sole cash flow, discounting it back to the present value. This approach places greater emphasis on long-term price appreciation rather than interim yearly income.
-
-### 2. Advanced DCF (Detailed Forecasting)
-The **Advanced DCF** method is a robust setup for multi-phase growth companies where growth rates are expected to change significantly over time.
-
-*   **Best for**: High-growth tech stocks, turnaround situations, or any company whose growth will decelerate/accelerate in distinct stages before reaching maturity.
-*   **How it works**: It discounts every single yearly cash flow back to its present value, and adds that to the present value of the terminal value.
-
-#### Using the Growth Phases Slider
-In the Advanced DCF, if you set your "Years to Forecast" to 3 or more, a draggable **Growth Phases** track will appear:
-*   **Add a Phase**: Click anywhere on the purple track to drop a split marker. 
-*   **Adjust Timing**: Drag the circular markers left and right to adjust how long each growth phase lasts. 
-*   **Remove a Phase**: Double-click or double-tap a marker to remove it.
-
-You can create up to 10 distinct phases, each with its own tunable growth rate and margin inputs.
+- **Multi‑Scenario Modeling** – Compare up to 10 different assumption sets side‑by‑side.
+- **Live Stock Search** – Fetch real‑time prices and company details via Finnhub and RapidAPI.
+- **AI‑Driven Financial Data** – Retrieve TTM revenue, FCF, net income, and shares outstanding using OpenRouter’s deep‑search AI.
+- **Two Valuation Methods** – Basic DCF for quick estimates, Advanced DCF with draggable growth phases.
+- **Three Projection Strategies** – Per‑share, total FCF with share count, and revenue‑margin build.
+- **Cloud Sync & Auto‑Save** – Seamless saving across devices when logged in.
+- **Export/Import** – Download valuations as JSON for backup or sharing.
+- **Sample Valuation** – Load a pre‑built example to see the tool in action.
+- **Dark/Light Theme** – Toggle between themes for comfortable viewing.
+- **Mobile‑Friendly Design** – Fully responsive interface that works on phones, tablets, and desktops.
 
 ---
 
-## 📊 Projection Strategies
+## ❓ Frequently Asked Questions
 
-For both Basic and Advanced DCFs, you aren't limited to just plugging in "Cash Flow." The app allows you to project the financials using three distinct bottom-up approaches:
+### Can I use FairValue Studio for free?
+Yes. The app is completely free to use. You can create an unlimited number of valuations and scenarios without any subscription.
 
-1.  **Per Share Method**: The simplest mode. Project growth directly on a per-share basis (e.g., FCF Per Share).
-2.  **Total FCF & Share Count**: Input the total company cash flows (in Millions or Billions) and combine it with a projected Share Change percentage. This allows you to accurately model the effects of aggressive share buybacks or shareholder dilution over time.
-3.  **Revenue & Margin Build**: The most robust approach. Project Total Revenue growth, apply a targeted Final FCF Margin percentage, and factor in share-count changes. Perfect for currently unprofitable companies that you expect to scale into profitability.
+### What happens if I close the browser?
+If you are using **guest mode**, your data is stored locally in your browser’s localStorage. It will persist until you clear site data. We recommend downloading your valuation as a JSON file for backup.
+
+If you are **logged in**, your work is automatically synced to the cloud. You can reopen it on any device by signing into your account.
+
+### Which stock exchanges are supported?
+The stock search works for equities listed on major exchanges worldwide (NASDAQ, NYSE, TSX, TSXV, LSE, ASX, etc.). AI financial data is most reliable for stocks on NASDAQ and NYSE.
+
+### Why doesn’t the AI data button appear for some stocks?
+The AI search is disabled for ETFs, mutual funds, and certain asset types where TTM financials aren’t applicable. It also shows a warning for minor exchanges where data availability may be limited.
+
+### How many scenarios can I have?
+Each valuation supports up to 10 scenarios. You can create, duplicate, reorder (drag‑and‑drop), and delete scenarios as needed.
+
+### Can I share my valuation with someone else?
+Yes. Download your valuation as a JSON file and send it to another person. They can upload it into their own FairValue Studio session (guest or logged‑in) and see exactly the same scenarios and results.
+
+### Is my data private?
+All valuations are stored privately under your account ID. We do not share, sell, or expose your financial models to third parties. For more details, please refer to our Privacy Policy (linked in the app footer).
 
 ---
 
-## 🤖 The "Pro Tip": Validating with AI
+## 🛠 Need Help?
 
-Valuations are only as good as the assumptions behind them. At the very bottom of the app, you will find a **Text Summary** block.
-
-Once you have finished tweaking your inputs, click the **Copy Text** button. You can then paste this dense, formatted summary into ChatGPT, Claude, or Gemini alongside a prompt like:
-> *"Here is my DCF model for [Ticker]. Please analyze my assumptions for Revenue Growth and Terminal Multiple. Are they realistic given the company's historical performance and current macroeconomic environment?"*
+- **In‑app guide** – Click the “How to Use” expandable panel in the header for a concise overview.
+- **Sample valuation** – Click “Load Sample Valuation” inside the “How to Use” panel to see a pre‑configured example.
+- **Report issues** – If you encounter a bug or have a feature request, please open an issue on the project’s GitHub repository (coming soon).
 
 ---
 
-## 💾 Exporting and Backups
-
-Even with cloud auto-save, you remain in full control of your data.
-*   **Download Valuation**: You can export your entire valuation (with all 10 scenarios) as a `.json` file to back it up locally.
-*   **Upload Valuation**: Easily restore or share a valuation by uploading a previously downloaded `.json` file.
+Happy valuing! 🚀
