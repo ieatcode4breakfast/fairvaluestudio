@@ -115,7 +115,7 @@ export function Header(props: HeaderProps) {
                 <li><strong>Configure Phases (Advanced):</strong> Click the timeline track to add growth phases. Drag the dots to adjust the years, or double-click/tap to remove them.</li>
                 <li><strong>Enter Assumptions:</strong> Fill in your estimates for cash flows, growth rates, margins, and discount rates.</li>
                 <li><strong>Load Stock Data:</strong> Use the search icon to fetch live stock prices (or AI-driven TTM financials when logged in) directly into your assumptions.</li>
-                <li><strong>Compare Scenarios:</strong> Use the tabs to create and compare up to 10 different scenarios.</li>
+                <li><strong>Multiple Scenarios:</strong> Add up to 10 different scenarios by clicking the (+) button to the right of the scenarios dropdown.</li>
                 <li><strong>Save & Load:</strong> Use the Download and Upload buttons to save your scenarios to a file and load them later.</li>
                 <li><strong>Text Summary Pro Tip:</strong> After finishing your inputs, copy the text summary at the bottom and paste into an AI chatbot for deeper analysis, sanity checks, or qualitative insights.</li>
               </ul>
