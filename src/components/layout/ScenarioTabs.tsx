@@ -92,27 +92,29 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="bg-slate-50/50 dark:bg-slate-900/50 rounded-xl p-1 border border-dashed border-slate-200 dark:border-slate-700"
+                className="absolute top-0 left-0 w-full z-20 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden"
               >
-                <Reorder.Group
-                  axis="y"
-                  values={tempOrder}
-                  onReorder={setTempOrder}
-                  className="flex flex-col gap-1"
-                >
-                  {tempOrder.map((sc) => (
-                    <Reorder.Item
-                      key={sc.id}
-                      value={sc}
-                      className="flex items-center gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 cursor-grab active:cursor-grabbing hover:border-indigo-200 dark:hover:border-indigo-800 transition-colors"
-                    >
-                      <GripVertical className="w-4 h-4 text-slate-400 shrink-0" />
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
-                        {sc.scenarioName || 'Untitled'}
-                      </span>
-                    </Reorder.Item>
-                  ))}
-                </Reorder.Group>
+                <div className="p-1">
+                  <Reorder.Group
+                    axis="y"
+                    values={tempOrder}
+                    onReorder={setTempOrder}
+                    className="flex flex-col gap-1"
+                  >
+                    {tempOrder.map((sc) => (
+                      <Reorder.Item
+                        key={sc.id}
+                        value={sc}
+                        className="flex items-center gap-2 p-2 bg-white dark:bg-slate-800 rounded-lg border border-transparent hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-grab active:cursor-grabbing transition-colors"
+                      >
+                        <GripVertical className="w-4 h-4 text-slate-400 shrink-0" />
+                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
+                          {sc.scenarioName || 'Untitled'}
+                        </span>
+                      </Reorder.Item>
+                    ))}
+                  </Reorder.Group>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
