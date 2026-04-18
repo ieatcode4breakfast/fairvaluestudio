@@ -116,7 +116,7 @@ export function Header(props: HeaderProps) {
                 <li><strong>Enter Assumptions:</strong> Fill in your estimates for cash flows, growth rates, margins, and discount rates.</li>
                 <li><strong>Load Stock Data:</strong> Use the search icon to fetch live stock prices (or AI-driven TTM financials when logged in) directly into your assumptions.</li>
                 <li><strong>Multiple Scenarios:</strong> Add up to 10 different scenarios by clicking the (+) button to the right of the scenarios dropdown.</li>
-                <li><strong>Save & Load:</strong> Use the Download and Upload buttons to save your scenarios to a file and load them later.</li>
+                <li><strong>Save & Load:</strong> Guest users can use the Download Valuation and Upload Valuation buttons to manually manage valuation files. Logged-in users have all their valuations and scenarios saved automatically to the cloud.</li>
                 <li><strong>Text Summary Pro Tip:</strong> After finishing your inputs, copy the text summary at the bottom and paste into an AI chatbot for deeper analysis, sanity checks, or qualitative insights.</li>
               </ul>
               <div className="flex items-center justify-between mt-4">
