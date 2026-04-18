@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search } from '../Icons';
-import { searchStocks, StockSearchResult, getStockFundamentals, FinnhubFundamentals } from '../../api/finnhub';
+import { searchStocks, StockSearchResult, getStockFundamentals, UnifiedFundamentals } from '../../api/marketData';
 
 interface StockSearchModalProps {
     show: boolean;
     onClose: () => void;
-    onSelect: (symbol: string, data: FinnhubFundamentals) => void;
+    onSelect: (symbol: string, data: UnifiedFundamentals) => void;
 }
 
 export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalProps) {
@@ -48,7 +48,7 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
             } finally {
                 setLoading(false);
             }
-        }, 1500); // 1.5 seconds delay
+        }, 500); // 0.5 seconds delay
 
         return () => {
             if (timeoutRef.current) {
