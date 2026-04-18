@@ -143,8 +143,7 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
         </div>
 
         {/* Action Buttons right next to the dropdown */}
-        {!isOpen && (
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2">
             {props.scenarios.length < MAX_SCENARIOS && (
               <button
                 onClick={props.addScenario}
@@ -163,7 +162,6 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
               <RotateCcw className="w-4 h-4" />
             </button>
           </div>
-        )}
       </div>
     </div>
   );
