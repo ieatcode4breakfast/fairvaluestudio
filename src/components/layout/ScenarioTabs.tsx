@@ -73,24 +73,88 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Header: Label + Action Buttons Grouped Together */}
-      <div className="flex items-center justify-start gap-4 px-1">
+      {/* Header: Label */}
+      <div className="px-1">
         <label htmlFor="scenario-select" className="text-sm font-semibold text-slate-700 dark:text-slate-300">
           Scenarios
         </label>
+      </div>
 
-        <div className="flex items-center gap-2">
-          {props.scenarios.length < MAX_SCENARIOS && !isOpen && (
-            <button
-              onClick={props.addScenario}
-              title="Add Scenario"
-              className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 hover:border-slate-200 dark:hover:border-slate-600 border border-transparent text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm"
-            >
-              <PlusIcon className="w-4 h-4" />
-            </button>
-          )}
+      <div className="flex items-center gap-2">
+        {/* Main Content Area: Pseudo-Dropdown Trigger or Reorder Overlay */}
+        <div className="relative w-full max-w-[400px] sm:max-w-[315px] min-h-[38px]">
+          <AnimatePresence mode="wait">
+            {!isOpen ? (
+              <motion.div
+                key="select"
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 5 }}
+                onClick={handleOpen}
+                className={`${SELECT_CLS} !bg-white dark:!bg-slate-800 shadow-sm flex items-center cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors group`}
+              >
+                <span className="truncate text-slate-700 dark:text-slate-300">
+                  {activeScenario?.scenarioName || 'Untitled'}
+                </span>
+              </motion.div>
+            ) : (
+              <>
+                {/* Backdrop to close and save */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={handleClose}
+                  className="fixed inset-0 z-10 bg-transparent"
+                />
 
-          {!isOpen && (
+                <motion.div
+                  key="reorder"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  className="absolute top-0 left-0 w-full z-20 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+                >
+                  <div className="p-1">
+                    <Reorder.Group
+                      axis="y"
+                      values={tempOrder}
+                      onReorder={setTempOrder}
+                      className="flex flex-col gap-1"
+                    >
+                      {tempOrder.map((sc) => (
+                        <ScenarioReorderItem
+                          key={sc.id}
+                          sc={sc}
+                          isActive={sc.id === props.activeScenarioId}
+                          onSelect={() => {
+                            props.setActiveScenarioId(sc.id);
+                            props.onReorder(tempOrder);
+                            setIsOpen(false);
+                          }}
+                        />
+                      ))}
+                    </Reorder.Group>
+                  </div>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Action Buttons right next to the dropdown */}
+        {!isOpen && (
+          <div className="flex items-center gap-2">
+            {props.scenarios.length < MAX_SCENARIOS && (
+              <button
+                onClick={props.addScenario}
+                title="Add Scenario"
+                className="flex items-center justify-center w-8 h-8 rounded-lg bg-slate-200/60 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-700 hover:border-slate-200 dark:hover:border-slate-600 border border-transparent text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all shadow-sm"
+              >
+                <PlusIcon className="w-4 h-4" />
+              </button>
+            )}
+
             <button
               onClick={props.onResetAll}
               title="Reset All Scenarios"
@@ -98,70 +162,10 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
             >
               <RotateCcw className="w-4 h-4" />
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-
-      {/* Main Content Area: Pseudo-Dropdown Trigger or Reorder Overlay */}
-      <div className="relative w-full max-w-[400px] sm:max-w-[315px] min-h-[38px]">
-        <AnimatePresence mode="wait">
-          {!isOpen ? (
-            <motion.div
-              key="select"
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 5 }}
-              onClick={handleOpen}
-              className={`${SELECT_CLS} !bg-white dark:!bg-slate-800 shadow-sm flex items-center cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors group`}
-            >
-              <span className="truncate text-slate-700 dark:text-slate-300">
-                {activeScenario?.scenarioName || 'Untitled'}
-              </span>
-            </motion.div>
-          ) : (
-            <>
-              {/* Backdrop to close and save */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={handleClose}
-                className="fixed inset-0 z-10 bg-transparent"
-              />
-
-              <motion.div
-                key="reorder"
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                className="absolute top-0 left-0 w-full z-20 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
-              >
-                <div className="p-1">
-                  <Reorder.Group
-                    axis="y"
-                    values={tempOrder}
-                    onReorder={setTempOrder}
-                    className="flex flex-col gap-1"
-                  >
-                    {tempOrder.map((sc) => (
-                      <ScenarioReorderItem
-                        key={sc.id}
-                        sc={sc}
-                        isActive={sc.id === props.activeScenarioId}
-                        onSelect={() => {
-                          props.setActiveScenarioId(sc.id);
-                          props.onReorder(tempOrder);
-                          setIsOpen(false);
-                        }}
-                      />
-                    ))}
-                  </Reorder.Group>
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
-      </div>
+    </div>
     </div>
   );
 }
