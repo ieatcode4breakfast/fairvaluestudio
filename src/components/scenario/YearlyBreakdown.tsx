@@ -28,7 +28,7 @@ export function YearlyBreakdown({ sc, results, onUpdate }: YearlyBreakdownProps)
       </div>
 
       {isSimple && lbl && (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto select-text">
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-medium border-b border-slate-100 dark:border-slate-600">
               <tr>
@@ -57,7 +57,7 @@ export function YearlyBreakdown({ sc, results, onUpdate }: YearlyBreakdownProps)
       )}
 
       {!isSimple && (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto select-text">
           <table className="w-full text-sm text-left">
             <thead className="bg-slate-50 dark:bg-slate-700 text-slate-500 dark:text-slate-400 font-medium border-b border-slate-100 dark:border-slate-600">
               <tr>

@@ -25,7 +25,7 @@ export function ScenarioComparisonTable({ scenarios, allResults }: Props) {
       </button>
 
       {isExpanded && (
-        <div className="p-4 pt-0 border-t border-slate-100 dark:border-slate-700 overflow-x-auto">
+        <div className="p-4 pt-0 border-t border-slate-100 dark:border-slate-700 overflow-x-auto select-text">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
