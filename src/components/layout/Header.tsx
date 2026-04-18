@@ -148,7 +148,7 @@ export function Header(props: HeaderProps) {
                         props.handleLoadValuation(e.target.value);
                       }
                     }}
-                    className={`${SELECT_CLS} flex-1 !bg-white dark:!bg-slate-800 shadow-sm`}
+                    className={`${SELECT_CLS} flex-1 max-w-[315px] !bg-white dark:!bg-slate-800 shadow-sm`}
                   >
                     <option value="NEW" className="font-semibold text-indigo-600 dark:text-indigo-400">✨ New valuation...</option>
                     {[...props.userValuations]

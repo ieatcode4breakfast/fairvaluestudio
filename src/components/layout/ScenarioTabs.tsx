@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Reorder, AnimatePresence, motion, useDragControls } from 'motion/react';
-import { PlusIcon, RotateCcw, List, Check, GripVertical } from '../Icons';
+import { PlusIcon, RotateCcw, List, Check, GripVertical, ChevronDown } from '../Icons';
 import { Scenario } from '../../types';
 import { MAX_SCENARIOS } from '../../utils/constants';
 import { SELECT_CLS } from '../../utils/constants';
@@ -56,19 +56,19 @@ function ScenarioReorderItem({ sc, isActive, onSelect }: ReorderItemProps) {
 }
 
 export function ScenarioTabs(props: ScenarioTabsProps) {
-  const [isSorting, setIsSorting] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [tempOrder, setTempOrder] = useState<Scenario[]>([]);
 
-  const handleToggleSorting = () => {
-    if (isSorting) {
-      // Apply the new order only on finish
-      props.onReorder(tempOrder);
-      setIsSorting(false);
-    } else {
-      // Initialize temp order when starting
-      setTempOrder([...props.scenarios]);
-      setIsSorting(true);
-    }
+  const activeScenario = props.scenarios.find(s => s.id === props.activeScenarioId);
+
+  const handleOpen = () => {
+    setTempOrder([...props.scenarios]);
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    props.onReorder(tempOrder);
+    setIsOpen(false);
   };
 
   return (
@@ -80,7 +80,7 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
         </label>
 
         <div className="flex items-center gap-2">
-          {props.scenarios.length < MAX_SCENARIOS && !isSorting && (
+          {props.scenarios.length < MAX_SCENARIOS && !isOpen && (
             <button
               onClick={props.addScenario}
               title="Add Scenario"
@@ -90,7 +90,7 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
             </button>
           )}
 
-          {!isSorting && (
+          {!isOpen && (
             <button
               onClick={props.onResetAll}
               title="Reset All Scenarios"
@@ -99,41 +99,42 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
               <RotateCcw className="w-4 h-4" />
             </button>
           )}
-
         </div>
       </div>
 
-      {/* Main Content Area: Dropdown/Reorder + Sort Button beside it */}
-      <div className="flex items-start gap-2 max-w-[455px]">
-        <div className="flex-1 relative min-h-[44px]">
-          <AnimatePresence mode="wait">
-            {!isSorting ? (
+      {/* Main Content Area: Pseudo-Dropdown Trigger or Reorder Overlay */}
+      <div className="relative w-full max-w-[400px] sm:max-w-[315px] min-h-[38px]">
+        <AnimatePresence mode="wait">
+          {!isOpen ? (
+            <motion.div
+              key="select"
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 5 }}
+              onClick={handleOpen}
+              className={`${SELECT_CLS} !bg-white dark:!bg-slate-800 shadow-sm flex items-center cursor-pointer hover:border-slate-300 dark:hover:border-slate-600 transition-colors group`}
+            >
+              <span className="truncate text-slate-700 dark:text-slate-300">
+                {activeScenario?.scenarioName || 'Untitled'}
+              </span>
+            </motion.div>
+          ) : (
+            <>
+              {/* Backdrop to close and save */}
               <motion.div
-                key="select"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-              >
-                <select
-                  id="scenario-select"
-                  value={props.activeScenarioId}
-                  onChange={(e) => props.setActiveScenarioId(Number(e.target.value))}
-                  className={`${SELECT_CLS} !bg-white dark:!bg-slate-800 shadow-sm h-11 text-base font-medium`}
-                >
-                  {props.scenarios.map((sc) => (
-                    <option key={sc.id} value={sc.id}>
-                      {sc.scenarioName || 'Untitled'}
-                    </option>
-                  ))}
-                </select>
-              </motion.div>
-            ) : (
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={handleClose}
+                className="fixed inset-0 z-10 bg-transparent"
+              />
+
               <motion.div
                 key="reorder"
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute top-0 left-0 w-full z-20 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden"
+                exit={{ opacity: 0, y: -5 }}
+                className="absolute top-0 left-0 w-full z-20 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden"
               >
                 <div className="p-1">
                   <Reorder.Group
@@ -143,34 +144,23 @@ export function ScenarioTabs(props: ScenarioTabsProps) {
                     className="flex flex-col gap-1"
                   >
                     {tempOrder.map((sc) => (
-                      <ScenarioReorderItem 
-                        key={sc.id} 
-                        sc={sc} 
+                      <ScenarioReorderItem
+                        key={sc.id}
+                        sc={sc}
                         isActive={sc.id === props.activeScenarioId}
                         onSelect={() => {
                           props.setActiveScenarioId(sc.id);
                           props.onReorder(tempOrder);
-                          setIsSorting(false);
+                          setIsOpen(false);
                         }}
                       />
                     ))}
                   </Reorder.Group>
                 </div>
               </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        <button
-          onClick={handleToggleSorting}
-          title={isSorting ? "Finish Reordering" : "Reorder Scenarios"}
-          className={`shrink-0 flex items-center justify-center w-11 h-11 rounded-lg transition-all shadow-sm border ${isSorting
-              ? 'bg-indigo-600 text-white border-indigo-500 hover:bg-indigo-700'
-              : 'bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:border-slate-200 dark:hover:border-slate-600 hover:text-indigo-600 dark:hover:text-indigo-400 border-slate-200 dark:border-slate-700'
-            }`}
-        >
-          {isSorting ? <Check className="w-5 h-5" /> : <List className="w-5 h-5" />}
-        </button>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
