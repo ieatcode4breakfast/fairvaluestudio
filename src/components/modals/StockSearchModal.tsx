@@ -27,6 +27,7 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
         if (!query.trim()) {
             setResults([]);
             setError(null);
+            setLoading(false);
             return;
         }
 
