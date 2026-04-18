@@ -34,12 +34,48 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
         throw new Error('VITE_OPENROUTER_API_KEY is not defined in .env.local');
     }
 
-    console.log(`[OpenRouter] Fetching TTM data for ${companyName} (${ticker})${exchange ? ` on ${exchange}` : ''}...`);
-
-    const context = exchange ? `${companyName} (${ticker}) listed on the ${exchange}` : `${companyName} (${ticker})`;
-
-    // Get the current date first to include it in the prompt
+    const uppercaseTicker = ticker.toUpperCase();
     const currentDate = new Date().toISOString().split('T')[0];
+
+    // ── 1. Cache Check ──────────────────────────────────────────────────────
+    try {
+        const { data: cached, error: cacheError } = await supabase
+            .from('ai_search_cache')
+            .select('*')
+            .eq('ticker', uppercaseTicker)
+            .single();
+
+        if (cached && !cacheError) {
+            const lastUpdated = new Date(cached.last_updated);
+            const now = new Date();
+            const hoursSinceUpdate = (now.getTime() - lastUpdated.getTime()) / (1000 * 60 * 60);
+
+            // If the cache is less than 24 hours old, return it instantly
+            if (hoursSinceUpdate < 24) {
+                console.log(`[OpenRouter] Cache HIT for ${uppercaseTicker} (${Math.round(hoursSinceUpdate)}h old)`);
+                return {
+                    ticker: uppercaseTicker,
+                    companyName: cached.company_name,
+                    revenue: Number(cached.revenue),
+                    freeCashFlow: Number(cached.free_cash_flow),
+                    netIncome: Number(cached.net_income),
+                    sharesOutstanding: Number(cached.shares_outstanding),
+                    freeCashFlowPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.free_cash_flow) / Number(cached.shares_outstanding) : 0,
+                    earningsPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.net_income) / Number(cached.shares_outstanding) : 0,
+                    currency: cached.currency || 'USD',
+                    asOfDate: cached.last_updated.split('T')[0],
+                };
+            }
+            console.log(`[OpenRouter] Cache STALE for ${uppercaseTicker} (${Math.round(hoursSinceUpdate)}h old). Fetching fresh data...`);
+        }
+    } catch (err) {
+        console.warn('[OpenRouter] Cache check failed, proceeding with fresh fetch:', err);
+    }
+
+    // ── 2. AI Fetch (Cache Miss/Stale) ───────────────────────────────────────
+    console.log(`[OpenRouter] Fetching TTM data for ${companyName} (${uppercaseTicker})${exchange ? ` on ${exchange}` : ''}...`);
+
+    const context = exchange ? `${companyName} (${uppercaseTicker}) listed on the ${exchange}` : `${companyName} (${uppercaseTicker})`;
 
     const prompt = `
     Today's date is ${currentDate}.
@@ -106,7 +142,7 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
         const shares = Number(parsedData.sharesOutstanding);
 
         const result: TTMData = {
-            ticker: ticker.toUpperCase(),
+            ticker: uppercaseTicker,
             companyName,
             revenue,
             freeCashFlow,
@@ -115,15 +151,17 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
             freeCashFlowPerShare: shares > 0 ? freeCashFlow / shares : 0,
             earningsPerShare: shares > 0 ? netIncome / shares : 0,
             currency: parsedData.currency || 'USD',
-            asOfDate: currentDate, // Use the same date generated at the start
+            asOfDate: currentDate,
         };
 
-        // Log successful usage asynchronously to avoid blocking the UI
+        // ── 3. Post-Fetch: Log Usage and Update Cache ────────────────────────
+        
+        // Log successful usage asynchronously
         if (userId) {
             const usageData = data.usage || {};
             supabase.from('ai_search_logs').insert({
                 user_id: userId,
-                ticker: ticker.toUpperCase(),
+                ticker: uppercaseTicker,
                 company_name: companyName,
                 model_id: data.model || 'perplexity/sonar-pro-search',
                 prompt_tokens: usageData.prompt_tokens || 0,
@@ -135,6 +173,20 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
                 if (error) console.error('[OpenRouter] Failed to log usage:', error);
             });
         }
+
+        // Update global cache asynchronously
+        supabase.from('ai_search_cache').upsert({
+            ticker: uppercaseTicker,
+            company_name: companyName,
+            revenue,
+            free_cash_flow: freeCashFlow,
+            net_income: netIncome,
+            shares_outstanding: shares,
+            currency: parsedData.currency || 'USD',
+            last_updated: new Date().toISOString()
+        }).then(({ error }) => {
+            if (error) console.error('[OpenRouter] Failed to update global cache:', error);
+        });
 
         return result;
     } catch (error) {
