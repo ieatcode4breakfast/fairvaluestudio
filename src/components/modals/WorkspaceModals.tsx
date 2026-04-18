@@ -7,7 +7,7 @@ export function DownloadModal({ show, setShow, filename, setFilename, onDownload
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm">
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
-        <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">Download Valuation</h3>
+        <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">Download Valuation (.json)</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Enter a name for your valuation file:</p>
         <input
           type="text"
@@ -34,7 +34,7 @@ export function UploadModal({ show, setShow, currentUser, onProceed }: any) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm">
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
-        <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">Upload Valuation</h3>
+        <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">Upload Valuation (.json)</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
           {currentUser
             ? 'This will create a new valuation. Do you want to proceed?'

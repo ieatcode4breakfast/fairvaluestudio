@@ -202,14 +202,14 @@ export function Header(props: HeaderProps) {
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-600 shadow-sm transition-all"
             >
               <DownloadIcon className="w-4 h-4" />
-              <span className="hidden lg:inline">Download Valuation (.json)</span>
+              <span className="hidden xl:inline">Download Valuation</span>
             </button>
             <button
               onClick={() => props.setShowUploadModal(true)}
               className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium border shadow-sm transition-all bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-600"
             >
               <UploadIcon className="w-4 h-4" />
-              <span className="hidden lg:inline">Upload Valuation (.json)</span>
+              <span className="hidden xl:inline">Upload Valuation</span>
             </button>
           </div>
         </div>
