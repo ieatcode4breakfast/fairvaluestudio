@@ -59,6 +59,20 @@ export default function App() {
   );
 
   useAutoSaveSync(loadedValuationId, currentUser, userValuations, scenarios, setScenarios, currentCleaned, isDirty, setLastSavedState, setIsSaving);
+  
+  // Clear text selection when clicking non-selectable areas
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // If we click something that is NOT selectable...
+      if (!target.closest('.select-text') && target.tagName !== 'TEXTAREA' && target.tagName !== 'INPUT') {
+        window.getSelection()?.removeAllRanges();
+      }
+    };
+
+    document.addEventListener('mousedown', handleMouseDown);
+    return () => document.removeEventListener('mousedown', handleMouseDown);
+  }, []);
 
   // Authentication UI State
   const [showLoginModal, setShowLoginModal] = useState(false);
