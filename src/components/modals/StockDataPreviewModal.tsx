@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Toggle } from '../Toggle';
-import { fetchTTMData } from '../../api/openrouter';
+import { fetchTTMData, getAIUsageStatus } from '../../api/openrouter';
 import { formatDynamicDecimal } from '../../utils/formatNumber';
 
 export interface DataField {
@@ -34,6 +34,8 @@ export function StockDataPreviewModal({
     const [isFetchingAI, setIsFetchingAI] = useState(false);
     const [aiError, setAiError] = useState<string | null>(null);
     const [aiFields, setAiFields] = useState<DataField[]>([]);
+    const [usageCount, setUsageCount] = useState<number>(0);
+    const [usageLimit, setUsageLimit] = useState<number>(5);
 
     // Reset toggles and AI state whenever the field list changes (new stock selected)
     useEffect(() => {
@@ -44,7 +46,15 @@ export function StockDataPreviewModal({
         setAiFields([]);
         setAiError(null);
         setIsFetchingAI(false);
-    }, [fields, show]);
+
+        // Fetch usage status for the user
+        if (userId) {
+            getAIUsageStatus(userId).then(status => {
+                setUsageCount(status.count);
+                setUsageLimit(status.limit);
+            });
+        }
+    }, [fields, show, userId]);
 
     if (!show) return null;
 
@@ -98,6 +108,13 @@ export function StockDataPreviewModal({
             setAiError(err.message || 'Failed to fetch AI data');
         } finally {
             setIsFetchingAI(false);
+            // Refresh usage status
+            if (userId) {
+                getAIUsageStatus(userId).then(status => {
+                    setUsageCount(status.count);
+                    setUsageLimit(status.limit);
+                });
+            }
         }
     };
 
@@ -171,10 +188,21 @@ export function StockDataPreviewModal({
                             <div className="space-y-3">
                                 <button
                                     onClick={handleFetchAI}
-                                    className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer"
+                                    disabled={usageCount >= usageLimit}
+                                    className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:text-slate-500 dark:disabled:text-slate-400 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer disabled:cursor-not-allowed"
                                 >
-                                    <span>✨ Search Current Financial Data (AI)</span>
+                                    <span>
+                                        {usageCount >= usageLimit 
+                                            ? 'Daily AI Limit Reached' 
+                                            : '✨ Search Current Financial Data (AI)'}
+                                    </span>
                                 </button>
+                                
+                                <div className="text-center">
+                                    <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                                        Quota: {Math.max(0, usageLimit - usageCount)} of {usageLimit} searches remaining today
+                                    </p>
+                                </div>
 
                                 {!isPreferredExchange && exchange && (
                                     <div className="flex items-center gap-1.5 justify-center px-2">

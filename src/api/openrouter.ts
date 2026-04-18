@@ -22,6 +22,41 @@ const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 
 /**
+ * Fetches the number of AI search requests made by a user today (UTC)
+ * AND their daily search limit from the database.
+ */
+export async function getAIUsageStatus(userId: string): Promise<{ count: number, limit: number }> {
+    const today = new Date().toISOString().split('T')[0];
+    
+    // 1. Fetch usage count
+    const { count, error: usageError } = await supabase
+        .from('ai_search_logs')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .gte('created_at', `${today}T00:00:00Z`);
+
+    if (usageError) {
+        console.error('[OpenRouter] Error checking usage:', usageError);
+    }
+
+    // 2. Fetch user's limit
+    const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('ai_search_limit')
+        .eq('id', userId)
+        .single();
+
+    if (userError) {
+        console.error('[OpenRouter] Error fetching user limit:', userError);
+    }
+
+    return { 
+        count: count || 0, 
+        limit: userData?.ai_search_limit ?? 5 // Default to 5 if not set or error
+    };
+}
+
+/**
  * Fetches TTM financial data for a specific stock including per-share metrics.
  * Uses the current date in the prompt to ensure AI grounding is up-to-date.
  * @param ticker - The stock symbol (e.g., "AAPL")
@@ -36,6 +71,14 @@ export async function fetchTTMData(ticker: string, companyName: string, exchange
 
     const uppercaseTicker = ticker.toUpperCase();
     const currentDate = new Date().toISOString().split('T')[0];
+
+    // ── 0. Usage Limit Check ────────────────────────────────────────────────
+    if (userId) {
+        const { count, limit } = await getAIUsageStatus(userId);
+        if (count >= limit) {
+            throw new Error(`Daily AI search limit reached (${limit}/${limit}). Please try again tomorrow.`);
+        }
+    }
 
     // ── 1. Cache Check (Server-Side Filtered via View) ─────────────────────
     try {
