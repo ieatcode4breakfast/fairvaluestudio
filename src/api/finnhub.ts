@@ -13,6 +13,13 @@ export interface StockSearchResult {
 }
 
 /**
+ * Raw financials fetched for a symbol. All monetary values are in millions (Finnhub standard).
+ */
+export interface FinnhubFundamentals {
+    price: number | null;
+}
+
+/**
  * Search for stocks by ticker or company name.
  * @param query Search string (e.g., "MSFT" or "Microsoft")
  * @returns Array of matching stocks
@@ -55,4 +62,14 @@ export async function getStockPrice(symbol: string): Promise<number | null> {
         console.error('Failed to fetch stock price:', error);
         throw error;
     }
+}
+
+/**
+ * Fetch stock price from Finnhub.
+ * Returns null for price if unavailable.
+ */
+export async function getStockFundamentals(symbol: string): Promise<FinnhubFundamentals> {
+    const price = await getStockPrice(symbol);
+    console.log('[Finnhub] final fundamentals:', { symbol, price });
+    return { price };
 }

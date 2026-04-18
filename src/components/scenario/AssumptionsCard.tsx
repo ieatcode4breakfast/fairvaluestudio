@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import { Scenario, Results } from '../../types';
 import { Settings2, Search } from '../Icons';
 import { StockSearchModal } from '../modals/StockSearchModal';
+import { StockDataPreviewModal, DataField } from '../modals/StockDataPreviewModal';
 import { NumericFormat } from '../NumericFormat';
 import { INPUT_CLS, SELECT_CLS } from '../../utils/constants';
+import { FinnhubFundamentals } from '../../api/finnhub';
+import { formatDynamicDecimal } from '../../utils/formatNumber';
 
 interface AssumptionsCardProps {
   sc: Scenario;
@@ -11,10 +14,77 @@ interface AssumptionsCardProps {
   onUpdate: (changes: Partial<Scenario>) => void;
 }
 
+// ---------------------------------------------------------------------------
+// computeFields
+// Builds the list of DataFields that will be shown in the preview modal.
+// Respects the current inMillions / simpleInMillions flag so labels and values
+// match exactly what is displayed in GrowthCard inputs.
+// ---------------------------------------------------------------------------
+function computeFields(_sc: Scenario, data: FinnhubFundamentals): DataField[] {
+  const fields: DataField[] = [];
+
+  // ── Buy Price (always present if price was fetched) ──────────────────────
+  if (data.price !== null) {
+    const v = formatDynamicDecimal(data.price);
+    fields.push({
+      key: 'buyPrice',
+      label: 'Buy Price',
+      value: v,
+      formatted: formatDynamicDecimal(data.price, true),
+    });
+  }
+
+  return fields;
+}
+
+// ---------------------------------------------------------------------------
+// AssumptionsCard
+// ---------------------------------------------------------------------------
 export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps) {
   const maxYears = sc.dcfMethod === 'Basic DCF' ? 10 : 50;
+
+  // Stock search modal
   const [showStockSearch, setShowStockSearch] = useState(false);
   const [buyPriceHighlighted, setBuyPriceHighlighted] = useState(false);
+
+  // Data preview modal
+  const [showPreview, setShowPreview] = useState(false);
+  const [pendingSymbol, setPendingSymbol] = useState('');
+  const [previewFields, setPreviewFields] = useState<DataField[]>([]);
+
+  // Called when the user selects a ticker in StockSearchModal.
+  // sc is already current at the time the search button was clicked,
+  // so computeFields correctly reflects the active scenario config.
+  const handleStockSelect = (symbol: string, data: FinnhubFundamentals) => {
+    const fields = computeFields(sc, data);
+    setPendingSymbol(symbol);
+    setPreviewFields(fields);
+    setShowStockSearch(false);
+    setShowPreview(true);
+  };
+
+  // Called when the user hits Apply in the preview modal.
+  const handleApply = (enabledKeys: string[]) => {
+    const changes: Partial<Scenario> = {};
+    previewFields.forEach(field => {
+      if (enabledKeys.includes(field.key)) {
+        (changes as any)[field.key] = field.value;
+      }
+    });
+    onUpdate(changes);
+    if (enabledKeys.includes('buyPrice')) {
+      setBuyPriceHighlighted(true);
+    }
+    setShowPreview(false);
+    setPreviewFields([]);
+    setPendingSymbol('');
+  };
+
+  const handlePreviewClose = () => {
+    setShowPreview(false);
+    setPreviewFields([]);
+    setPendingSymbol('');
+  };
 
   return (
     <div className="p-6">
@@ -25,7 +95,7 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
         <button
           onClick={() => setShowStockSearch(true)}
           className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded transition-colors"
-          title="Search stock price"
+          title="Load Stock Data"
         >
           <Search className="w-5 h-5 text-slate-400" />
         </button>
@@ -90,14 +160,21 @@ export function AssumptionsCard({ sc, results, onUpdate }: AssumptionsCardProps)
           </div>
         </div>
       </div>
+
+      {/* Step 1: Search modal */}
       <StockSearchModal
         show={showStockSearch}
         onClose={() => setShowStockSearch(false)}
-        onSelect={(symbol, price) => {
-          onUpdate({ buyPrice: price });
-          setBuyPriceHighlighted(true);
-          setShowStockSearch(false);
-        }}
+        onSelect={handleStockSelect}
+      />
+
+      {/* Step 2: Preview + apply modal */}
+      <StockDataPreviewModal
+        show={showPreview}
+        symbol={pendingSymbol}
+        fields={previewFields}
+        onApply={handleApply}
+        onClose={handlePreviewClose}
       />
     </div>
   );
