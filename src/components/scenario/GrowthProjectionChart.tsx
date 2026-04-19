@@ -151,12 +151,14 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
                             <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{formatCurrency(data.sellPrice)}</span>
                           </div>
 
-                          <div className="flex justify-between gap-8">
-                            <span className="text-xs text-slate-500 dark:text-slate-400">
-                              Intrinsic Value:
-                            </span>
-                            <span className="text-xs font-bold text-purple-600">{formatCurrency(data.intrinsicValue)}</span>
-                          </div>
+                          {data.year !== valYears && (
+                            <div className="flex justify-between gap-8">
+                              <span className="text-xs text-slate-500 dark:text-slate-400">
+                                Intrinsic Value:
+                              </span>
+                              <span className="text-xs font-bold text-purple-600">{formatCurrency(data.intrinsicValue)}</span>
+                            </div>
+                          )}
 
                           {data.year !== 0 && (
                             <div className="flex flex-col">
