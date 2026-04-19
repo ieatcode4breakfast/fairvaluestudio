@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Scenario, Results } from '../../types';
-import { Settings2, Search } from '../Icons';
+import { Settings2, Search, InfoIcon } from '../Icons';
+import { Tooltip } from '../Tooltip';
 import { StockSearchModal } from '../modals/StockSearchModal';
 import { StockDataPreviewModal, DataField } from '../modals/StockDataPreviewModal';
 import { NumericFormat } from '../NumericFormat';
@@ -44,8 +45,8 @@ function computeFields(_sc: Scenario, data: UnifiedFundamentals): DataField[] {
 // ---------------------------------------------------------------------------
 // AssumptionsCard
 // ---------------------------------------------------------------------------
-export function AssumptionsCard({ 
-  sc, results, onUpdate, highlightedKeys, onSetHighlights, onClearHighlight, currentUser 
+export function AssumptionsCard({
+  sc, results, onUpdate, highlightedKeys, onSetHighlights, onClearHighlight, currentUser
 }: AssumptionsCardProps) {
   const maxYears = sc.dcfMethod === 'Basic DCF' ? 10 : 50;
 
@@ -79,17 +80,17 @@ export function AssumptionsCard({
   // Called when the user hits Apply in the preview modal.
   const handleApply = (enabledKeys: string[], aiFields: DataField[] = []) => {
     const changes: Partial<Scenario> = {};
-    
+
     // Merge standard preview fields and AI fields
     const allFields = [...previewFields, ...aiFields];
-    
+
     allFields.forEach(field => {
       if (enabledKeys.includes(field.key)) {
         (changes as any)[field.key] = field.value;
       }
     });
     onUpdate(changes);
-    
+
     // Set highlights for all successfully applied fields
     onSetHighlights(enabledKeys);
 
@@ -148,7 +149,12 @@ export function AssumptionsCard({
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Discount Rate (%)</label>
+            <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1.5">
+              Discount Rate (%)
+              <Tooltip content="The rate used to discount future cash flows to the present. This can also be considered your Desired Yearly Return.">
+                <InfoIcon className="w-3.5 h-3.5 text-slate-400 hover:text-slate-500 transition-colors" />
+              </Tooltip>
+            </label>
             <NumericFormat value={sc.discountRate} onValueChange={v => onUpdate({ discountRate: v.floatValue === undefined ? '' : v.floatValue })} className={INPUT_CLS} />
           </div>
         </div>
