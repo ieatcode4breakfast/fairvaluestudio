@@ -67,7 +67,8 @@ export function GrowthCard({
           const e = i === sc.splitYears.length ? valYears : sc.splitYears[i] - 1;
           return (
             <div key={i}>
-              <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Growth Rate (Yrs {s}-{e}) (%)</label>
+              <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">Phase {i + 1} (Yrs {s}-{e})</h3>
+              <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Growth Rate (%)</label>
               <NumericFormat
                 value={sc.metricGrowthRates[i]}
                 onValueChange={v => {
@@ -110,7 +111,7 @@ export function GrowthCard({
           const e = i === sc.splitYears.length ? valYears : sc.splitYears[i] - 1;
           return (
             <div key={i}>
-              <h3 className="text-sm font-medium text-slate-800 mb-2">Phase {i + 1} (Yrs {s}-{e})</h3>
+              <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">Phase {i + 1} (Yrs {s}-{e})</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
                 <div>
                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">FCF Growth (%)</label>
@@ -172,7 +173,7 @@ export function GrowthCard({
           const e = i === sc.splitYears.length ? valYears : sc.splitYears[i] - 1;
           return (
             <div key={i}>
-              <h3 className="text-sm font-medium text-slate-800 mb-2">Phase {i + 1} (Yrs {s}-{e})</h3>
+              <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">Phase {i + 1} (Yrs {s}-{e})</h3>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
                 <div>
                   <label className="block text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">Rev Growth (%)</label>
@@ -575,7 +576,7 @@ export function GrowthCard({
           {showSlider && (
             <div className="mb-8 pt-6 border-t border-slate-100 dark:border-slate-700">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-sm font-medium text-slate-800">Growth Phases</h3>
+                <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200">Growth Phases</h3>
                 <span className="text-xs font-medium bg-indigo-50 text-indigo-600 px-2 py-1 rounded-md">
                   {sc.splitYears.length === 0 ? 'Single Phase' : `${sc.splitYears.length + 1} Phases`}
                 </span>
@@ -692,7 +693,7 @@ export function GrowthCard({
                         document.addEventListener('mouseup', onUp);
                       }}
                     >
-                      <div className={`absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap pointer-events-none transition-opacity ${sc.draggingIndex === idx ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                      <div className={`absolute -top-8 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs px-2 py-1 rounded whitespace-nowrap pointer-events-none transition-opacity ${sc.draggingIndex === idx ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                         Year {year}
                       </div>
                     </div>
