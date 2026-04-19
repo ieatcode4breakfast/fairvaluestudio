@@ -99,7 +99,7 @@ export function buildSummaryText(sc: Scenario, res: Results, index: number) {
       `[ Inputs ]\n` +
       `Buy Price: ${formatCurrency(Number(sc.buyPrice) || 0)}\n` +
       `Years: ${sc.years}\n` +
-      `Discount Rate: ${sc.discountRate}%\n` +
+      `Desired Yearly Return: ${sc.discountRate}%\n` +
       `Metrics: ${metricsLabel}\n` +
       methodInputs +
       exitStr + `\n\n` +
@@ -107,7 +107,7 @@ export function buildSummaryText(sc: Scenario, res: Results, index: number) {
       `Intrinsic Value: ${formatCurrency(res.intrinsicValueTotal)}\n` +
       `Margin of Safety: ${formatPercent(res.marginOfSafety)}\n` +
       `Upside: ${formatPercent(res.upside)}\n` +
-      `IRR: ${formatPercent(res.irr)}\n\n` +
+      `Yearly Return: ${formatPercent(res.irr)}\n\n` +
       `[ Breakdown ]\n` +
       `${lbl.labelProjectedFinal} (Year ${valYears}): ${formatCurrency(res.finalMetricPerShare)}\n` +
       `Terminal Value: ${formatCurrency(res.terminalValuePerShare)}\n` +

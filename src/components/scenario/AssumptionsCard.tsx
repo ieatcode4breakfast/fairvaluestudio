@@ -150,7 +150,7 @@ export function AssumptionsCard({
           </div>
           <div>
             <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1.5">
-              Discount Rate (%)
+              {sc.dcfMethod === 'Basic DCF' ? 'Desired Yearly Return (%)' : 'Discount Rate (%)'}
               <Tooltip content="The rate used to discount future cash flows to the present. This can also be considered your Desired Yearly Return.">
                 <InfoIcon className="w-3.5 h-3.5 text-slate-400 hover:text-slate-500 transition-colors" />
               </Tooltip>

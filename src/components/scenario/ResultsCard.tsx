@@ -24,7 +24,11 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
         <div className="text-5xl md:text-6xl font-light tracking-tight text-slate-900 dark:text-slate-100 truncate select-text">
           {formatCurrency(results.intrinsicValueTotal)}
         </div>
-        <div className="text-sm text-slate-400 dark:text-slate-500 mt-1">Total Present Value</div>
+        <div className="text-sm text-slate-400 dark:text-slate-500 mt-1">
+          {isSimple
+            ? `The price you have to pay for a yearly return of ${formatPercent(Number(sc.discountRate) || 0)}`
+            : 'Total Present Value'}
+        </div>
       </div>
 
       {/* Secondary Metrics Grid */}

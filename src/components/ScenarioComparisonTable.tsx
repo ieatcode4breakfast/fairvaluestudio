@@ -33,7 +33,7 @@ export function ScenarioComparisonTable({ scenarios, allResults }: Props) {
                 <th className="p-3 text-right">Intrinsic Value</th>
                 <th className="p-3 text-right">Margin of Safety</th>
                 <th className="p-3 text-right">Upside</th>
-                <th className="p-3 text-right">IRR</th>
+                <th className="p-3 text-right">Yearly Return / IRR</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
