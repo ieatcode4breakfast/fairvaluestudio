@@ -102,7 +102,7 @@ export function GrowthProjectionChart({ sc }: GrowthProjectionChartProps) {
                 formatter={(value: any, name: any) => [
                   formatCurrency(value),
                   name === 'metricPerShare' ? metricLabel :
-                  name === 'revenue' ? 'Revenue' : 'Shares Outstanding',
+                    name === 'revenue' ? 'Revenue' : 'Shares Outstanding',
                 ]}
                 labelStyle={{ fontWeight: 600, color: '#475569' }}
               />
@@ -114,7 +114,7 @@ export function GrowthProjectionChart({ sc }: GrowthProjectionChartProps) {
                 formatter={(value: any) => (
                   <span className="text-sm text-slate-600 dark:text-slate-300">
                     {value === 'metricPerShare' ? metricLabel :
-                     value === 'revenue' ? 'Revenue' : 'Shares Outstanding'}
+                      value === 'revenue' ? 'Revenue' : 'Shares Outstanding'}
                   </span>
                 )}
               />

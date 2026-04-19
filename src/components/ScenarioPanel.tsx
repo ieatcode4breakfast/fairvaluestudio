@@ -5,7 +5,7 @@ import { ScenarioMetaCard } from './scenario/ScenarioMetaCard';
 import { AssumptionsCard } from './scenario/AssumptionsCard';
 import { GrowthCard } from './scenario/GrowthCard';
 import { ResultsCard } from './scenario/ResultsCard';
-import { YearlyBreakdown } from './scenario/YearlyBreakdown';
+// import { YearlyBreakdown } from './scenario/YearlyBreakdown';
 import { GrowthProjectionChart } from './scenario/GrowthProjectionChart';
 
 interface ScenarioPanelProps {
@@ -108,11 +108,11 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
         {sc.dcfMethod !== 'Advanced DCF' && <GrowthProjectionChart sc={sc} />}
 
         {/* Valuation Breakdown */}
-        <YearlyBreakdown
+        {/* <YearlyBreakdown
           sc={sc}
           results={results}
           onUpdate={handleUpdate}
-        />
+        /> */}
 
       </div>
     </div>

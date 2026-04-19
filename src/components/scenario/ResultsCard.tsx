@@ -54,7 +54,9 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
         {/* IRR */}
         <div className="p-5 flex flex-col justify-between min-w-0">
           <div>
-            <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 select-text">IRR (Annual)</div>
+            <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 select-text">
+              {isSimple ? 'Yearly Return' : 'Internal Rate of Return (IRR)'}
+            </div>
             <div className={`text-3xl font-light tracking-tight truncate select-text ${irrColor}`}>
               {formatPercent(results.irr)}
             </div>
