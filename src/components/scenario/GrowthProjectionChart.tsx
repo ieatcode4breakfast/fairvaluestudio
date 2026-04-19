@@ -83,12 +83,25 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
     // Intrinsic value growing at discount rate
     const intrinsicValue = intrinsicValueToday * Math.pow(1 + discountRate, point.year);
 
+    // Yearly return based on intrinsic value (CAGR from buy price to intrinsic value)
+    let intrinsicYearlyReturn = null;
+    if (buyPrice !== 0) {
+      if (point.year === 0) {
+        // Instantaneous return from buy price to intrinsic value today
+        intrinsicYearlyReturn = (intrinsicValue / buyPrice - 1) * 100;
+      } else {
+        // Annualized CAGR
+        intrinsicYearlyReturn = (Math.pow(intrinsicValue / buyPrice, 1 / point.year) - 1) * 100;
+      }
+    }
+
     return {
       year: point.year,
       displayYear: point.year === 0 ? 'Today' : `Year ${point.year}`,
       sellPrice,
       yearlyReturn,
       intrinsicValue,
+      intrinsicYearlyReturn,
     };
   });
 
@@ -151,15 +164,6 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
                             <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{formatCurrency(data.sellPrice)}</span>
                           </div>
 
-                          {data.year !== valYears && (
-                            <div className="flex justify-between gap-8">
-                              <span className="text-xs text-slate-500 dark:text-slate-400">
-                                Intrinsic Value:
-                              </span>
-                              <span className="text-xs font-bold text-purple-600">{formatCurrency(data.intrinsicValue)}</span>
-                            </div>
-                          )}
-
                           {data.year !== 0 && (
                             <div className="flex flex-col">
                               <div className="flex justify-between gap-8">
@@ -169,6 +173,28 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
                                 </span>
                               </div>
                             </div>
+                          )}
+
+                          <div className="h-2"></div>
+
+                          {data.year !== valYears && (
+                            <>
+                              <div className="flex justify-between gap-8">
+                                <span className="text-xs text-slate-500 dark:text-slate-400">
+                                  Intrinsic Value:
+                                </span>
+                                <span className="text-xs font-bold text-purple-600">{formatCurrency(data.intrinsicValue)}</span>
+                              </div>
+
+                              {data.intrinsicYearlyReturn !== null && (
+                                <div className="flex justify-between gap-8">
+                                  <span className="text-xs text-slate-500 dark:text-slate-400">Yearly Return (based on Intrinsic Value):</span>
+                                  <span className="text-xs font-bold text-purple-600">
+                                    {data.intrinsicYearlyReturn.toFixed(2)}%
+                                  </span>
+                                </div>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>
