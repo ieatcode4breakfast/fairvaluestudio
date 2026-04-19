@@ -415,7 +415,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans selection:bg-indigo-100 dark:selection:bg-indigo-900 selection:text-indigo-900 dark:selection:text-indigo-100 pb-12 overflow-x-hidden select-none">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans selection:bg-indigo-100 dark:selection:bg-indigo-900 selection:text-indigo-900 dark:selection:text-indigo-100 pb-12 overflow-x-visible select-none">
 
       {/* Reorder Toast Notification */}
       <div
@@ -481,8 +481,8 @@ export default function App() {
         />
 
         {(!currentUser || (currentUser && userValuations.length > 0)) && (
-          <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-3xl shadow-lg border-y border-x-0 md:border-x border-slate-200 dark:border-slate-700 overflow-hidden">
-            <div className="bg-slate-50/80 dark:bg-slate-900/50 px-4 md:px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+          <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-3xl shadow-lg border-y border-x-0 md:border-x border-slate-200 dark:border-slate-700">
+            <div className="bg-slate-50/80 dark:bg-slate-900/50 px-4 md:px-6 py-4 border-b border-slate-200 dark:border-slate-700 rounded-t-none md:rounded-t-3xl">
               <ScenarioSelector
                 scenarios={scenarios}
                 activeScenarioId={activeScenarioId}

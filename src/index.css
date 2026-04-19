@@ -48,11 +48,16 @@ body {
   outline: none !important;
   box-shadow: none !important;
 }
-
 /* Constrain Recharts tooltips to viewport */
 .recharts-tooltip-wrapper {
   max-width: calc(100vw - 80px) !important;
   white-space: normal !important;
 }
 
+/* Sticky right column for results */
+.sticky-results {
+  position: sticky;
+  top: 1rem;
+  align-self: start;
+}
 

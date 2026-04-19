@@ -98,7 +98,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
       </div>
 
       {/* ══ RIGHT: RESULTS ══ */}
-      <div className="lg:col-span-8 space-y-6">
+      <div className="lg:col-span-8 space-y-6 lg:sticky lg:top-4 self-start sticky-results">
 
         {/* Key metric cards */}
         <ResultsCard
