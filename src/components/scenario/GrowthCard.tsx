@@ -266,13 +266,18 @@ export function GrowthCard({
         }
 
         return (
-          <div className="p-6 relative">
+          <div className="p-5 lg:p-6 relative">
+
+
+
             <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-slate-400" /> Growth
             </h2>
 
             {sc.simpleProjectionMethod === 'Per Share' && (
               <div className="space-y-4">
+
+
                 <div>
                   <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.labelCurrentPerShare}</label>
                   <NumericFormat 
@@ -303,8 +308,10 @@ export function GrowthCard({
 
             {sc.simpleProjectionMethod === 'Metric, Share Count' && (
               <div className="space-y-4">
+
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Values in Millions</span>
+
                   <Toggle checked={sc.inMillions} onChange={() => {
                     const newFlag = !sc.inMillions;
                     upd({
@@ -369,9 +376,10 @@ export function GrowthCard({
             )}
 
             {sc.simpleProjectionMethod === 'Revenue, Metric Margin, Share Count' && (
-              <div className="space-y-4">
+              <div className="space-y-2 lg:space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Values in Millions</span>
+
                   <Toggle checked={sc.inMillions} onChange={() => {
                     const newFlag = !sc.inMillions;
                     upd({
@@ -453,10 +461,11 @@ export function GrowthCard({
 
       {/* ── ADVANCED: Growth section ── */}
       {!isSimple && (
-        <div className="p-6 relative">
+        <div className="p-3 lg:p-6 relative">
           <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-slate-400" /> Growth
           </h2>
+
 
           {/* Current Metrics */}
           {sc.projectionMethod === 'Per Share Method' && (

@@ -35,7 +35,10 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 p-6 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700">
+    <div className="bg-white dark:bg-slate-800 p-5 lg:p-6 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700">
+
+
+
       <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Scenario Name</label>
       <input
         type="text"

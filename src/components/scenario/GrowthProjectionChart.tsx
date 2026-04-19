@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import { Scenario } from '../../types';
 import { getYearlyProjection, ProjectionPoint } from '../../utils/projection';
-import { formatCurrency } from '../../utils/helpers';
+import { formatCurrency, formatCompactNumber } from '../../utils/helpers';
 
 interface GrowthProjectionChartProps {
   sc: Scenario;
@@ -21,8 +21,24 @@ export function GrowthProjectionChart({ sc }: GrowthProjectionChartProps) {
   const projection = getYearlyProjection(sc);
   const valYears = Number(sc.years) || 0;
   const buyPrice = Number(sc.buyPrice) || 0;
+  const isBasic = sc.dcfMethod === 'Basic DCF';
+
+  // Determine dynamic labels for the formula
+  let metricLabel = 'Metric';
+  if (isBasic) {
+    if (sc.simpleMetricType === 'Net Income (Earnings)') metricLabel = 'Earnings';
+    else if (sc.simpleMetricType === 'Custom') metricLabel = sc.simpleCustomMetric || 'Custom Metric';
+    else metricLabel = 'FCF';
+  } else {
+    metricLabel = 'FCF';
+  }
+
+  const exitTypeLabel = sc.exitAssumptionType === 'Perpetuity Growth' ? 'Multiple (Implied)' : sc.exitAssumptionType;
+  const operator = sc.exitAssumptionType === 'Yield' ? '/' : '*';
+
 
   // Calculate effective multiple (P/E or 100/Yield)
+
   const valExitMultiple = Number(sc.exitMultiple) || 0;
   const valExitYield = Number(sc.exitYield) || 0;
   const effectiveMultiple = sc.exitAssumptionType === 'Multiple'
@@ -52,24 +68,35 @@ export function GrowthProjectionChart({ sc }: GrowthProjectionChartProps) {
       displayYear: `Year ${point.year}`,
       sellPrice,
       yearlyReturn,
+      metricPerShare: point.metricPerShare,
     };
   });
 
+
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 overflow-hidden">
-      <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-700">
+    <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 overflow-hidden select-none">
+      <div className="p-5 lg:px-6 lg:py-4 border-b border-slate-100 dark:border-slate-700">
+
+
         <h3 className="text-lg font-medium text-slate-800 dark:text-slate-200">Return Projection</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Projected sell price and yearly return based on current buy price ({formatCurrency(buyPrice)})
+          Projected Sell Price and Yearly Return based on current buy price of {formatCurrency(buyPrice)}
+        </p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          Sell Price = {metricLabel} Per Share {operator} Exit {exitTypeLabel}
         </p>
       </div>
-      <div className="p-6">
+      <div className="p-5 lg:p-6">
+
+
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+              accessibilityLayer={false}
             >
+
               <CartesianGrid
                 strokeDasharray="3 3"
                 stroke="#e2e8f0"
@@ -86,8 +113,8 @@ export function GrowthProjectionChart({ sc }: GrowthProjectionChartProps) {
                 axisLine={false}
                 tickLine={false}
                 tick={{ fill: '#64748b', fontSize: 12 }}
-                tickFormatter={(value) => formatCurrency(value)}
-                width={80}
+                tickFormatter={(value) => formatCompactNumber(value)}
+                width={55}
               />
               <Tooltip
                 content={({ active, payload, label }) => {
@@ -98,9 +125,14 @@ export function GrowthProjectionChart({ sc }: GrowthProjectionChartProps) {
                         <div className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-2">{label}</div>
                         <div className="flex flex-col gap-1.5">
                           <div className="flex justify-between gap-8">
+                            <span className="text-xs text-slate-500 dark:text-slate-400">{metricLabel} Per Share:</span>
+                            <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{formatCurrency(data.metricPerShare)}</span>
+                          </div>
+                          <div className="flex justify-between gap-8">
                             <span className="text-xs text-slate-500 dark:text-slate-400">Sell Price:</span>
                             <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{formatCurrency(data.sellPrice)}</span>
                           </div>
+
                           <div className="flex flex-col">
                             <div className="flex justify-between gap-8">
                               <span className="text-xs text-slate-500 dark:text-slate-400">Yearly Return:</span>

@@ -108,7 +108,10 @@ export function AssumptionsCard({
   };
 
   return (
-    <div className="p-6">
+    <div className="p-5 lg:p-6">
+
+
+
       <h2 className="text-lg font-medium mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Settings2 className="w-5 h-5 text-slate-400" /> General Assumptions
@@ -122,6 +125,8 @@ export function AssumptionsCard({
         </button>
       </h2>
       <div className="space-y-4">
+
+
         <div>
           <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Buy Price</label>
           <NumericFormat
