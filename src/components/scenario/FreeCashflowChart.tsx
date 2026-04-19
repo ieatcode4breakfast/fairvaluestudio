@@ -115,7 +115,7 @@ export function FreeCashflowChart({ sc, results, onUpdate }: FreeCashflowChartPr
               />
               <Tooltip
                 wrapperStyle={{
-                  maxWidth: 'calc(100vw - 40px)',
+                  maxWidth: 'calc(100vw - 80px)',
                   whiteSpace: 'normal',
                   overflowWrap: 'break-word',
                   zIndex: 1000,
@@ -130,12 +130,12 @@ export function FreeCashflowChart({ sc, results, onUpdate }: FreeCashflowChartPr
                     return (
                       <div className="bg-white dark:bg-slate-800 p-4 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl">
                         <div className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-2">{label}</div>
-                        <div className="flex flex-col gap-1.5">
-                          <div className="flex justify-between gap-8">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex justify-between gap-4 flex-wrap">
                             <span className="text-xs text-slate-500 dark:text-slate-400">Cash Flow Per Share:</span>
                             <span className="text-xs font-bold text-blue-500">{formatCurrency(data.fcfPerShare)}</span>
                           </div>
-                          <div className="flex justify-between gap-8">
+                          <div className="flex justify-between gap-4 flex-wrap">
                             <span className="text-xs text-slate-500 dark:text-slate-400">Present Value:</span>
                             <span className="text-xs font-bold text-violet-500">{formatCurrency(data.presentValue)}</span>
                           </div>

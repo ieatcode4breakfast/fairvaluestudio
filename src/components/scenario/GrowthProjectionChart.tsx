@@ -153,7 +153,7 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
               />
               <Tooltip
                 wrapperStyle={{
-                  maxWidth: 'calc(100vw - 40px)',
+                  maxWidth: 'calc(100vw - 80px)',
                   whiteSpace: 'normal',
                   overflowWrap: 'break-word',
                   zIndex: 1000,
@@ -168,8 +168,8 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
                     return (
                       <div className="bg-white dark:bg-slate-800 p-4 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl">
                         <div className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-2">{label}</div>
-                        <div className="flex flex-col gap-1.5">
-                          <div className="flex justify-between gap-8">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex justify-between gap-4 flex-wrap">
                             <span className="text-xs text-slate-500 dark:text-slate-400">
                               {data.year === 0 ? 'Buy Price' : data.year === valYears ? 'Final Stock Price' : 'Compounded Buy Price'}:
                             </span>
@@ -178,7 +178,7 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
 
                           {data.year !== 0 && (
                             <div className="flex flex-col">
-                              <div className="flex justify-between gap-8">
+                              <div className="flex justify-between gap-4 flex-wrap">
                                 <span className="text-xs text-slate-500 dark:text-slate-400">Yearly Return:</span>
                                 <span className="text-xs font-bold text-emerald-600">
                                   {data.yearlyReturn !== null ? `${data.yearlyReturn.toFixed(2)}%` : 'N/A'}
@@ -191,7 +191,7 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
 
                           {data.year !== valYears && (
                             <>
-                              <div className="flex justify-between gap-8">
+                              <div className="flex justify-between gap-4 flex-wrap">
                                 <span className="text-xs text-slate-500 dark:text-slate-400">
                                   Intrinsic Value:
                                 </span>
@@ -199,8 +199,8 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
                               </div>
 
                               {data.intrinsicYearlyReturn !== null && (
-                                <div className="flex justify-between gap-8">
-                                  <span className="text-xs text-slate-500 dark:text-slate-400">Yearly Return (if price reaches Intrinsic Value):</span>
+                                <div className="flex justify-between gap-4 flex-wrap">
+                                  <span className="text-xs text-slate-500 dark:text-slate-400 break-words">Yearly Return (if price reaches Intrinsic Value):</span>
                                   <span className={`text-xs font-bold ${data.intrinsicYearlyReturn > 0 ? 'text-emerald-600' : data.intrinsicYearlyReturn < 0 ? 'text-red-600' : 'text-slate-900 dark:text-slate-100'}`}>
                                     {data.intrinsicYearlyReturn.toFixed(2)}%
                                   </span>

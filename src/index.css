@@ -51,7 +51,7 @@ body {
 
 /* Constrain Recharts tooltips to viewport */
 .recharts-tooltip-wrapper {
-  max-width: calc(100vw - 40px) !important;
+  max-width: calc(100vw - 80px) !important;
   white-space: normal !important;
 }
 
