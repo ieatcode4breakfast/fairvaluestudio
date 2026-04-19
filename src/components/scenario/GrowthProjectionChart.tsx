@@ -218,10 +218,9 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
                 dataKey="intrinsicValue"
                 name="Intrinsic Value (Discount Rate)"
                 stroke="#8b5cf6"
-                strokeWidth={2}
-                strokeDasharray="5 5"
-                dot={false}
-                activeDot={false}
+                strokeWidth={3}
+                dot={{ r: 4, fill: '#8b5cf6', strokeWidth: 0 }}
+                activeDot={{ r: 6, strokeWidth: 0 }}
                 isAnimationActive={true}
               />
             </LineChart>
