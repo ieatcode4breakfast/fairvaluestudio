@@ -150,6 +150,7 @@ export function AssumptionsCard({
                 onUpdate({ years: val === undefined ? '' : val });
               }}
               isAllowed={v => v.floatValue === undefined || v.floatValue <= maxYears}
+              onBlur={() => onUpdate({ _trimPhases: true } as any)}
               className={INPUT_CLS}
             />
           </div>

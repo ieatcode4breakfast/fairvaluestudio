@@ -71,9 +71,25 @@ export function useScenarios(currentUser: User | null) {
         const maxY = merged.dcfMethod === 'Basic DCF' ? 10 : 50;
         if (Number(merged.years) > maxY) merged.years = maxY;
       }
-      if ('years' in changes) {
+      // Phase trimming is intentionally deferred to onBlur (via _trimPhases flag).
+      // This prevents mid-typing keystrokes (e.g. typing "1" before "10") from
+      // prematurely nuking phases. sc.years still updates live for chart reactivity.
+      if ((changes as any)._trimPhases) {
         const valYears = Number(merged.years) || 0;
+        const prevSplitCount = merged.splitYears.length;
         merged.splitYears = merged.splitYears.filter(y => y < valYears).sort((a, b) => a - b);
+        const removedCount = prevSplitCount - merged.splitYears.length;
+        if (removedCount > 0) {
+          // Trim trailing rate array entries to match the new phase count.
+          // Years increasing needs no action — the last phase stretches automatically.
+          const keepCount = merged.splitYears.length + 1;
+          const trim = (arr: any[]) => arr.slice(0, keepCount);
+          merged.metricGrowthRates      = trim(merged.metricGrowthRates);
+          merged.metricGrowthRatesTotal = trim(merged.metricGrowthRatesTotal);
+          merged.revenueGrowthRates     = trim(merged.revenueGrowthRates);
+          merged.finalMargins           = trim(merged.finalMargins);
+          merged.sharesGrowthRates      = trim(merged.sharesGrowthRates);
+        }
       }
       return merged;
     }));

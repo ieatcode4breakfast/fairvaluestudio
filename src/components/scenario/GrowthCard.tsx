@@ -24,6 +24,9 @@ export function GrowthCard({
   const isSimple = sc.dcfMethod === 'Basic DCF';
   const showSlider = !isSimple && valYears >= 3;
   const lbl = isSimple ? getSimpleLabels(sc) : null;
+  // Splits within the current year range — used for all rendering.
+  // sc.splitYears (full array) is kept in memory for when years increases again.
+  const effectiveSplits = sc.splitYears.filter(y => y < valYears);
 
   /* ── Advanced phase split helpers ── */
   const handleAddSplit = (year: number) => {
@@ -60,11 +63,11 @@ export function GrowthCard({
 
   /* ── Advanced phase input renderers ── */
   const renderAdvancedPerShare = () => {
-    if (sc.splitYears.length > 0) return (
+    if (effectiveSplits.length > 0) return (
       <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-700">
-        {Array.from({ length: sc.splitYears.length + 1 }).map((_, i) => {
-          const s = i === 0 ? 1 : sc.splitYears[i - 1];
-          const e = i === sc.splitYears.length ? valYears : sc.splitYears[i] - 1;
+        {Array.from({ length: effectiveSplits.length + 1 }).map((_, i) => {
+          const s = i === 0 ? 1 : effectiveSplits[i - 1];
+          const e = i === effectiveSplits.length ? valYears : effectiveSplits[i] - 1;
           return (
             <div key={i}>
               <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">Phase {i + 1} (Yrs {s}-{e})</h3>
@@ -104,11 +107,11 @@ export function GrowthCard({
   };
 
   const renderAdvancedTotal = () => {
-    if (sc.splitYears.length > 0) return (
+    if (effectiveSplits.length > 0) return (
       <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-700">
-        {Array.from({ length: sc.splitYears.length + 1 }).map((_, i) => {
-          const s = i === 0 ? 1 : sc.splitYears[i - 1];
-          const e = i === sc.splitYears.length ? valYears : sc.splitYears[i] - 1;
+        {Array.from({ length: effectiveSplits.length + 1 }).map((_, i) => {
+          const s = i === 0 ? 1 : effectiveSplits[i - 1];
+          const e = i === effectiveSplits.length ? valYears : effectiveSplits[i] - 1;
           return (
             <div key={i}>
               <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">Phase {i + 1} (Yrs {s}-{e})</h3>
@@ -166,11 +169,11 @@ export function GrowthCard({
   };
 
   const renderAdvancedRevenue = () => {
-    if (sc.splitYears.length > 0) return (
+    if (effectiveSplits.length > 0) return (
       <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-700">
-        {Array.from({ length: sc.splitYears.length + 1 }).map((_, i) => {
-          const s = i === 0 ? 1 : sc.splitYears[i - 1];
-          const e = i === sc.splitYears.length ? valYears : sc.splitYears[i] - 1;
+        {Array.from({ length: effectiveSplits.length + 1 }).map((_, i) => {
+          const s = i === 0 ? 1 : effectiveSplits[i - 1];
+          const e = i === effectiveSplits.length ? valYears : effectiveSplits[i] - 1;
           return (
             <div key={i}>
               <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200 mb-2">Phase {i + 1} (Yrs {s}-{e})</h3>
@@ -578,7 +581,7 @@ export function GrowthCard({
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200">Growth Phases</h3>
                 <span className="text-xs font-medium bg-indigo-50 text-indigo-600 px-2 py-1 rounded-md">
-                  {sc.splitYears.length === 0 ? 'Single Phase' : `${sc.splitYears.length + 1} Phases`}
+                  {effectiveSplits.length === 0 ? 'Single Phase' : `${effectiveSplits.length + 1} Phases`}
                 </span>
               </div>
               <div className="px-2 relative h-12">
@@ -604,9 +607,9 @@ export function GrowthCard({
                     }
                   }}
                 >
-                  {Array.from({ length: sc.splitYears.length + 1 }).map((_, i) => {
-                    const s = i === 0 ? 1 : sc.splitYears[i - 1];
-                    const e2 = i === sc.splitYears.length ? valYears : sc.splitYears[i];
+                  {Array.from({ length: effectiveSplits.length + 1 }).map((_, i) => {
+                    const s = i === 0 ? 1 : effectiveSplits[i - 1];
+                    const e2 = i === effectiveSplits.length ? valYears : effectiveSplits[i];
                     const left = ((s - 1) / (valYears - 1)) * 100;
                     const width = ((e2 - s) / (valYears - 1)) * 100;
                     return <div key={i} className="absolute h-full bg-indigo-500 rounded-lg opacity-20" style={{ left: `${left}%`, width: `${width}%` }} />;
@@ -623,7 +626,7 @@ export function GrowthCard({
                   )}
                 </div>
 
-                {sc.splitYears.map((year, idx) => {
+                {effectiveSplits.map((year, idx) => {
                   const left = ((year - 1) / (valYears - 1)) * 100;
                   return (
                     <div
@@ -656,8 +659,8 @@ export function GrowthCard({
                           const rect = track.getBoundingClientRect();
                           const pct = Math.max(0, Math.min(1, (mv.touches[0].clientX - rect.left) / rect.width));
                           const newYr = Math.round(pct * (valYears - 1)) + 1;
-                          const minYr = idx === 0 ? 2 : sc.splitYears[idx - 1] + 1;
-                          const maxYr = idx === sc.splitYears.length - 1 ? valYears - 1 : sc.splitYears[idx + 1] - 1;
+                          const minYr = idx === 0 ? 2 : effectiveSplits[idx - 1] + 1;
+                          const maxYr = idx === effectiveSplits.length - 1 ? valYears - 1 : effectiveSplits[idx + 1] - 1;
                           const clamped = Math.max(minYr, Math.min(maxYr, newYr));
                           upd({ splitYears: sc.splitYears.map((y, si) => si === idx ? clamped : y) });
                         };
@@ -679,8 +682,8 @@ export function GrowthCard({
                           const rect = track.getBoundingClientRect();
                           const pct = Math.max(0, Math.min(1, (mv.clientX - rect.left) / rect.width));
                           const newYr = Math.round(pct * (valYears - 1)) + 1;
-                          const minYr = idx === 0 ? 2 : sc.splitYears[idx - 1] + 1;
-                          const maxYr = idx === sc.splitYears.length - 1 ? valYears - 1 : sc.splitYears[idx + 1] - 1;
+                          const minYr = idx === 0 ? 2 : effectiveSplits[idx - 1] + 1;
+                          const maxYr = idx === effectiveSplits.length - 1 ? valYears - 1 : effectiveSplits[idx + 1] - 1;
                           const clamped = Math.max(minYr, Math.min(maxYr, newYr));
                           upd({ splitYears: sc.splitYears.map((y, si) => si === idx ? clamped : y) });
                         };
