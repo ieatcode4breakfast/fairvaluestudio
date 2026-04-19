@@ -71,7 +71,7 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
               {formatPercent(results.upside)}
             </div>
           </div>
-          <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 uppercase tracking-wider">Potential</div>
+          <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 uppercase tracking-wider">To intrinsic value</div>
         </div>
 
         {/* IRR */}

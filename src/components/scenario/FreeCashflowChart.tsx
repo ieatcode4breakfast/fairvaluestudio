@@ -57,7 +57,7 @@ export function FreeCashflowChart({ sc, results, onUpdate }: FreeCashflowChartPr
           onClick={() => onUpdate({ showYearlyBreakdown: !sc.showYearlyBreakdown })}
         >
           <div className="flex justify-between items-center text-sm">
-            <div className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2">
+            <div className="font-medium text-slate-700 dark:text-slate-300 flex items-center gap-2 ml-4">
               Intrinsic Value (Present Value of Cash Flows)
               <ChevronDown className={`w-4 h-4 text-slate-400 dark:text-slate-500 transition-transform ${sc.showYearlyBreakdown ? 'rotate-180' : ''}`} />
             </div>

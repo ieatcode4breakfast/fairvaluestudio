@@ -112,12 +112,14 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
 
 
         <h3 className="text-lg font-medium text-slate-800 dark:text-slate-200">Return Projection</h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Compounded price growth at yearly return of {yearlyReturnPercent.toFixed(2)}% based on current buy price of {formatCurrency(buyPrice)}
-        </p>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Final Stock Price = {formatCurrency(results.terminalValuePerShare ?? 0)} (Final {metricLabel} Per Share {operator} Exit {exitTypeLabel})
-        </p>
+        <div className="ml-2">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Buy Price: {formatCurrency(buyPrice)}
+          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Final Stock Price = {formatCurrency(results.terminalValuePerShare ?? 0)} (Final {metricLabel} Per Share {operator} Exit {exitTypeLabel})
+          </p>
+        </div>
       </div>
       <div className="p-5 lg:p-6">
 
@@ -159,7 +161,7 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
                         <div className="flex flex-col gap-1.5">
                           <div className="flex justify-between gap-8">
                             <span className="text-xs text-slate-500 dark:text-slate-400">
-                              {data.year === 0 ? 'Buy Price' : data.year === valYears ? 'Final Stock Price' : 'Compounded Price'}:
+                              {data.year === 0 ? 'Buy Price' : data.year === valYears ? 'Final Stock Price' : 'Compounded Buy Price'}:
                             </span>
                             <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{formatCurrency(data.sellPrice)}</span>
                           </div>
@@ -188,7 +190,7 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
 
                               {data.intrinsicYearlyReturn !== null && (
                                 <div className="flex justify-between gap-8">
-                                  <span className="text-xs text-slate-500 dark:text-slate-400">Yearly Return (based on Intrinsic Value):</span>
+                                  <span className="text-xs text-slate-500 dark:text-slate-400">Yearly Return (if price reaches Intrinsic Value):</span>
                                   <span className="text-xs font-bold text-purple-600">
                                     {data.intrinsicYearlyReturn.toFixed(2)}%
                                   </span>
