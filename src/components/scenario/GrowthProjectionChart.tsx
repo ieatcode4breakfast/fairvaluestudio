@@ -203,10 +203,16 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
                   return null;
                 }}
               />
+              <Legend
+                wrapperStyle={{ fontSize: 12, paddingTop: 12 }}
+                formatter={(value) => (
+                  <span className="text-slate-500 dark:text-slate-400">{value}</span>
+                )}
+              />
               <Line
                 type="monotone"
                 dataKey="sellPrice"
-                name="Compounded Price"
+                name="Compounded Buy Price"
                 stroke="#3b82f6"
                 strokeWidth={3}
                 dot={{ r: 4, fill: '#3b82f6', strokeWidth: 0 }}
@@ -216,7 +222,7 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
               <Line
                 type="monotone"
                 dataKey="intrinsicValue"
-                name="Intrinsic Value (Discount Rate)"
+                name="Intrinsic Value"
                 stroke="#8b5cf6"
                 strokeWidth={3}
                 dot={{ r: 4, fill: '#8b5cf6', strokeWidth: 0 }}
