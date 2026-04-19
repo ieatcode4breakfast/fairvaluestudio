@@ -114,6 +114,16 @@ export function FreeCashflowChart({ sc, results, onUpdate }: FreeCashflowChartPr
                 width={55}
               />
               <Tooltip
+                wrapperStyle={{
+                  maxWidth: 'calc(100vw - 40px)',
+                  whiteSpace: 'normal',
+                  overflowWrap: 'break-word',
+                  zIndex: 1000,
+                }}
+                contentStyle={{
+                  padding: '1rem',
+                  whiteSpace: 'normal',
+                }}
                 content={({ active, payload, label }) => {
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
