@@ -17,26 +17,50 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
   const irrColor = results.irr && results.irr > (Number(sc.discountRate) || 0) ? 'text-emerald-600' : 'text-slate-900 dark:text-slate-100';
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div className="md:col-span-2 bg-white dark:bg-slate-800 p-8 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 flex flex-col justify-between min-w-0">
-        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2 select-text">Intrinsic Value</div>
-        <div className="text-5xl md:text-6xl font-light tracking-tight text-slate-900 dark:text-slate-100 truncate select-text">{formatCurrency(results.intrinsicValueTotal)}</div>
-        <div className="text-sm text-slate-400 dark:text-slate-500 mt-2">Total Present Value</div>
+    <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 overflow-hidden">
+      {/* Main Metric: Intrinsic Value */}
+      <div className="p-6 md:p-8 border-b border-slate-100 dark:border-slate-700">
+        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 select-text">Intrinsic Value</div>
+        <div className="text-5xl md:text-6xl font-light tracking-tight text-slate-900 dark:text-slate-100 truncate select-text">
+          {formatCurrency(results.intrinsicValueTotal)}
+        </div>
+        <div className="text-sm text-slate-400 dark:text-slate-500 mt-1">Total Present Value</div>
       </div>
-      <div className="bg-white dark:bg-slate-800 p-6 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 flex flex-col justify-between min-w-0">
-        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2 select-text">Margin of Safety</div>
-        <div className={`text-4xl font-light tracking-tight truncate select-text ${mosColor}`}>{formatPercent(results.marginOfSafety)}</div>
-        <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">Discount to Intrinsic Value</div>
-      </div>
-      <div className="bg-white dark:bg-slate-800 p-6 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 flex flex-col justify-between min-w-0">
-        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2 select-text">Upside</div>
-        <div className={`text-4xl font-light tracking-tight truncate select-text ${upsideColor}`}>{formatPercent(results.upside)}</div>
-        <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">Potential return to Intrinsic Value</div>
-      </div>
-      <div className="bg-white dark:bg-slate-800 p-6 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 flex flex-col justify-between min-w-0">
-        <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2 select-text">Internal Rate of Return (Annual Return)</div>
-        <div className={`text-4xl font-light tracking-tight truncate select-text ${irrColor}`}>{formatPercent(results.irr)}</div>
-        <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">At current buy price</div>
+
+      {/* Secondary Metrics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-100 dark:divide-slate-700">
+        {/* Margin of Safety */}
+        <div className="p-5 flex flex-col justify-between min-w-0">
+          <div>
+            <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 select-text">Margin of Safety</div>
+            <div className={`text-3xl font-light tracking-tight truncate select-text ${mosColor}`}>
+              {formatPercent(results.marginOfSafety)}
+            </div>
+          </div>
+          <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 uppercase tracking-wider">Discount</div>
+        </div>
+
+        {/* Upside */}
+        <div className="p-5 flex flex-col justify-between min-w-0">
+          <div>
+            <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 select-text">Upside</div>
+            <div className={`text-3xl font-light tracking-tight truncate select-text ${upsideColor}`}>
+              {formatPercent(results.upside)}
+            </div>
+          </div>
+          <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 uppercase tracking-wider">Potential</div>
+        </div>
+
+        {/* IRR */}
+        <div className="p-5 flex flex-col justify-between min-w-0">
+          <div>
+            <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1 select-text">IRR (Annual)</div>
+            <div className={`text-3xl font-light tracking-tight truncate select-text ${irrColor}`}>
+              {formatPercent(results.irr)}
+            </div>
+          </div>
+          <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-2 uppercase tracking-wider">Return</div>
+        </div>
       </div>
     </div>
   );
