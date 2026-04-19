@@ -28,6 +28,11 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
   const yearlyReturnPercent = results.irr ?? 0;
   const yearlyReturnRate = yearlyReturnPercent / 100;
 
+  // Intrinsic value growth at discount rate
+  const discountRatePercent = Number(sc.discountRate) || 0;
+  const discountRate = discountRatePercent / 100;
+  const intrinsicValueToday = results.intrinsicValueTotal ?? 0;
+
   // Determine dynamic labels for the formula
   let metricLabel = 'Metric';
   if (isBasic) {
@@ -75,11 +80,15 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
       yearlyReturn = yearlyReturnPercent; // constant yearly return
     }
 
+    // Intrinsic value growing at discount rate
+    const intrinsicValue = intrinsicValueToday * Math.pow(1 + discountRate, point.year);
+
     return {
       year: point.year,
       displayYear: point.year === 0 ? 'Today' : `Year ${point.year}`,
       sellPrice,
       yearlyReturn,
+      intrinsicValue,
     };
   });
 
@@ -142,6 +151,13 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
                             <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{formatCurrency(data.sellPrice)}</span>
                           </div>
 
+                          <div className="flex justify-between gap-8">
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                              Intrinsic Value:
+                            </span>
+                            <span className="text-xs font-bold text-purple-600">{formatCurrency(data.intrinsicValue)}</span>
+                          </div>
+
                           {data.year !== 0 && (
                             <div className="flex flex-col">
                               <div className="flex justify-between gap-8">
@@ -167,6 +183,17 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
                 strokeWidth={3}
                 dot={{ r: 4, fill: '#3b82f6', strokeWidth: 0 }}
                 activeDot={{ r: 6, strokeWidth: 0 }}
+                isAnimationActive={true}
+              />
+              <Line
+                type="monotone"
+                dataKey="intrinsicValue"
+                name="Intrinsic Value (Discount Rate)"
+                stroke="#8b5cf6"
+                strokeWidth={2}
+                strokeDasharray="5 5"
+                dot={false}
+                activeDot={false}
                 isAnimationActive={true}
               />
             </LineChart>
