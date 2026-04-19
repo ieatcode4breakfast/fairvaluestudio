@@ -107,7 +107,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
         />
 
         {/* Growth Projection Chart */}
-        {sc.dcfMethod !== 'Advanced DCF' && <GrowthProjectionChart sc={sc} />}
+        {sc.dcfMethod !== 'Advanced DCF' && <GrowthProjectionChart sc={sc} results={results} />}
 
         {/* FCF Per Share Chart + Valuation Breakdown (Advanced DCF only) */}
         {sc.dcfMethod === 'Advanced DCF' && (

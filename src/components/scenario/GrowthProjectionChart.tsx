@@ -9,19 +9,24 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { Scenario } from '../../types';
+import { Scenario, Results } from '../../types';
 import { getYearlyProjection, ProjectionPoint } from '../../utils/projection';
 import { formatCurrency, formatCompactNumber } from '../../utils/helpers';
 
 interface GrowthProjectionChartProps {
   sc: Scenario;
+  results: Results;
 }
 
-export function GrowthProjectionChart({ sc }: GrowthProjectionChartProps) {
+export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProps) {
   const projection = getYearlyProjection(sc);
   const valYears = Number(sc.years) || 0;
   const buyPrice = Number(sc.buyPrice) || 0;
   const isBasic = sc.dcfMethod === 'Basic DCF';
+  
+  // Use calculated yearly return (IRR) for compounding
+  const yearlyReturnPercent = results.irr ?? 0;
+  const yearlyReturnRate = yearlyReturnPercent / 100;
 
   // Determine dynamic labels for the formula
   let metricLabel = 'Metric';
@@ -55,20 +60,26 @@ export function GrowthProjectionChart({ sc }: GrowthProjectionChartProps) {
     );
   }
 
-  // Prepare data for chart: focus on sellPrice and yearlyReturn
+  // Prepare data for chart: focus on compounded price using yearly return
   const chartData = projection.map((point) => {
-    const sellPrice = point.metricPerShare * effectiveMultiple;
+    let sellPrice = 0;
     let yearlyReturn = null;
-    if (buyPrice > 0 && sellPrice > 0 && point.year > 0) {
-      yearlyReturn = (Math.pow(sellPrice / buyPrice, 1 / point.year) - 1) * 100;
+    
+    if (point.year === 0) {
+      // Year 0: show buy price (current price)
+      sellPrice = buyPrice;
+      yearlyReturn = 0; // 0% return at Year 0
+    } else {
+      // Year 1+: compound buy price by yearly return
+      sellPrice = buyPrice * Math.pow(1 + yearlyReturnRate, point.year);
+      yearlyReturn = yearlyReturnPercent; // constant yearly return
     }
 
     return {
       year: point.year,
-      displayYear: `Year ${point.year}`,
+      displayYear: point.year === 0 ? 'Today' : `Year ${point.year}`,
       sellPrice,
       yearlyReturn,
-      metricPerShare: point.metricPerShare,
     };
   });
 
@@ -80,10 +91,10 @@ export function GrowthProjectionChart({ sc }: GrowthProjectionChartProps) {
 
         <h3 className="text-lg font-medium text-slate-800 dark:text-slate-200">Return Projection</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Projected Sell Price and Yearly Return based on current buy price of {formatCurrency(buyPrice)}
+          Compounded price growth at yearly return of {yearlyReturnPercent.toFixed(2)}% based on current buy price of {formatCurrency(buyPrice)}
         </p>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Sell Price = {metricLabel} Per Share {operator} Exit {exitTypeLabel}
+          Final Stock Price = {formatCurrency(results.terminalValuePerShare ?? 0)} (Final {metricLabel} Per Share {operator} Exit {exitTypeLabel})
         </p>
       </div>
       <div className="p-5 lg:p-6">
@@ -125,25 +136,22 @@ export function GrowthProjectionChart({ sc }: GrowthProjectionChartProps) {
                         <div className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-2">{label}</div>
                         <div className="flex flex-col gap-1.5">
                           <div className="flex justify-between gap-8">
-                            <span className="text-xs text-slate-500 dark:text-slate-400">{metricLabel} Per Share:</span>
-                            <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{formatCurrency(data.metricPerShare)}</span>
-                          </div>
-                          <div className="flex justify-between gap-8">
-                            <span className="text-xs text-slate-500 dark:text-slate-400">Sell Price:</span>
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                              {data.year === 0 ? 'Buy Price' : data.year === valYears ? 'Final Stock Price' : 'Compounded Price'}:
+                            </span>
                             <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{formatCurrency(data.sellPrice)}</span>
                           </div>
 
-                          <div className="flex flex-col">
-                            <div className="flex justify-between gap-8">
-                              <span className="text-xs text-slate-500 dark:text-slate-400">Yearly Return:</span>
-                              <span className="text-xs font-bold text-emerald-600">
-                                {data.yearlyReturn !== null ? `${data.yearlyReturn.toFixed(2)}%` : 'N/A'}
-                              </span>
+                          {data.year !== 0 && (
+                            <div className="flex flex-col">
+                              <div className="flex justify-between gap-8">
+                                <span className="text-xs text-slate-500 dark:text-slate-400">Yearly Return:</span>
+                                <span className="text-xs font-bold text-emerald-600">
+                                  {data.yearlyReturn !== null ? `${data.yearlyReturn.toFixed(2)}%` : 'N/A'}
+                                </span>
+                              </div>
                             </div>
-                            <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
-                              (if sold at this price in Year {data.year})
-                            </div>
-                          </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -154,7 +162,7 @@ export function GrowthProjectionChart({ sc }: GrowthProjectionChartProps) {
               <Line
                 type="monotone"
                 dataKey="sellPrice"
-                name="Sell Price"
+                name="Compounded Price"
                 stroke="#3b82f6"
                 strokeWidth={3}
                 dot={{ r: 4, fill: '#3b82f6', strokeWidth: 0 }}
@@ -166,7 +174,7 @@ export function GrowthProjectionChart({ sc }: GrowthProjectionChartProps) {
         </div>
         <div className="mt-4 text-xs text-slate-500 dark:text-slate-400 text-center">
           <p>
-            Hover over points to see projected sell price and annual return potential.
+            Hover over points to see compounded price and yearly return.
           </p>
         </div>
       </div>

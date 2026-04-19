@@ -62,6 +62,29 @@ function getSimpleProjection(sc: Scenario): ProjectionPoint[] {
 
   const points: ProjectionPoint[] = [];
 
+  // Add Year 0 (current values, no compounding)
+  let year0MetricPerShare = 0;
+  let year0Revenue = 0;
+  let year0Shares = valCurrentShares;
+
+  if (sc.simpleProjectionMethod === 'Per Share') {
+    year0MetricPerShare = valMetricPerShare;
+  } else if (sc.simpleProjectionMethod === 'Metric, Share Count') {
+    year0MetricPerShare = valCurrentShares !== 0 ? valMetricTotal / valCurrentShares : 0;
+  } else {
+    // Revenue & margin method
+    year0Revenue = valCurrentRevenue;
+    year0MetricPerShare = valCurrentShares !== 0 ? (valCurrentRevenue * (valMargin / 100)) / valCurrentShares : 0;
+  }
+
+  points.push({
+    year: 0,
+    metricPerShare: year0MetricPerShare,
+    revenue: year0Revenue,
+    shares: year0Shares,
+    growthRate: 0,
+  });
+
   for (let year = 1; year <= valYears; year++) {
     let metricPerShare = 0;
     let revenue = 0;
@@ -123,6 +146,31 @@ function getAdvancedProjection(sc: Scenario): ProjectionPoint[] {
   let curShares = valCurrentShares;
 
   const points: ProjectionPoint[] = [];
+
+  // Add Year 0 (current values, no growth applied)
+  let year0MetricPerShare = 0;
+  let year0Revenue = 0;
+  let year0Shares = valCurrentShares;
+
+  if (sc.projectionMethod === 'Per Share Method') {
+    year0MetricPerShare = valCurrentMetricPerShare;
+  } else if (sc.projectionMethod === 'Total FCF, Share Count') {
+    year0MetricPerShare = valCurrentShares !== 0 ? valCurrentMetricTotal / valCurrentShares : 0;
+  } else {
+    // Revenue & margin method
+    year0Revenue = valCurrentRevenue;
+    const cfTotal = valCurrentRevenue * ((valFinalMargins[0] || 0) / 100);
+    year0MetricPerShare = valCurrentShares !== 0 ? cfTotal / valCurrentShares : 0;
+  }
+
+  points.push({
+    year: 0,
+    metricPerShare: year0MetricPerShare,
+    revenue: year0Revenue,
+    shares: year0Shares,
+    cashFlow: year0MetricPerShare,
+    growthRate: 0,
+  });
 
   for (let year = 1; year <= valYears; year++) {
     // Determine which growth phase this year belongs to
