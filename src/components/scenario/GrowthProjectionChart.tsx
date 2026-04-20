@@ -124,8 +124,8 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
       <div className="p-5 lg:p-6">
 
 
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-auto min-h-[320px]">
+          <ResponsiveContainer width="100%" aspect={2.1} debounce={50}>
             <LineChart
               data={chartData}
               margin={{ top: 5, right: 10, left: 0, bottom: 5 }}

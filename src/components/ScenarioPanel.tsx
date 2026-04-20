@@ -98,7 +98,7 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
       </div>
 
       {/* ══ RIGHT: RESULTS ══ */}
-      <div className="lg:col-span-8">
+      <div className="lg:col-span-8 min-w-0">
 
         {/* Add an inner wrapper that handles the sticky behavior and viewport constraints */}
         <div className="space-y-6 lg:sticky lg:top-6">

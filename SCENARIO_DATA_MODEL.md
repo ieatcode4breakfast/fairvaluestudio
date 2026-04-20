@@ -10,7 +10,7 @@ These metrics represent common company data and are shared across **all** DCF mo
 | **Current Revenue** | `currentRevenue` | Global |
 | **Shares** | `currentShares` | Global |
 | **Values in Millions** | `inMillions` | Global |
-| **Shares Growth (%)** | `simpleSharesGrowthRate` | Synced with Advanced Phase 1 |
+| **Shares Growth (%)** | `simpleSharesGrowthRate` | Synced with Advanced Phase 1 (`sharesGrowthRates[0]`) |
 
 ---
 
@@ -21,7 +21,8 @@ These fields represent the core FCF model. The Basic FCF mode and Advanced DCF P
 | :--- | :--- | :--- |
 | **Current FCF Per Share** | `currentMetricPerShare` | Same identifier |
 | **Current FCF (Total)** | `currentMetricTotal` | Same identifier |
-| **FCF Growth (%)** | `simpleMetricGrowthRate` | `metricGrowthRates[0]` |
+| **FCF Growth (%)** *(Per Share)* | `simpleMetricGrowthRate` | `metricGrowthRates[0]` |
+| **FCF Growth (%)** *(Total)* | `simpleMetricGrowthRateTotal` | `metricGrowthRatesTotal[0]` |
 | **Revenue Growth (%)** | `simpleRevenueGrowthRate` | `revenueGrowthRates[0]` |
 | **FCF Margin (%)** | `simpleFinalMargin` | `finalMargins[0]` |
 
