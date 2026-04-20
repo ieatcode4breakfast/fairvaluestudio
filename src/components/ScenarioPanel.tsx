@@ -98,24 +98,26 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
       </div>
 
       {/* ══ RIGHT: RESULTS ══ */}
-      <div className="lg:col-span-8 space-y-6 lg:sticky lg:top-4 self-start sticky-results">
+      <div className="lg:col-span-8">
 
-        {/* Key metric cards */}
-        <ResultsCard
-          sc={sc}
-          results={results}
-        />
+        {/* Add an inner wrapper that handles the sticky behavior and viewport constraints */}
+        <div className="space-y-6 lg:sticky lg:top-6">
 
-        {/* Growth Projection Chart */}
-        {sc.dcfMethod !== 'Advanced DCF' && <GrowthProjectionChart sc={sc} results={results} />}
+          {/* Key metric cards */}
+          <ResultsCard
+            sc={sc}
+            results={results}
+          />
 
-        {/* FCF Per Share Chart + Valuation Breakdown (Advanced DCF only) */}
-        {sc.dcfMethod === 'Advanced DCF' && (
-          <FreeCashflowChart sc={sc} results={results} onUpdate={handleUpdate} />
-        )}
+          {/* Growth Projection Chart */}
+          {sc.dcfMethod !== 'Advanced DCF' && <GrowthProjectionChart sc={sc} results={results} />}
 
+          {/* FCF Per Share Chart + Valuation Breakdown (Advanced DCF only) */}
+          {sc.dcfMethod === 'Advanced DCF' && (
+            <FreeCashflowChart sc={sc} results={results} onUpdate={handleUpdate} />
+          )}
 
-
+        </div>
       </div>
     </div>
   );
