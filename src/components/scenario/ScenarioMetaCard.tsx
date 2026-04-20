@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Scenario } from '../../types';
-import { Trash2, RotateCcw, Copy } from '../Icons';
+import { Trash2, RotateCcw, Copy, InfoIcon } from '../Icons';
+import { Tooltip } from '../Tooltip';
 import { INPUT_CLS, SELECT_CLS } from '../../utils/constants';
 
 interface ScenarioMetaCardProps {
@@ -114,11 +115,16 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
       {sc.dcfMethod === 'Basic DCF' && (
         <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Metric</label>
+            <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1.5">
+              Metric
+              <Tooltip content="Name your own metric">
+                <InfoIcon className="w-3.5 h-3.5 text-slate-400 hover:text-slate-500 transition-colors" />
+              </Tooltip>
+            </label>
             <select value={sc.simpleMetricType} onChange={e => onUpdate({ simpleMetricType: e.target.value })} className={SELECT_CLS}>
               <option>Free Cash Flow</option>
               <option>Net Income (Earnings)</option>
-              <option>Custom</option>
+              <option title="Name your own metric">Custom</option>
             </select>
           </div>
           {sc.simpleMetricType === 'Custom' && (
