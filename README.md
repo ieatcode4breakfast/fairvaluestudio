@@ -48,7 +48,7 @@ The “Assumptions” card lets you control the core inputs of your model:
 ### 4. Project Cash Flows (Three Approaches)
 You aren’t limited to just plugging in a single cash‑flow number. FairValue Studio gives you three bottom‑up projection strategies:
 
-1. **Per Share Method** – The simplest. Project growth directly on a per‑share basis (e.g., FCF Per Share).
+1. **Per Share Method** – The simplest. Project growth directly on a per‑share basis (e.g., Free Cash Flow Per Share).
 2. **Total FCF & Share Count** – Input total company cash flows (in millions/billions) and combine it with a projected share‑change percentage. This lets you model the effects of share buybacks or dilution over time.
 3. **Revenue & Margin Build** – The most detailed approach. Project total revenue growth, apply a targeted final FCF margin, and factor in share‑count changes. Perfect for currently unprofitable companies that you expect to scale into profitability.
 

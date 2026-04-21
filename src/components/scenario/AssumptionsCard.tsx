@@ -414,11 +414,10 @@ export function AssumptionsCard({
               onUpdate({ _resetRequest: true } as any);
             }
           }}
-          className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border cursor-pointer ${
-            sc.showResetConfirm
+          className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border cursor-pointer ${sc.showResetConfirm
               ? 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200 dark:bg-red-900/40 dark:hover:bg-red-900/60 dark:text-red-300 dark:border-red-800'
               : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-700 dark:text-slate-300 dark:border-slate-700'
-          }`}
+            }`}
         >
           <RotateCcw className="w-4 h-4" />
           {sc.showResetConfirm ? 'Are you sure? (Click to confirm)' : 'Reset Scenario'}
@@ -426,11 +425,10 @@ export function AssumptionsCard({
         {canDelete && (
           <button
             onClick={handleDeleteClick}
-            className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${
-              deleteConfirm
+            className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${deleteConfirm
                 ? 'bg-red-600 hover:bg-red-700 text-white border-red-600'
                 : 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200 dark:bg-red-900/40 dark:hover:bg-red-900/60 dark:text-red-300 dark:border-red-800'
-            }`}
+              }`}
           >
             <Trash2 className="w-4 h-4" />
             {deleteConfirm ? 'Are you sure? Click to confirm' : 'Delete Scenario'}
@@ -503,7 +501,7 @@ export function AssumptionsCard({
                 );
               })()}
             </div>
-            </div>
+          </div>
         )}
 
         {sc.dcfMethod !== 'Basic DCF' && (
@@ -809,7 +807,7 @@ export function AssumptionsCard({
             {sc.projectionMethod === 'Per Share Method' && (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current FCF Per Share</label>
+                  <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Current Free Cash Flow Per Share</label>
                   <NumericFormat
                     value={sc.currentMetricPerShare}
                     onValueChange={v => upd({ currentMetricPerShare: v.floatValue === undefined ? '' : v.floatValue })}

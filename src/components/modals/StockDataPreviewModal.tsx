@@ -92,7 +92,7 @@ export function StockDataPreviewModal({
             const newFields: DataField[] = [
                 { key: 'currentRevenue', label: 'Revenue (TTM)', value: s(data.revenue), formatted: formatDynamicDecimal(s(data.revenue), true) },
                 { key: 'currentMetricTotal', label: 'Free Cash Flow (TTM)', value: s(data.freeCashFlow), formatted: formatDynamicDecimal(s(data.freeCashFlow), true) },
-                { key: 'currentMetricPerShare', label: 'FCF Per Share (TTM)', value: round(data.freeCashFlowPerShare), formatted: formatDynamicDecimal(data.freeCashFlowPerShare, true) },
+                { key: 'currentMetricPerShare', label: 'Free Cash Flow Per Share (TTM)', value: round(data.freeCashFlowPerShare), formatted: formatDynamicDecimal(data.freeCashFlowPerShare, true) },
                 { key: 'niCurrentMetricTotal', label: 'Net Income (TTM)', value: s(data.netIncome), formatted: formatDynamicDecimal(s(data.netIncome), true) },
                 { key: 'niCurrentMetricPerShare', label: 'Earnings Per Share (TTM)', value: round(data.earningsPerShare), formatted: formatDynamicDecimal(data.earningsPerShare, true) },
                 { key: 'currentShares', label: 'Shares Outstanding', value: s(data.sharesOutstanding), formatted: formatDynamicDecimal(s(data.sharesOutstanding), true) },
@@ -153,39 +153,39 @@ export function StockDataPreviewModal({
                     </p>
                 </div>
 
-            <div className="flex-1 overflow-y-auto p-6 py-2 custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-6 py-2 custom-scrollbar">
 
-                {/* Field list */}
-                {(fields.length === 0 && aiFields.length === 0) ? (
-                    <div className="text-center py-6">
-                        <p className="text-slate-400 dark:text-slate-500 text-sm mb-4">
-                            No market data found for this symbol.
-                        </p>
-                    </div>
-                ) : (
-                    <ul className="divide-y divide-slate-100 dark:divide-slate-700 mb-4">
-                        {allFields.map(field => (
-                            <li key={field.key} className="flex items-center justify-between py-3 gap-4">
-                                <div className="min-w-0">
-                                    <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                        {field.label}
-                                    </p>
-                                    <p className="text-base font-semibold text-slate-900 dark:text-slate-100 mt-0.5">
-                                        {field.formatted}
-                                    </p>
-                                </div>
-                                <Toggle
-                                    checked={!!enabled[field.key]}
-                                    onChange={() =>
-                                        setEnabled(prev => ({ ...prev, [field.key]: !prev[field.key] }))
-                                    }
-                                />
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                    {/* Field list */}
+                    {(fields.length === 0 && aiFields.length === 0) ? (
+                        <div className="text-center py-6">
+                            <p className="text-slate-400 dark:text-slate-500 text-sm mb-4">
+                                No market data found for this symbol.
+                            </p>
+                        </div>
+                    ) : (
+                        <ul className="divide-y divide-slate-100 dark:divide-slate-700 mb-4">
+                            {allFields.map(field => (
+                                <li key={field.key} className="flex items-center justify-between py-3 gap-4">
+                                    <div className="min-w-0">
+                                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                            {field.label}
+                                        </p>
+                                        <p className="text-base font-semibold text-slate-900 dark:text-slate-100 mt-0.5">
+                                            {field.formatted}
+                                        </p>
+                                    </div>
+                                    <Toggle
+                                        checked={!!enabled[field.key]}
+                                        onChange={() =>
+                                            setEnabled(prev => ({ ...prev, [field.key]: !prev[field.key] }))
+                                        }
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    )}
 
-            </div>
+                </div>
 
                 {/* Actions - Fixed */}
                 <div className="p-6 pt-4 border-t border-slate-100 dark:border-slate-700">
@@ -258,25 +258,25 @@ export function StockDataPreviewModal({
                             </div>
                         </div>
                     )}
-                <div className="flex gap-3 justify-end">
-                    <button
-                        onClick={onClose}
-                        className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
-                    >
-                        Cancel
-                    </button>
-                    {(fields.length > 0 || aiFields.length > 0) && (
+                    <div className="flex gap-3 justify-end">
                         <button
-                            onClick={handleApply}
-                            disabled={!anyEnabled}
-                            className="px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors cursor-pointer disabled:cursor-default"
+                            onClick={onClose}
+                            className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 transition-colors cursor-pointer"
                         >
-                            Apply
+                            Cancel
                         </button>
-                    )}
+                        {(fields.length > 0 || aiFields.length > 0) && (
+                            <button
+                                onClick={handleApply}
+                                disabled={!anyEnabled}
+                                className="px-4 py-2 text-sm font-medium bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors cursor-pointer disabled:cursor-default"
+                            >
+                                Apply
+                            </button>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     );
 }

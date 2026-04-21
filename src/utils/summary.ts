@@ -6,17 +6,17 @@ export function getSimpleLabels(sc: Scenario) {
   const metricName = mt === 'Net Income (Earnings)'
     ? 'Net Income'
     : mt === 'Custom'
-    ? (sc.simpleCustomMetric || 'Custom Metric')
-    : 'Free Cash Flow';
+      ? (sc.simpleCustomMetric || 'Custom Metric')
+      : 'Free Cash Flow';
   const isNI = mt === 'Net Income (Earnings)';
   return {
     metricName,
-    labelCurrentPerShare:  isNI ? 'Current Earnings Per Share' : `Current ${metricName} Per Share`,
-    labelGrowthRate:       isNI ? 'Earnings Per Share Growth Rate' : `${metricName} Growth Rate`,
-    labelProjectedFinal:   isNI ? 'Projected Final Earnings' : `Projected Final ${metricName}`,
-    labelExitMultiple:     (isNI && sc.simpleProjectionMethod === 'Per Share')
-                             ? 'Exit Multiple (x Earnings Per Share)'
-                             : `Exit Multiple (x ${metricName})`,
+    labelCurrentPerShare: isNI ? 'Current Earnings Per Share' : `Current ${metricName} Per Share`,
+    labelGrowthRate: isNI ? 'Earnings Per Share Growth Rate' : `${metricName} Growth Rate`,
+    labelProjectedFinal: isNI ? 'Projected Final Earnings' : `Projected Final ${metricName}`,
+    labelExitMultiple: (isNI && sc.simpleProjectionMethod === 'Per Share')
+      ? 'Exit Multiple (x Earnings Per Share)'
+      : `Exit Multiple (x ${metricName})`,
   };
 }
 
@@ -30,8 +30,8 @@ export function buildSummaryText(sc: Scenario, res: Results, index: number) {
   const exitStr = sc.exitAssumptionType === 'Multiple'
     ? `Exit Multiple: ${sc.exitMultiple}x`
     : sc.exitAssumptionType === 'Yield'
-    ? `Exit Yield: ${sc.exitYield}%`
-    : `Growth in Perpetuity: ${sc.perpetuityGrowthRate}%`;
+      ? `Exit Yield: ${sc.exitYield}%`
+      : `Growth in Perpetuity: ${sc.perpetuityGrowthRate}%`;
 
   if (sc.dcfMethod === 'Basic DCF') {
     const lbl = getSimpleLabels(sc);
@@ -39,17 +39,17 @@ export function buildSummaryText(sc: Scenario, res: Results, index: number) {
 
     // ── Field Selection Logic ──
     let metricPerShare: number | string | '' = sc.currentMetricPerShare;
-    let metricTotal:    number | string | '' = sc.currentMetricTotal;
-    let metricMargin:   number | string | '' = sc.simpleFinalMargin;
+    let metricTotal: number | string | '' = sc.currentMetricTotal;
+    let metricMargin: number | string | '' = sc.simpleFinalMargin;
 
     if (sc.simpleMetricType === 'Net Income (Earnings)') {
       metricPerShare = sc.niCurrentMetricPerShare;
-      metricTotal    = sc.niCurrentMetricTotal;
-      metricMargin   = sc.niFinalMargin;
+      metricTotal = sc.niCurrentMetricTotal;
+      metricMargin = sc.niFinalMargin;
     } else if (sc.simpleMetricType === 'Custom') {
       metricPerShare = sc.customCurrentMetricPerShare;
-      metricTotal    = sc.customCurrentMetricTotal;
-      metricMargin   = sc.customFinalMargin;
+      metricTotal = sc.customCurrentMetricTotal;
+      metricMargin = sc.customFinalMargin;
     }
 
     if (sc.simpleProjectionMethod === 'Per Share') {
@@ -117,7 +117,7 @@ export function buildSummaryText(sc: Scenario, res: Results, index: number) {
 
   let phaseInputs = '';
   if (sc.projectionMethod === 'Per Share Method') {
-    phaseInputs = `Current FCF Per Share: ${formatCurrency(Number(sc.currentMetricPerShare) || 0)}\n`;
+    phaseInputs = `Current Free Cash Flow Per Share: ${formatCurrency(Number(sc.currentMetricPerShare) || 0)}\n`;
     if (sc.splitYears.length > 0) {
       for (let i = 0; i <= sc.splitYears.length; i++) {
         const s = i === 0 ? 1 : sc.splitYears[i - 1];

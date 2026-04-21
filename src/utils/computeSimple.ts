@@ -1,6 +1,23 @@
 import { Scenario, Results } from '../types';
+import { isScenarioIncomplete } from './helpers';
+
+const NULL_RESULTS: Results = {
+  finalMetricPerShare: 0,
+  terminalValuePerShare: 0,
+  intrinsicValueTotal: 0,
+  irr: null,
+  impliedGrowth: null,
+  marginOfSafety: null,
+  upside: null,
+  pvOfCashFlows: 0,
+  presentValueTV: 0,
+  yearlyDetails: [],
+  effectiveMultiple: 0,
+};
 
 export function computeSimple(sc: Scenario): Results {
+  if (isScenarioIncomplete(sc)) return NULL_RESULTS;
+
   const valBuyPrice    = Number(sc.buyPrice)    || 0;
   const valYears       = Number(sc.years)       || 0;
   const valDiscountRate= Number(sc.discountRate)|| 0;

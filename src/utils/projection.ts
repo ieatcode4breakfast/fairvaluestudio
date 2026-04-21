@@ -2,7 +2,7 @@ import { Scenario } from '../types';
 
 export interface ProjectionPoint {
   year: number;
-  metricPerShare: number; // The primary metric (FCF per share, EPS, etc.)
+  metricPerShare: number; // The primary metric (Free Cash Flow Per Share, EPS, etc.)
   revenue?: number;       // Revenue per share (if applicable)
   shares?: number;        // Shares outstanding (in millions)
   cashFlow?: number;      // Cash flow per share (same as metricPerShare for Per Share Method)
@@ -114,8 +114,8 @@ function getSimpleProjection(sc: Scenario): ProjectionPoint[] {
       revenue,
       shares,
       growthRate: sc.simpleProjectionMethod === 'Per Share' ? valGrowth :
-                 sc.simpleProjectionMethod === 'Metric, Share Count' ? valGrowthTotal :
-                 valRevenueGrowth,
+        sc.simpleProjectionMethod === 'Metric, Share Count' ? valGrowthTotal :
+          valRevenueGrowth,
     });
   }
 
@@ -208,8 +208,8 @@ function getAdvancedProjection(sc: Scenario): ProjectionPoint[] {
       shares,
       cashFlow: metricPerShare,
       growthRate: sc.projectionMethod === 'Per Share Method' ? valMetricGrowthRates[phaseIndex] :
-                 sc.projectionMethod === 'Total FCF, Share Count' ? valMetricGrowthRatesTotal[phaseIndex] :
-                 valRevenueGrowthRates[phaseIndex],
+        sc.projectionMethod === 'Total FCF, Share Count' ? valMetricGrowthRatesTotal[phaseIndex] :
+          valRevenueGrowthRates[phaseIndex],
     });
   }
 

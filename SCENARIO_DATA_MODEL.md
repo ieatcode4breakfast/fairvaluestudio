@@ -19,7 +19,7 @@ These fields represent the core FCF model. The Basic FCF mode and Advanced DCF P
 
 | UI Label | JSON Identifier | Advanced Counterpart (Phase 1) |
 | :--- | :--- | :--- |
-| **Current FCF Per Share** | `currentMetricPerShare` | Same identifier |
+| **Current Free Cash Flow Per Share** | `currentMetricPerShare` | Same identifier |
 | **Current FCF (Total)** | `currentMetricTotal` | Same identifier |
 | **FCF Growth (%)** *(Per Share)* | `simpleMetricGrowthRate` | `metricGrowthRates[0]` |
 | **FCF Growth (%)** *(Total)* | `simpleMetricGrowthRateTotal` | `metricGrowthRatesTotal[0]` |

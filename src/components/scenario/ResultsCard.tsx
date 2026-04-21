@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Results, Scenario } from '../../types';
-import { formatCurrency, formatPercent } from '../../utils/helpers';
+import { formatCurrency, formatPercent, isScenarioIncomplete } from '../../utils/helpers';
 import { getSimpleLabels } from '../../utils/summary';
 import { ChevronDown } from 'lucide-react';
 
@@ -15,6 +15,7 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
 
   const isSimple = sc.dcfMethod === 'Basic DCF';
   const lbl = isSimple ? getSimpleLabels(sc) : null;
+  const incomplete = isScenarioIncomplete(sc);
 
   const mosColor = results.marginOfSafety !== null ? (results.marginOfSafety > 0 ? 'text-emerald-600' : 'text-red-600') : 'text-slate-900';
   const upsideColor = results.upside !== null ? (results.upside > 0 ? 'text-emerald-600' : 'text-red-600') : 'text-slate-900';
@@ -29,9 +30,12 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
       >
         <div className="flex items-center justify-between gap-4">
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 select-text">Intrinsic Value</div>
+            <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 select-text">
+              Intrinsic Value
+              {incomplete && <span className="text-red-500 ml-1.5 text-xs font-normal">(inputs incomplete)</span>}
+            </div>
             <div className="text-5xl md:text-6xl font-light tracking-tight text-slate-900 dark:text-slate-100 truncate select-text">
-              {formatCurrency(results.intrinsicValueTotal)}
+              {formatCurrency(incomplete ? null : results.intrinsicValueTotal)}
             </div>
           </div>
           <div className={`sm:hidden transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}>
