@@ -127,7 +127,7 @@ export function AssumptionsCard({
   /* ── Advanced phase input renderers ── */
   const renderAdvancedPerShare = () => {
     if (effectiveSplits.length > 0) return (
-      <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+      <div className="space-y-4">
         {Array.from({ length: effectiveSplits.length + 1 }).map((_, i) => {
           const s = i === 0 ? 1 : effectiveSplits[i - 1];
           const e = i === effectiveSplits.length ? valYears : effectiveSplits[i] - 1;
@@ -171,7 +171,7 @@ export function AssumptionsCard({
 
   const renderAdvancedTotal = () => {
     if (effectiveSplits.length > 0) return (
-      <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+      <div className="space-y-4">
         {Array.from({ length: effectiveSplits.length + 1 }).map((_, i) => {
           const s = i === 0 ? 1 : effectiveSplits[i - 1];
           const e = i === effectiveSplits.length ? valYears : effectiveSplits[i] - 1;
@@ -233,7 +233,7 @@ export function AssumptionsCard({
 
   const renderAdvancedRevenue = () => {
     if (effectiveSplits.length > 0) return (
-      <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+      <div className="space-y-4">
         {Array.from({ length: effectiveSplits.length + 1 }).map((_, i) => {
           const s = i === 0 ? 1 : effectiveSplits[i - 1];
           const e = i === effectiveSplits.length ? valYears : effectiveSplits[i] - 1;
@@ -439,7 +439,7 @@ export function AssumptionsCard({
       </div>
 
       {/* ── Method & Metric ── */}
-      <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 space-y-4">
+      <div className={`mt-4 space-y-4 ${!isSimple ? 'pt-4 border-t border-slate-100 dark:border-slate-700' : ''}`}>
         <div>
           <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Method</label>
           <select
@@ -461,7 +461,7 @@ export function AssumptionsCard({
         </div>
 
         {sc.dcfMethod === 'Basic DCF' && (
-          <>
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-700 space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1.5">
                 Metric
@@ -503,7 +503,7 @@ export function AssumptionsCard({
                 );
               })()}
             </div>
-          </>
+            </div>
         )}
 
         {sc.dcfMethod !== 'Basic DCF' && (
@@ -594,7 +594,7 @@ export function AssumptionsCard({
           }
 
           return (
-            <div className="pt-4 border-t border-slate-100 dark:border-slate-700 space-y-4">
+            <div className="space-y-4">
               {sc.simpleProjectionMethod === 'Per Share' && (
                 <div className="space-y-4">
                   <div>
@@ -776,7 +776,7 @@ export function AssumptionsCard({
         })()}
 
         {/* Terminal Value */}
-        <div className="pt-4 border-t border-slate-100 dark:border-slate-700">
+        <div className="pt-2">
           <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-2">
             Terminal Value
           </label>
@@ -804,7 +804,7 @@ export function AssumptionsCard({
 
         {/* Advanced Growth (If Advanced DCF) */}
         {!isSimple && (
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-700 space-y-6">
+          <div className="space-y-6">
             {/* Current Metrics */}
             {sc.projectionMethod === 'Per Share Method' && (
               <div className="space-y-4">
@@ -911,9 +911,12 @@ export function AssumptionsCard({
 
             {/* Growth Phases Slider */}
             {showSlider && (
-              <div className="pt-2">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200">Growth Phases</h3>
+              <div className="pt-6 border-t border-slate-100 dark:border-slate-700">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-medium text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-slate-400" />
+                    Growth Phases
+                  </h2>
                   <span className="text-xs font-medium bg-indigo-50 text-indigo-600 px-2 py-1 rounded-md">
                     {effectiveSplits.length === 0 ? 'Single Phase' : `${effectiveSplits.length + 1} Phases`}
                   </span>

@@ -222,6 +222,7 @@ export function StockDataPreviewModal({
                                 <div className="flex flex-col items-center justify-center py-2">
                                     <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-2" />
                                     <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium animate-pulse">Deep-searching filings & transcripts...</p>
+                                    <p className="text-[10px] text-indigo-500/70 dark:text-indigo-400/70 mt-1">(this can take up to a minute)</p>
                                 </div>
                             ) : (
                                 <div className="text-center py-1">
