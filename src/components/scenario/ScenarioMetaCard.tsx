@@ -3,7 +3,7 @@ import { Scenario } from '../../types';
 import { Trash2, RotateCcw, Copy, InfoIcon } from '../Icons';
 import { Tooltip } from '../Tooltip';
 import { NumericFormat } from '../NumericFormat';
-import { INPUT_CLS, SELECT_CLS } from '../../utils/constants';
+import { INPUT_CLS, SELECT_CLS, BLANK_GLOW_CLS } from '../../utils/constants';
 
 interface ScenarioMetaCardProps {
   sc: Scenario;
@@ -50,7 +50,7 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
         onChange={e => onUpdate({ scenarioName: e.target.value })}
         maxLength={50}
         placeholder="e.g. AAPL - Base Case"
-        className={INPUT_CLS}
+        className={`${INPUT_CLS} ${!sc.scenarioName ? BLANK_GLOW_CLS : ''}`}
       />
 
       <button
@@ -138,7 +138,7 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
                 value={sc.simpleCustomMetric}
                 onChange={e => onUpdate({ simpleCustomMetric: e.target.value })}
                 placeholder="e.g. EBITDA, Operating Cash Flow"
-                className={INPUT_CLS}
+                className={`${INPUT_CLS} ${!sc.simpleCustomMetric ? BLANK_GLOW_CLS : ''}`}
               />
             </div>
           )}

@@ -6,7 +6,7 @@ import { StockSearchModal } from '../modals/StockSearchModal';
 import { StockDataPreviewModal, DataField } from '../modals/StockDataPreviewModal';
 import { NumericFormat } from '../NumericFormat';
 import { Toggle } from '../Toggle';
-import { INPUT_CLS, SELECT_CLS, MAX_SPLITS } from '../../utils/constants';
+import { INPUT_CLS, SELECT_CLS, MAX_SPLITS, BLANK_GLOW_CLS } from '../../utils/constants';
 import { UnifiedFundamentals } from '../../api/marketData';
 import { formatDynamicDecimal } from '../../utils/formatNumber';
 import { getSimpleLabels } from '../../utils/summary';
@@ -483,7 +483,7 @@ export function AssumptionsCard({
                   value={sc.simpleCustomMetric}
                   onChange={e => onUpdate({ simpleCustomMetric: e.target.value })}
                   placeholder="e.g. EBITDA, Operating Cash Flow"
-                  className={INPUT_CLS}
+                  className={`${INPUT_CLS} ${!sc.simpleCustomMetric ? BLANK_GLOW_CLS : ''}`}
                 />
               </div>
             )}

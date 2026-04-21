@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BLANK_GLOW_CLS } from '../utils/constants';
 
 interface NumericFormatProps {
   value: number | string | undefined | null;
@@ -92,7 +93,7 @@ export function NumericFormat({ value, onValueChange, className, isAllowed, plac
       onBlur={handleBlur}
       onFocus={handleFocus}
       placeholder={placeholder}
-      className={className}
+      className={`${className} ${(!display && !isFocused) ? BLANK_GLOW_CLS : ''}`}
     />
   );
 }

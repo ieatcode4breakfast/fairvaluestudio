@@ -3,3 +3,4 @@ export const SELECT_CLS = "w-full pl-3 pr-10 py-2 bg-slate-50 dark:bg-slate-900 
 export const MAX_SCENARIOS = 10;
 export const MAX_SPLITS = 9;
 export const TRANSIENT_KEYS = ['hoverYear', 'draggingIndex', 'showResetConfirm', 'showYearlyBreakdown'];
+export const BLANK_GLOW_CLS = "border-amber-400! dark:border-amber-500! ring-2 ring-amber-400/20 dark:ring-amber-500/20";
