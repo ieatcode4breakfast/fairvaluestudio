@@ -9,11 +9,17 @@ export interface TTMData {
     ticker: string;
     companyName: string;
     revenue: number;
+    ebitda: number;
+    ebitdaPerShare: number;
     freeCashFlow: number;
-    netIncome: number;
-    sharesOutstanding: number;
     freeCashFlowPerShare: number;
+    operatingCashFlow: number;
+    operatingCashFlowPerShare: number;
+    netIncome: number;
     earningsPerShare: number;
+    bookValue: number;
+    bookValuePerShare: number;
+    sharesOutstanding: number;
     currency: string;
     asOfDate: string;
     fiscalYear: number;
@@ -141,11 +147,17 @@ export async function fetchTTMData(
                     ticker: uppercaseTicker,
                     companyName: cached.company_name,
                     revenue: Number(cached.revenue),
+                    ebitda: Number(cached.ebitda || 0),
+                    ebitdaPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.ebitda || 0) / Number(cached.shares_outstanding) : 0,
                     freeCashFlow: Number(cached.free_cash_flow),
-                    netIncome: Number(cached.net_income),
-                    sharesOutstanding: Number(cached.shares_outstanding),
                     freeCashFlowPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.free_cash_flow) / Number(cached.shares_outstanding) : 0,
+                    operatingCashFlow: Number(cached.operating_cash_flow || 0),
+                    operatingCashFlowPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.operating_cash_flow || 0) / Number(cached.shares_outstanding) : 0,
+                    netIncome: Number(cached.net_income),
                     earningsPerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.net_income) / Number(cached.shares_outstanding) : 0,
+                    bookValue: Number(cached.book_value || 0),
+                    bookValuePerShare: Number(cached.shares_outstanding) > 0 ? Number(cached.book_value || 0) / Number(cached.shares_outstanding) : 0,
+                    sharesOutstanding: Number(cached.shares_outstanding),
                     currency: cached.currency || 'USD',
                     asOfDate: cached.last_updated.split('T')[0],
                     fiscalYear: cacheFiscalYear,
@@ -174,8 +186,11 @@ export async function fetchTTMData(
 
     Return EXACTLY these metrics in a flat JSON format:
     - "revenue": Net revenue (TTM)
+    - "ebitda": EBITDA (TTM). If not explicitly stated, use (Operating Income + Depreciation & Amortization).
     - "freeCashFlow": Operating Cash Flow minus CAPEX (TTM)
-    - "netIncome": GAAP Net Income (TTM)
+    - "operatingCashFlow": Net Cash Provided by Operating Activities (TTM)
+    - "netIncome": GAAP Net Income attributable to shareholders (TTM)
+    - "bookValue": Total Shareholders' Equity / Total Equity (Latest available on balance sheet)
     - "sharesOutstanding": Total Diluted Shares Outstanding (Latest available)
     - "currency": The reported currency (e.g., "USD")
     - "fiscalYear": The fiscal year this data belongs to (e.g., 2024). Use the company's specific fiscal calendar.
@@ -226,8 +241,11 @@ export async function fetchTTMData(
         const parsedData = JSON.parse(content.trim());
 
         const revenue = Number(parsedData.revenue);
+        const ebitda = Number(parsedData.ebitda || 0);
         const freeCashFlow = Number(parsedData.freeCashFlow);
+        const operatingCashFlow = Number(parsedData.operatingCashFlow || 0);
         const netIncome = Number(parsedData.netIncome);
+        const bookValue = Number(parsedData.bookValue || 0);
         const shares = Number(parsedData.sharesOutstanding);
         const fiscalYear = Number(parsedData.fiscalYear);
         const fiscalQuarter = Number(parsedData.fiscalQuarter);
@@ -236,11 +254,17 @@ export async function fetchTTMData(
             ticker: uppercaseTicker,
             companyName,
             revenue,
+            ebitda,
+            ebitdaPerShare: shares > 0 ? ebitda / shares : 0,
             freeCashFlow,
-            netIncome,
-            sharesOutstanding: shares,
             freeCashFlowPerShare: shares > 0 ? freeCashFlow / shares : 0,
+            operatingCashFlow,
+            operatingCashFlowPerShare: shares > 0 ? operatingCashFlow / shares : 0,
+            netIncome,
             earningsPerShare: shares > 0 ? netIncome / shares : 0,
+            bookValue,
+            bookValuePerShare: shares > 0 ? bookValue / shares : 0,
+            sharesOutstanding: shares,
             currency: parsedData.currency || 'USD',
             asOfDate: currentDate,
             fiscalYear,
@@ -270,8 +294,11 @@ export async function fetchTTMData(
             ticker: uppercaseTicker,
             company_name: companyName,
             revenue,
+            ebitda,
             free_cash_flow: freeCashFlow,
+            operating_cash_flow: operatingCashFlow,
             net_income: netIncome,
+            book_value: bookValue,
             shares_outstanding: shares,
             currency: parsedData.currency || 'USD',
             fiscal_year: fiscalYear,
