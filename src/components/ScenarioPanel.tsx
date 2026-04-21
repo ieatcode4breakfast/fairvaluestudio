@@ -1,9 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Scenario, Results } from '../types';
 
-import { ScenarioMetaCard } from './scenario/ScenarioMetaCard';
 import { AssumptionsCard } from './scenario/AssumptionsCard';
-import { GrowthCard } from './scenario/GrowthCard';
 import { ResultsCard } from './scenario/ResultsCard';
 
 
@@ -59,19 +57,10 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 p-0 md:p-6">
 
-      {/* ══ LEFT: INPUTS ══ */}
+      {/* Input column */}
       <div className="lg:col-span-4 space-y-6">
 
-        {/* Meta card */}
-        <ScenarioMetaCard
-          sc={sc}
-          canDelete={canDelete}
-          onDeleteClick={() => onDelete(sc.id)}
-          onDuplicateClick={() => onDuplicate(sc.id)}
-          onUpdate={handleUpdate}
-        />
-
-        {/* Assumptions Card */}
+        {/* Combined Meta + Assumptions Card */}
         <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 overflow-hidden">
           <AssumptionsCard
             sc={sc}
@@ -81,18 +70,11 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
             onSetHighlights={handleSetHighlights}
             onClearHighlight={handleClearHighlight}
             currentUser={currentUser}
-          />
-        </div>
-
-        {/* Growth Card */}
-        <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 overflow-hidden">
-          <GrowthCard
-            sc={sc}
-            onUpdate={handleUpdate}
             ignoreTrackClickUntil={ignoreTrackClickUntil}
             setIgnoreTrackClickUntil={setIgnoreTrackClickUntil}
-            highlightedKeys={highlightedKeys}
-            onClearHighlight={handleClearHighlight}
+            canDelete={canDelete}
+            onDeleteClick={() => onDelete(sc.id)}
+            onDuplicateClick={() => onDuplicate(sc.id)}
           />
         </div>
       </div>

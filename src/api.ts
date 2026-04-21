@@ -78,7 +78,8 @@ export const getScenarios = async (valuationId: string): Promise<Scenario[]> => 
   return data.map((s: any) => ({
     ...(s.parameters as Scenario),
     scenarioName: s.name || s.parameters?.scenarioName || '',
-  }));
+    _order: typeof s.parameters?._order === 'number' ? s.parameters._order : 0
+  })).sort((a: any, b: any) => a._order - b._order);
 };
 
 export const signup = async (email: string, password: string, username: string): Promise<{ id: string; username: string; email: string }> => {
@@ -109,10 +110,10 @@ export const createValuation = async (userId: string, name: string, scenarios: S
 
   const valuationId = valData.id;
 
-  const scenariosToInsert = scenarios.map((sc) => ({
+  const scenariosToInsert = scenarios.map((sc, index) => ({
     valuation_id: valuationId,
     name: sc.scenarioName || 'Untitled',
-    parameters: sc
+    parameters: { ...sc, _order: index }
   }));
 
   const { error: scError } = await supabase
@@ -140,10 +141,10 @@ export const updateValuation = async (valuationId: string, name: string, scenari
 
   if (delError) throw new Error(delError.message);
 
-  const scenariosToInsert = scenarios.map((sc) => ({
+  const scenariosToInsert = scenarios.map((sc, index) => ({
     valuation_id: valuationId,
     name: sc.scenarioName || 'Untitled',
-    parameters: sc
+    parameters: { ...sc, _order: index }
   }));
 
   const { error: scError } = await supabase

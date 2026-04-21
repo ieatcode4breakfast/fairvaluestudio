@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Scenario } from '../../types';
 import { Trash2, RotateCcw, Copy, InfoIcon } from '../Icons';
 import { Tooltip } from '../Tooltip';
+import { NumericFormat } from '../NumericFormat';
 import { INPUT_CLS, SELECT_CLS } from '../../utils/constants';
 
 interface ScenarioMetaCardProps {
@@ -15,6 +16,8 @@ interface ScenarioMetaCardProps {
 export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClick, onUpdate }: ScenarioMetaCardProps) {
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const deleteTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const maxYears = sc.dcfMethod === 'Basic DCF' ? 10 : 50;
 
   useEffect(() => {
     return () => { if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current); };
@@ -167,6 +170,7 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
 
       {sc.dcfMethod !== 'Basic DCF' && (
         <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+          <label className="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-1">Metric</label>
           <select value={sc.projectionMethod} onChange={e => onUpdate({ projectionMethod: e.target.value })} className={SELECT_CLS}>
             <option value="Per Share Method">Per Share</option>
             <option value="Total FCF, Share Count">Total FCF, Share Count</option>
@@ -174,6 +178,39 @@ export function ScenarioMetaCard({ sc, canDelete, onDeleteClick, onDuplicateClic
           </select>
         </div>
       )}
+
+      {/* Years to Forecast & Discount Rate */}
+      <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700 space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">
+            Years to Forecast <span className="text-[10px] text-slate-400 opacity-70">(Max {maxYears})</span>
+          </label>
+          <NumericFormat
+            value={sc.years}
+            onValueChange={v => {
+              let val = v.floatValue;
+              if (val !== undefined && val > maxYears) val = maxYears;
+              onUpdate({ years: val === undefined ? '' : val });
+            }}
+            isAllowed={v => v.floatValue === undefined || v.floatValue <= maxYears}
+            onBlur={() => onUpdate({ _trimPhases: true } as any)}
+            className={INPUT_CLS}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1.5">
+            {sc.dcfMethod === 'Basic DCF' ? 'Desired Return (%)' : 'Discount Rate (%)'}
+            <Tooltip content="The rate used to discount future cash flows to the present. This can also be considered your Desired Yearly Return.">
+              <InfoIcon className="w-3.5 h-3.5 text-slate-400 hover:text-slate-500 transition-colors" />
+            </Tooltip>
+          </label>
+          <NumericFormat
+            value={sc.discountRate}
+            onValueChange={v => onUpdate({ discountRate: v.floatValue === undefined ? '' : v.floatValue })}
+            className={INPUT_CLS}
+          />
+        </div>
+      </div>
     </div>
   );
 }
