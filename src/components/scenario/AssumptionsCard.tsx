@@ -394,7 +394,7 @@ export function AssumptionsCard({
         onChange={e => onUpdate({ scenarioName: e.target.value })}
         maxLength={50}
         placeholder="e.g. AAPL - Base Case"
-        className={INPUT_CLS}
+        className={`${INPUT_CLS} ${!sc.scenarioName ? BLANK_GLOW_CLS : ''}`}
       />
 
       <div className="space-y-3 mt-3">
