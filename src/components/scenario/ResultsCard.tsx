@@ -24,7 +24,7 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-none md:rounded-2xl shadow-sm border-y border-x-0 md:border-x border-slate-100 dark:border-slate-700 overflow-hidden">
       {/* Main Metric: Intrinsic Value */}
-      <div 
+      <div
         className="p-5 lg:p-6 lg:md:p-8 border-b border-slate-100 dark:border-slate-700 cursor-pointer sm:cursor-default transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-700/30 sm:hover:bg-transparent"
         onClick={() => setIsExpanded(!isExpanded)}
       >
@@ -32,7 +32,11 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
           <div className="flex-1 min-w-0">
             <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 select-text">
               Intrinsic Value
-              {incomplete && <span className="text-red-500 ml-1.5 text-xs font-normal">(inputs incomplete)</span>}
+              {incomplete && (
+                <span className="ml-1.5 text-xs font-normal text-slate-400 dark:text-slate-500">
+                  (<span className="text-red-500">inputs incomplete</span>)
+                </span>
+              )}
             </div>
             <div className="text-5xl md:text-6xl font-light tracking-tight text-slate-900 dark:text-slate-100 truncate select-text">
               {formatCurrency(incomplete ? null : results.intrinsicValueTotal)}
