@@ -8,7 +8,7 @@ import { MAX_SCENARIOS, TRANSIENT_KEYS } from './utils/constants';
 import { genId } from './utils/genId';
 
 // Custom Utils
-import { createDefaultScenario, migrateScenario } from './utils/scenario';
+import { createDefaultScenario, migrateScenario, isScenarioEmpty } from './utils/scenario';
 
 // Custom Hooks
 import { loadInitialScenarios, useScenarios } from './hooks/useScenarios';
@@ -434,10 +434,8 @@ export default function App() {
           isSaving={isSaving}
           loadedValuationId={loadedValuationId}
           onLoginClick={() => {
-            const guestData = localStorage.getItem('fairvalue_scenarios');
-            // Only prompt if there is data and it's not just the default empty state
-            // (Standard length for an empty-ish default state is short)
-            if (guestData && guestData.length > 300) {
+            const isDefault = scenarios.length === 1 && isScenarioEmpty(scenarios[0]);
+            if (!isDefault) {
               setShowRetainGuestModal(true);
             } else {
               setShowLoginModal(true);

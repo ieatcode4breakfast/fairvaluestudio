@@ -121,3 +121,46 @@ export function cloneScenario(src: Scenario): Scenario {
     showYearlyBreakdown: false,
   };
 }
+
+export function isScenarioEmpty(sc: Scenario): boolean {
+  const hasName = sc.scenarioName && sc.scenarioName.trim() !== '';
+  const hasBuyPrice = sc.buyPrice !== '';
+  
+  // Check meaningful "Current" metrics
+  const hasCurrentMetric = 
+    sc.currentMetricPerShare !== '' || 
+    sc.currentMetricTotal !== '' || 
+    sc.currentRevenue !== '' || 
+    sc.currentShares !== '';
+
+  const hasNiMetric = 
+    sc.niCurrentMetricPerShare !== '' ||
+    sc.niCurrentMetricTotal !== '' ||
+    sc.niFinalMargin !== '';
+
+  const hasCustomMetric =
+    sc.customCurrentMetricPerShare !== '' ||
+    sc.customCurrentMetricTotal !== '' ||
+    sc.customFinalMargin !== '';
+
+  // Check growth rates (Advanced)
+  const hasMetricGrowth = sc.metricGrowthRates.some(r => r !== '');
+  const hasMetricGrowthTotal = sc.metricGrowthRatesTotal.some(r => r !== '');
+  const hasRevenueGrowth = sc.revenueGrowthRates.some(r => r !== '');
+  const hasFinalMargin = sc.finalMargins.some(r => r !== '');
+  const hasSharesGrowth = sc.sharesGrowthRates.some(r => r !== '');
+
+  // Check growth rates (Basic)
+  const hasSimpleGrowth = 
+    sc.simpleMetricGrowthRate !== '' ||
+    sc.simpleMetricGrowthRateTotal !== '' ||
+    sc.simpleRevenueGrowthRate !== '' ||
+    sc.simpleFinalMargin !== '' ||
+    sc.simpleSharesGrowthRate !== '';
+
+  return !hasName && !hasBuyPrice && !hasCurrentMetric && 
+         !hasNiMetric && !hasCustomMetric &&
+         !hasMetricGrowth && !hasMetricGrowthTotal && 
+         !hasRevenueGrowth && !hasFinalMargin && !hasSharesGrowth &&
+         !hasSimpleGrowth;
+}
