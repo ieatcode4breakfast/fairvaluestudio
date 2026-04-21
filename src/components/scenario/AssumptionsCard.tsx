@@ -52,6 +52,13 @@ export function AssumptionsCard({
 
   // Stock search modal
   const [showStockSearch, setShowStockSearch] = useState(false);
+  const [searchModalKey, setSearchModalKey] = useState(0);
+
+  const handleSearchClose = () => {
+    setShowStockSearch(false);
+    // Incrementing key forces a reset the next time it opens
+    setSearchModalKey(prev => prev + 1);
+  };
 
   // Data preview modal
   const [showPreview, setShowPreview] = useState(false);
@@ -94,6 +101,8 @@ export function AssumptionsCard({
     // Set highlights for all successfully applied fields
     onSetHighlights(enabledKeys);
 
+    // Reset search modal state so it's fresh next time search is opened
+    setSearchModalKey(prev => prev + 1);
     handlePreviewClose();
   };
 
@@ -200,8 +209,9 @@ export function AssumptionsCard({
 
       {/* Step 1: Search modal */}
       <StockSearchModal
+        key={searchModalKey}
         show={showStockSearch}
-        onClose={() => setShowStockSearch(false)}
+        onClose={handleSearchClose}
         onSelect={handleStockSelect}
       />
 

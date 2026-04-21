@@ -26,7 +26,7 @@ interface StockDataPreviewModalProps {
 }
 
 const SUPPORTED_TYPES = ['Common Stock', 'Equity', 'STK', 'ADR', 'REIT'];
-const PREFERRED_EXCHANGES = ['Nasdaq', 'NYSE', 'TSX', 'TSXV', 'LSE', 'ASX'];
+const PREFERRED_EXCHANGES = ['Nasdaq', 'NYSE'];
 
 export function StockDataPreviewModal({
     show, symbol, companyName, assetType, exchange, inMillions, fields, onApply, onClose, isGuest, userId, reportingPeriod
@@ -127,25 +127,30 @@ export function StockDataPreviewModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-sm p-6 animate-in fade-in zoom-in-95">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-1">
-                    <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">Apply Data</h3>
-                    <button
-                        onClick={onClose}
-                        className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
-                        aria-label="Close"
-                    >
-                        <svg className="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-sm flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95">
+                {/* Header - Fixed */}
+                <div className="p-6 pb-4 border-b border-slate-100 dark:border-slate-700">
+                    <div className="flex items-center justify-between mb-2">
+                        <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">Apply Data</h3>
+                        <button
+                            onClick={onClose}
+                            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                            aria-label="Close"
+                        >
+                            <svg className="w-5 h-5 text-slate-500 dark:text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Available data for{' '}
+                        <span className="font-semibold text-slate-700 dark:text-slate-200">
+                            {companyName} ({symbol})
+                        </span>.
+                    </p>
                 </div>
 
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-                    Available data for{' '}
-                    <span className="font-semibold text-slate-700 dark:text-slate-200">{symbol}</span>.
-                </p>
+            <div className="flex-1 overflow-y-auto p-6 py-2 custom-scrollbar">
 
                 {/* Field list */}
                 {(fields.length === 0 && aiFields.length === 0) ? (
@@ -177,76 +182,78 @@ export function StockDataPreviewModal({
                     </ul>
                 )}
 
-                {/* AI Trigger Section */}
-                {!isGuest && (
-                    <div className="mb-6 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600">
-                        {!canUseAI ? (
-                            <div className="py-2 text-center">
-                                <p className="text-sm font-medium text-slate-400 dark:text-slate-500 italic">
-                                    AI search is not available for {isETF ? 'ETFs/Funds' : 'this asset type'}.
-                                </p>
-                            </div>
-                        ) : aiFields.length === 0 && !isFetchingAI ? (
-                            <div className="space-y-3">
-                                <button
-                                    onClick={handleFetchAI}
-                                    disabled={usageCount >= usageLimit}
-                                    className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:text-slate-500 dark:disabled:text-slate-400 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer disabled:cursor-not-allowed"
-                                >
-                                    <span>
-                                        {usageCount >= usageLimit
-                                            ? 'Daily AI Limit Reached'
-                                            : '✨ AI Query Current Financial Data'}
-                                    </span>
-                                </button>
+            </div>
 
-                                <div className="text-center">
-                                    <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
-                                        Quota: {Math.max(0, usageLimit - usageCount)} of {usageLimit} searches remaining today
+                {/* Actions - Fixed */}
+                <div className="p-6 pt-4 border-t border-slate-100 dark:border-slate-700">
+                    {/* AI Trigger Section */}
+                    {!isGuest && (
+                        <div className="mb-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-200 dark:border-slate-600">
+                            {!canUseAI ? (
+                                <div className="py-2 text-center">
+                                    <p className="text-sm font-medium text-slate-400 dark:text-slate-500 italic">
+                                        AI search is not available for {isETF ? 'ETFs/Funds' : 'this asset type'}.
                                     </p>
                                 </div>
-                            </div>
-                        ) : isFetchingAI ? (
-                            <div className="flex flex-col items-center justify-center py-2">
-                                <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-2" />
-                                <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium animate-pulse">Deep-searching filings & transcripts...</p>
-                            </div>
-                        ) : (
-                            <div className="text-center py-1">
-                                {loadedFiscal && (
-                                    <div className="mb-3 flex items-center gap-2 justify-center py-1 px-3 bg-indigo-50 dark:bg-indigo-900/40 rounded-lg border border-indigo-100 dark:border-indigo-800/50">
-                                        <div className="text-indigo-600 dark:text-indigo-400">
-                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                        </div>
-                                        <p className="text-[11px] font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-tighter">
-                                            Latest Reported: {loadedFiscal.year} Q{loadedFiscal.quarter}
+                            ) : aiFields.length === 0 && !isFetchingAI ? (
+                                <div className="space-y-3">
+                                    <button
+                                        onClick={handleFetchAI}
+                                        disabled={usageCount >= usageLimit}
+                                        className="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:text-slate-500 dark:disabled:text-slate-400 text-white text-sm font-semibold rounded-lg flex items-center justify-center gap-2 transition-all shadow-sm cursor-pointer disabled:cursor-not-allowed"
+                                    >
+                                        <span>
+                                            {usageCount >= usageLimit
+                                                ? 'Daily AI Limit Reached'
+                                                : '✨ AI Query Current Financial Data'}
+                                        </span>
+                                    </button>
+
+                                    <div className="text-center">
+                                        <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                                            Quota: {Math.max(0, usageLimit - usageCount)} of {usageLimit} searches remaining today
                                         </p>
                                     </div>
-                                )}
-                                <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 justify-center">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                    </svg>
-                                    <span className="text-xs font-semibold">Financial Data Loaded</span>
                                 </div>
+                            ) : isFetchingAI ? (
+                                <div className="flex flex-col items-center justify-center py-2">
+                                    <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mb-2" />
+                                    <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium animate-pulse">Deep-searching filings & transcripts...</p>
+                                </div>
+                            ) : (
+                                <div className="text-center py-1">
+                                    {loadedFiscal && (
+                                        <div className="mb-3 flex items-center gap-2 justify-center py-1 px-3 bg-indigo-50 dark:bg-indigo-900/40 rounded-lg border border-indigo-100 dark:border-indigo-800/50">
+                                            <div className="text-indigo-600 dark:text-indigo-400">
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </div>
+                                            <p className="text-[11px] font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-tighter">
+                                                Latest Reported: {loadedFiscal.year} Q{loadedFiscal.quarter}
+                                            </p>
+                                        </div>
+                                    )}
+                                    <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 justify-center">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                        <span className="text-xs font-semibold">Financial Data Loaded</span>
+                                    </div>
+                                </div>
+                            )}
+
+                            {aiError && (
+                                <p className="text-xs text-red-500 mt-2 text-center">{aiError}</p>
+                            )}
+
+                            <div className="mt-3 flex items-center justify-center text-center">
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal text-center">
+                                    ⚠️ AI can make mistakes. Please double-check accuracy.
+                                </p>
                             </div>
-                        )}
-
-                        {aiError && (
-                            <p className="text-xs text-red-500 mt-2 text-center">{aiError}</p>
-                        )}
-
-                        <div className="mt-3 flex items-center justify-center text-center">
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-normal text-center">
-                                ⚠️ AI can make mistakes. Please double-check accuracy.
-                            </p>
                         </div>
-                    </div>
-                )}
-
-                {/* Actions */}
+                    )}
                 <div className="flex gap-3 justify-end">
                     <button
                         onClick={onClose}
@@ -266,5 +273,6 @@ export function StockDataPreviewModal({
                 </div>
             </div>
         </div>
+    </div>
     );
 }
