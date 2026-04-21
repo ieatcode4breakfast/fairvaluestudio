@@ -27,9 +27,7 @@ These components reside within the "Inputs Track" and handle user data entry.
 
 | UI Element Name | React Component | Description |
 | :--- | :--- | :--- |
-| **Meta Card** | `<ScenarioMetaCard />` | The uppermost card containing the scenario name input, DCF method dropdown selector, and Delete/Duplicate action buttons. |
-| **Assumptions Card** | `<AssumptionsCard />` | The middle card containing core, single-value inputs (e.g., Current Price, Discount Rate, Forecast Duration, and Terminal Value). |
-| **Growth Card** | `<GrowthCard />` | The bottom card managing multi-stage growth phases. Features an interactive timeline track for adding/removing phases and inputs for growth rates and margins. |
+| **Assumptions Card** | `<AssumptionsCard />` | A single unified component managing all core scenario inputs. It consolidates scenario metadata (name, DCF method, copy/reset/delete actions), single-value inputs (buy price, forecast duration, discount rate, terminal value), and all multi-stage growth phase inputs (including the interactive timeline track for Advanced DCF). |
 
 ## 4. Right Column: Output Elements
 These components reside within the "Sticky Track" and display calculated outputs and visualizations.
@@ -49,6 +47,7 @@ Floating components used for specific workflows or secondary configurations.
 | **Data Preview** | `<StockDataPreviewModal />` | Displays fetched financial data (TTM, AI-driven) and allows users to apply specific metrics back to the scenario. |
 | **Auth / Account** | `<AuthModal />` / `<AccountModal />` | Modals for login, signup, and user profile management. |
 | **Copy Scenario** | `<CopyScenarioModal />` | Advanced duplication modal allowing users to copy a scenario to a different valuation workspace. |
+| **Workspace Modals**| `WorkspaceModals.tsx` | A collection of utility modals for managing valuations (save, delete, rename), file upload/download, and guest session retention. |
 
 ## AI Context Protocol
-When requesting modifications, utilize the exact **UI Element Name** or **React Component** listed above to ensure precise targeting (e.g., *"Target the Assumptions Card to add a tooltip to the Discount Rate input"*).
+When requesting modifications, utilize the exact **UI Element Name** or **React Component** listed above to ensure precise targeting (e.g., *"Target the Assumptions Card to add a tooltip to the Discount Rate input"*).
