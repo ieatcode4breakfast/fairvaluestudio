@@ -246,7 +246,7 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
         </div>
         <div className="mt-4 text-xs text-slate-500 dark:text-slate-400 text-center">
           <p>
-            Hover over points to see compounded buy price, intrinsic value overtime and yearly returns.
+            Hover over points to see Compounded Buy Price, Intrinsic Value overtime and yearly returns.
           </p>
         </div>
       </div>
