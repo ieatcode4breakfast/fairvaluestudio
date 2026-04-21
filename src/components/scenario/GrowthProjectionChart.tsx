@@ -23,7 +23,7 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
   const valYears = Number(sc.years) || 0;
   const buyPrice = Number(sc.buyPrice) || 0;
   const isBasic = sc.dcfMethod === 'Basic DCF';
-  
+
   // Use calculated yearly return (IRR) for compounding
   const yearlyReturnPercent = results.irr ?? 0;
   const yearlyReturnRate = yearlyReturnPercent / 100;
@@ -38,9 +38,9 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
   if (isBasic) {
     if (sc.simpleMetricType === 'Net Income (Earnings)') metricLabel = 'Earnings';
     else if (sc.simpleMetricType === 'Custom') metricLabel = sc.simpleCustomMetric || 'Custom Metric';
-    else metricLabel = 'FCF';
+    else metricLabel = 'Free Cash Flow';
   } else {
-    metricLabel = 'FCF';
+    metricLabel = 'Free Cash Flow';
   }
 
   const exitTypeLabel = sc.exitAssumptionType === 'Perpetuity Growth' ? 'Multiple (Implied)' : sc.exitAssumptionType;
@@ -69,7 +69,7 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
   const chartData = projection.map((point) => {
     let sellPrice = 0;
     let yearlyReturn = null;
-    
+
     if (point.year === 0) {
       // Year 0: show buy price (current price)
       sellPrice = buyPrice;
