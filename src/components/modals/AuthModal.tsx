@@ -1,5 +1,6 @@
 import React from 'react';
 import { Eye, EyeOff } from '../Icons';
+import { useScrollLock } from '../../hooks/useScrollLock';
 
 interface AuthModalProps {
   showLoginModal: boolean;
@@ -37,6 +38,8 @@ interface AuthModalProps {
 }
 
 export function AuthModal(props: AuthModalProps) {
+  useScrollLock(props.showLoginModal);
+
   if (!props.showLoginModal) return null;
 
   return (

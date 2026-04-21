@@ -1,5 +1,6 @@
 import React from 'react';
 import { Eye, EyeOff } from '../Icons';
+import { useScrollLock } from '../../hooks/useScrollLock';
 
 interface AccountModalProps {
   showAccountModal: boolean;
@@ -28,6 +29,8 @@ interface AccountModalProps {
 }
 
 export function AccountModal(props: AccountModalProps) {
+  useScrollLock(props.showAccountModal);
+
   if (!props.showAccountModal) return null;
 
   const handleSave = async () => {

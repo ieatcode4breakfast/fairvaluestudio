@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Toggle } from '../Toggle';
+import { useScrollLock } from '../../hooks/useScrollLock';
 import { fetchTTMData, getAIUsageStatus } from '../../api/openrouter';
 import { formatDynamicDecimal } from '../../utils/formatNumber';
 
@@ -38,6 +39,8 @@ export function StockDataPreviewModal({
     const [usageCount, setUsageCount] = useState<number>(0);
     const [usageLimit, setUsageLimit] = useState<number>(5);
     const [loadedFiscal, setLoadedFiscal] = useState<{ year: number; quarter: number } | null>(null);
+
+    useScrollLock(show);
 
     // Reset toggles and AI state whenever the field list changes (new stock selected)
     useEffect(() => {
