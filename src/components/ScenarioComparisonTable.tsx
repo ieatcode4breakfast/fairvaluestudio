@@ -26,14 +26,14 @@ export function ScenarioComparisonTable({ scenarios, allResults }: Props) {
 
       {isExpanded && (
         <div className="p-4 pt-0 border-t border-slate-100 dark:border-slate-700 overflow-x-auto select-text">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left border-collapse table-fixed">
             <thead>
               <tr className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                <th className="p-3">Scenario Name</th>
-                <th className="p-3 text-right">Intrinsic Value</th>
-                <th className="p-3 text-right">Margin of Safety</th>
-                <th className="p-3 text-right">Upside</th>
-                <th className="p-3 text-right">Yearly Return / IRR</th>
+                <th className="p-3 w-[40%]">Scenario Name</th>
+                <th className="p-3 text-right w-[15%]">Intrinsic Value</th>
+                <th className="p-3 text-right w-[15%]">Margin of Safety</th>
+                <th className="p-3 text-right w-[15%]">Upside</th>
+                <th className="p-3 text-right w-[15%]">Yearly Return / IRR</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
