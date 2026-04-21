@@ -40,7 +40,7 @@ export function AuthModal(props: AuthModalProps) {
   if (!props.showLoginModal) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) { props.setShowLoginModal(false); props.setLoginError(''); props.setLoginEmail(''); props.setLoginPassword(''); } }}>
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
         <div className="flex border-b border-slate-200 dark:border-slate-700 mb-4">
           <button

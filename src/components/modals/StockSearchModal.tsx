@@ -55,18 +55,13 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
                 clearTimeout(timeoutRef.current);
             }
         };
-    }, [query, show]);
-
-    // Clear state when modal closes
+    }, [query, show]);    // Reset selection state when modal re-opens
     useEffect(() => {
-        if (!show) {
-            setQuery('');
-            setResults([]);
-            setLoading(false);
-            setError(null);
+        if (show) {
             setSelectingSymbol(null);
         }
     }, [show]);
+
 
     const handleSelect = async (symbol: string) => {
         setSelectingSymbol(symbol);
@@ -98,7 +93,7 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
     if (!show) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
             <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">Search Stocks</h3>

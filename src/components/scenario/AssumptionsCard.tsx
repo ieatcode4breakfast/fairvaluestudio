@@ -107,6 +107,11 @@ export function AssumptionsCard({
     setPendingReportingPeriod(null);
   };
 
+  const handlePreviewCancel = () => {
+    handlePreviewClose();
+    setShowStockSearch(true);
+  };
+
   return (
     <div className="p-5 lg:p-6">
 
@@ -211,7 +216,7 @@ export function AssumptionsCard({
         fields={previewFields}
         reportingPeriod={pendingReportingPeriod}
         onApply={handleApply}
-        onClose={handlePreviewClose}
+        onClose={handlePreviewCancel}
         isGuest={!currentUser}
         userId={currentUser?.id}
       />

@@ -5,7 +5,7 @@ import { ValuationMetadata, User } from '../../types';
 export function DownloadModal({ show, setShow, filename, setFilename, onDownload }: any) {
   if (!show) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setShow(false); }}>
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
         <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">Download Valuation (.json)</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Enter a name for your valuation file:</p>
@@ -32,7 +32,7 @@ export function DownloadModal({ show, setShow, filename, setFilename, onDownload
 export function UploadModal({ show, setShow, currentUser, onProceed }: any) {
   if (!show) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setShow(false); }}>
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
         <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">Upload Valuation (.json)</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
@@ -62,7 +62,7 @@ export function UploadModal({ show, setShow, currentUser, onProceed }: any) {
 export function SaveAsModal({ show, setShow, name, setName, onSave }: any) {
   if (!show) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setShow(false); }}>
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
         <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">Save As New Valuation</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Enter a name for the new valuation:</p>
@@ -89,7 +89,7 @@ export function SaveAsModal({ show, setShow, name, setName, onSave }: any) {
 export function NewValuationModal({ show, setShow, name, setName, isSaving, userValuations, onCreateClick }: any) {
   if (!show) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget && userValuations.length > 0) setShow(false); }}>
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-sm p-6 animate-in fade-in zoom-in-95 duration-200">
         <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">Create New Valuation</h3>
         {userValuations.length === 0 && (
@@ -152,7 +152,7 @@ export function NewValuationModal({ show, setShow, name, setName, isSaving, user
 export function DeleteModal({ show, setShow, onDelete }: any) {
   if (!show) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setShow(false); }}>
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
         <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">Delete Valuation?</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
@@ -180,7 +180,7 @@ export function DeleteModal({ show, setShow, onDelete }: any) {
 export function RenameModal({ show, setShow, name, setName, onRename }: any) {
   if (!show) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setShow(false); }}>
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
         <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">Rename Valuation</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Enter the new name for your valuation:</p>
@@ -207,7 +207,7 @@ export function RenameModal({ show, setShow, name, setName, onRename }: any) {
 export function GenericConfirmModal({ show, setShow, title, description, confirmText, confirmClass, onConfirm }: any) {
   if (!show) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setShow(false); }}>
       <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-6 animate-in fade-in zoom-in-95">
         <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">{title}</h3>
         <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">{description}</p>
