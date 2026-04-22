@@ -7,6 +7,7 @@ import { ResultsCard } from './scenario/ResultsCard';
 
 import { GrowthProjectionChart } from './scenario/GrowthProjectionChart';
 import { FreeCashflowChart } from './scenario/FreeCashflowChart';
+import { createDefaultScenario } from '../utils/scenario';
 
 interface ScenarioPanelProps {
   sc: Scenario;
@@ -43,11 +44,8 @@ export function ScenarioPanel({ sc, index, totalScenarios, onUpdate, onDelete, o
     // by calling createDefaultScenario in the parent, or if we pass the flag just reset the ID
     // Wait, the parent App.tsx didn't give us createDefaultScenario. 
     if ((changes as any)._resetRequest) {
-      // Actually we just import createDefaultScenario and do it here:
-      import('../utils/scenario').then(({ createDefaultScenario }) => {
-        const fresh = createDefaultScenario();
-        onUpdate(sc.id, { ...fresh, id: sc.id, showResetConfirm: false });
-      });
+      const fresh = createDefaultScenario();
+      onUpdate(sc.id, { ...fresh, id: sc.id, showResetConfirm: false });
       return;
     }
 

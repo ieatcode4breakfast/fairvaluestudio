@@ -33,8 +33,8 @@ export function ResultsCard({ sc, results }: ResultsCardProps) {
             <div className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 select-text">
               Intrinsic Value
               {missingField && (
-                <span className="ml-1.5 text-xs font-normal text-slate-400 dark:text-slate-500">
-                  (<span className="text-red-500">missing: {missingField}</span>)
+                <span className="ml-2 px-2 py-0.5 text-[10px] font-bold bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 rounded-md border border-red-100 dark:border-red-900/50 uppercase tracking-wider inline-flex items-center">
+                  Inputs Incomplete
                 </span>
               )}
             </div>

@@ -8,7 +8,7 @@ import { MAX_SCENARIOS, TRANSIENT_KEYS } from './utils/constants';
 import { genId } from './utils/genId';
 
 // Custom Utils
-import { createDefaultScenario, migrateScenario, isScenarioEmpty } from './utils/scenario';
+import { createDefaultScenario, migrateScenario, isScenarioEmpty, cloneScenario } from './utils/scenario';
 
 // Custom Hooks
 import { loadInitialScenarios, useScenarios } from './hooks/useScenarios';
@@ -253,7 +253,6 @@ export default function App() {
 
     // 1. If we have a pending copy, it becomes the SOLE scenario in the new valuation
     if (pendingCopyScenarioRef.current) {
-      const { cloneScenario } = await import('./utils/scenario');
       const copied = cloneScenario(pendingCopyScenarioRef.current);
       copied.scenarioName = `${pendingCopyScenarioRef.current.scenarioName || 'Untitled'} (Copy)`;
       initialScenarios = [copied];

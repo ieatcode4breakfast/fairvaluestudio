@@ -45,11 +45,8 @@ function getSimpleProjection(sc: Scenario): ProjectionPoint[] {
     metricPerShare = sc.niCurrentMetricPerShare;
     metricTotal = sc.niCurrentMetricTotal;
     metricMargin = sc.niFinalMargin;
-  } else if (sc.simpleMetricType === 'Custom') {
-    metricPerShare = sc.customCurrentMetricPerShare;
-    metricTotal = sc.customCurrentMetricTotal;
-    metricMargin = sc.customFinalMargin;
   }
+
 
   const valMetricPerShare = Number(metricPerShare) || 0;
   const valMetricTotal = Number(metricTotal) || 0;

@@ -37,7 +37,6 @@ export function GrowthProjectionChart({ sc, results }: GrowthProjectionChartProp
   let metricLabel = 'Metric';
   if (isBasic) {
     if (sc.simpleMetricType === 'Net Income (Earnings)') metricLabel = 'Earnings';
-    else if (sc.simpleMetricType === 'Custom') metricLabel = sc.simpleCustomMetric || 'Custom Metric';
     else metricLabel = 'Free Cash Flow';
   } else {
     metricLabel = 'Free Cash Flow';

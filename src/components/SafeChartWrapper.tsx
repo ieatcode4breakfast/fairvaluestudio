@@ -49,7 +49,7 @@ export function SafeChartWrapper({ children }: SafeChartWrapperProps) {
   return (
     <div ref={containerRef} className="w-full h-full min-w-0 min-h-0 relative">
       {dimensions.width > 0 && dimensions.height > 0 ? (
-        React.cloneElement(children, {
+        React.cloneElement(children as React.ReactElement<any>, {
           width: dimensions.width,
           height: dimensions.height,
         })
