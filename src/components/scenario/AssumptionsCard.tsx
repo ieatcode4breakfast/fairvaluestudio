@@ -143,23 +143,23 @@ function computeFields(sc: Scenario, data: UnifiedFundamentals): DataField[] {
     });
   }
 
-  // 11. Shares Outstanding
-  if (data.sharesOutstanding) {
-    fields.push({
-      key: 'currentShares',
-      label: 'Shares Outstanding',
-      value: s(data.sharesOutstanding),
-      formatted: formatDynamicDecimal(s(data.sharesOutstanding), true),
-    });
-  }
-
-  // 12. Book Value
+  // 11. Book Value
   if (data.bookValue) {
     fields.push({
       key: 'bookValue',
       label: 'Book Value',
       value: round(data.bookValue),
       formatted: formatDynamicDecimal(data.bookValue, true),
+    });
+  }
+
+  // 12. Shares Outstanding
+  if (data.sharesOutstanding) {
+    fields.push({
+      key: 'currentShares',
+      label: 'Shares Outstanding',
+      value: s(data.sharesOutstanding),
+      formatted: formatDynamicDecimal(s(data.sharesOutstanding), true),
     });
   }
 
