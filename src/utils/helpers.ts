@@ -1,108 +1,128 @@
-export const formatCurrency = (num: number | null | undefined) => {
-  if (num === null || num === undefined) return 'N/A';
-  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+import { Scenario } from '../types';
+
+export const formatCurrency = (value: number | null | undefined) => {
+  if (value === null || value === undefined) return 'N/A';
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
 };
 
-export const formatPercent = (num: number | null | undefined) => {
-  if (num === null || num === undefined) return 'N/A';
-  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + '%';
+export const formatPercent = (value: number | null | undefined) => {
+  if (value === null || value === undefined) return 'N/A';
+  return (value >= 0 ? '+' : '') + value.toFixed(1) + '%';
 };
 
-export const formatCompactNumber = (num: number | null | undefined) => {
-  if (num === null || num === undefined) return 'N/A';
-  
-  // Use absolute value for comparison
-  const absNum = Math.abs(num);
-  
-  // Keep standard format if under 10,000
-  if (absNum < 10000) {
-    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
-
-
-  const suffixes = [
-    { value: 1e12, symbol: 'T' },
-    { value: 1e9, symbol: 'B' },
-    { value: 1e6, symbol: 'M' },
-    { value: 1e3, symbol: 'K' },
-  ];
-
-  for (let i = 0; i < suffixes.length; i++) {
-    if (absNum >= suffixes[i].value) {
-      const formatted = (num / suffixes[i].value).toFixed(2) + suffixes[i].symbol;
-      return formatted;
-    }
-  }
-
-  return num.toFixed(2);
+export const formatCompactNumber = (value: number | null | undefined) => {
+  if (value === null || value === undefined) return '0';
+  return new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    compactDisplay: 'short',
+    maximumFractionDigits: 1,
+  }).format(value);
 };
 
 const MILLION = 1_000_000;
 
-
+/**
+ * convertMillions
+ * Helper to scale values when toggling "Values in Millions"
+ */
 export const convertMillions = (
-  currentValue: number | '',
+  value: number | string | undefined | null,
   fromMillions: boolean,
   toMillions: boolean
-): number | '' => {
-  if (currentValue === '' || currentValue === 0) return currentValue;
-  const num = Number(currentValue);
+): number | string => {
+  if (value === '' || value === undefined || value === null) return '';
+  const num = Number(value);
+  if (isNaN(num)) return '';
+
   if (fromMillions && !toMillions) return num * MILLION;
   if (!fromMillions && toMillions) return num / MILLION;
   return num;
 };
 
-const isBlank = (v: number | string | ''): boolean => v === '';
-const anyBlank = (...vals: (number | string | '')[]): boolean => vals.some(isBlank);
+export function getIncompleteField(sc: Scenario): string | null {
+  const isBlank = (v: any): boolean => 
+    v === '' || v === null || v === undefined || (typeof v === 'number' && isNaN(v));
 
-export function isScenarioIncomplete(sc: import('../types').Scenario): boolean {
-  // Universal required fields
-  if (anyBlank(sc.buyPrice, sc.years, sc.discountRate)) return true;
+  // 1. Universal required fields
+  if (isBlank(sc.buyPrice)) return 'Buy Price';
+  if (isBlank(sc.years)) return 'Years';
+  if (isBlank(sc.discountRate)) return 'Discount Rate';
 
-  // Exit assumption required fields
-  if (sc.exitAssumptionType === 'Multiple' && isBlank(sc.exitMultiple)) return true;
-  if (sc.exitAssumptionType === 'Yield' && isBlank(sc.exitYield)) return true;
-  if (sc.exitAssumptionType === 'Perpetuity Growth' && isBlank(sc.perpetuityGrowthRate)) return true;
+  // 2. Terminal Value check
+  if (sc.exitAssumptionType === 'Multiple') {
+    if (isBlank(sc.exitMultiple)) return 'Exit Multiple';
+  } else if (sc.exitAssumptionType === 'Yield') {
+    if (isBlank(sc.exitYield)) return 'Exit Yield';
+  } else {
+    if (isBlank(sc.perpetuityGrowthRate)) return 'Perpetuity Growth Rate';
+  }
 
+  // 3. Method-specific checks
   if (sc.dcfMethod === 'Basic DCF') {
-    // Metric-specific current value fields
-    if (sc.simpleProjectionMethod === 'Per Share') {
-      let val: any = sc.currentMetricPerShare;
-      if (sc.simpleMetricType === 'Net Income (Earnings)') val = sc.niCurrentMetricPerShare;
-      else if (sc.simpleMetricType === 'Operating Cash Flow') val = sc.ocfPerShare;
-      else if (sc.simpleMetricType === 'EBITDA') val = sc.ebitdaPerShare;
-      else if (sc.simpleMetricType === 'Book Value') val = sc.bookValue;
+    let val: any = sc.currentMetricPerShare;
+    let label = 'Current Metric';
 
-      if (anyBlank(val, sc.simpleMetricGrowthRate)) return true;
-    } else if (sc.simpleProjectionMethod === 'Metric, Share Count') {
-      let val: any = sc.currentMetricTotal;
-      if (sc.simpleMetricType === 'Net Income (Earnings)') val = sc.niCurrentMetricTotal;
-      else if (sc.simpleMetricType === 'Operating Cash Flow') val = sc.operatingCashflow;
-      else if (sc.simpleMetricType === 'EBITDA') val = sc.ebitda;
+    if (sc.simpleMetricType === 'Net Income (Earnings)') {
+      val = sc.niCurrentMetricPerShare;
+      label = 'Net Income (EPS)';
+    } else if (sc.simpleMetricType === 'Operating Cash Flow') {
+      val = sc.ocfPerShare;
+      label = 'OCF Per Share';
+    } else if (sc.simpleMetricType === 'EBITDA') {
+      val = sc.ebitdaPerShare;
+      label = 'EBITDA Per Share';
+    } else if (sc.simpleMetricType === 'Book Value') {
+      val = sc.bookValue;
+      label = 'Book Value';
+    }
 
-      if (anyBlank(val, sc.simpleMetricGrowthRateTotal, sc.currentShares, sc.simpleSharesGrowthRate)) return true;
-    } else {
-      let valMargin: any = sc.simpleFinalMargin;
-      if (sc.simpleMetricType === 'Net Income (Earnings)') valMargin = sc.niFinalMargin;
-      else if (sc.simpleMetricType === 'Operating Cash Flow') valMargin = sc.ocfFinalMargin;
-      else if (sc.simpleMetricType === 'EBITDA') valMargin = sc.ebitdaFinalMargin;
+    if (isBlank(val)) return label;
+    if (isBlank(sc.simpleMetricGrowthRate)) return 'Growth Rate';
 
-      if (anyBlank(sc.currentRevenue, sc.simpleRevenueGrowthRate, valMargin, sc.currentShares, sc.simpleSharesGrowthRate)) return true;
+    if (sc.simpleProjectionMethod === 'Metric, Share Count') {
+      if (isBlank(sc.currentShares)) return 'Shares Outstanding';
+      if (isBlank(sc.simpleSharesGrowthRate)) return 'Shares Growth';
+    } else if (sc.simpleProjectionMethod === 'Revenue, Metric Margin, Share Count') {
+      if (isBlank(sc.currentRevenue)) return 'Current Revenue';
+      if (isBlank(sc.simpleRevenueGrowthRate)) return 'Revenue Growth';
+      if (isBlank(sc.currentShares)) return 'Shares Outstanding';
+      if (isBlank(sc.simpleSharesGrowthRate)) return 'Shares Growth';
+      
+      let m: any = sc.simpleFinalMargin;
+      if (sc.simpleMetricType === 'Net Income (Earnings)') m = sc.niFinalMargin;
+      else if (sc.simpleMetricType === 'Operating Cash Flow') m = sc.ocfFinalMargin;
+      else if (sc.simpleMetricType === 'EBITDA') m = sc.ebitdaFinalMargin;
+      if (isBlank(m)) return 'Final Margin';
     }
   } else {
-    // Advanced DCF - Only validate ACTIVE phases
+    // Advanced DCF
     const numPhases = sc.splitYears.length + 1;
     if (sc.projectionMethod === 'Per Share Method') {
-      if (isBlank(sc.currentMetricPerShare)) return true;
-      if (sc.metricGrowthRates.slice(0, numPhases).some(isBlank)) return true;
+      if (isBlank(sc.currentMetricPerShare)) return 'Current Metric (PS)';
+      if (sc.metricGrowthRates.slice(0, numPhases).some(isBlank)) return 'Growth Rate (Phases)';
     } else if (sc.projectionMethod === 'Total FCF, Share Count') {
-      if (anyBlank(sc.currentMetricTotal, sc.currentShares)) return true;
-      if (sc.metricGrowthRatesTotal.slice(0, numPhases).some(isBlank) || sc.sharesGrowthRates.slice(0, numPhases).some(isBlank)) return true;
+      if (isBlank(sc.currentMetricTotal)) return 'Current Metric (Total)';
+      if (isBlank(sc.currentShares)) return 'Current Shares';
+      if (sc.metricGrowthRatesTotal.slice(0, numPhases).some(isBlank)) return 'Growth Rate (Phases)';
+      if (sc.sharesGrowthRates.slice(0, numPhases).some(isBlank)) return 'Shares Growth (Phases)';
     } else {
-      if (anyBlank(sc.currentRevenue, sc.currentShares)) return true;
-      if (sc.revenueGrowthRates.slice(0, numPhases).some(isBlank) || sc.finalMargins.slice(0, numPhases).some(isBlank) || sc.sharesGrowthRates.slice(0, numPhases).some(isBlank)) return true;
+      // Revenue Method
+      if (isBlank(sc.currentRevenue)) return 'Current Revenue';
+      if (isBlank(sc.currentShares)) return 'Current Shares';
+      if (sc.revenueGrowthRates.slice(0, numPhases).some(isBlank)) return 'Revenue Growth (Phases)';
+      if (sc.finalMargins.slice(0, numPhases).some(isBlank)) return 'Margins (Phases)';
+      if (sc.sharesGrowthRates.slice(0, numPhases).some(isBlank)) return 'Shares Growth (Phases)';
     }
   }
 
-  return false;
+  return null;
+}
+
+export function isScenarioIncomplete(sc: Scenario): boolean {
+  return getIncompleteField(sc) !== null;
 }

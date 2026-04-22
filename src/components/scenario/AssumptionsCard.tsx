@@ -672,7 +672,7 @@ export function AssumptionsCard({
         </div>
 
         {/* Book Value */}
-        {sc.dcfMethod === 'Basic DCF' && sc.simpleMetricType === 'Book Value' && (
+        {isSimple && sc.simpleMetricType === 'Book Value' && (
           <div>
             <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Book Value</label>
             <NumericFormat
