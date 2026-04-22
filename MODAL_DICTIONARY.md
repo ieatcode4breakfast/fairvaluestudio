@@ -33,13 +33,13 @@ Workflow-specific modals for data manipulation and confirmations.
 | **Generic Confirm** | `<GenericConfirmModal />` | Used for high-impact actions like "Reset All Scenarios" or guest data errors. |
 | **Save Feedback** | `<SaveSuccessModal />` | A centered success notification triggered after successful cloud synchronization. |
 
-## 4. Market Data & AI Search (`src/components/modals/StockSearchModal.tsx`, etc.)
+## 4. Market Data (`src/components/modals/StockSearchModal.tsx`, etc.)
 Dialogs used for fetching and validating external financial data.
 
 | UI Element Name | React Component | Trigger / Purpose |
 | :--- | :--- | :--- |
-| **Stock Search** | `<StockSearchModal />` | Triggered by Search Icons in input fields. Searches for tickers/company names. |
-| **Market Data Preview** | `<StockDataPreviewModal />` | Triggered after selecting a stock. Displays TTM data and AI retrieval options. |
+| **Stock Search** | `<StockSearchModal />` | Triggered by Search Icons in input fields. Searches for tickers/company names via Finnhub. |
+| **Market Data Preview** | `<StockDataPreviewModal />` | Triggered after selecting a stock. Displays live price (Finnhub) and TTM financial data (Yahoo Finance) for review before applying to the scenario. |
 
 ## 5. Layout-Integrated Overlays
 Components that use modal-like backdrops but are rendered inline within the layout.

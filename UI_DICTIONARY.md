@@ -44,7 +44,7 @@ Floating components used for specific workflows or secondary configurations.
 | UI Element Name | React Component | Description |
 | :--- | :--- | :--- |
 | **Stock Search** | `<StockSearchModal />` | Modal triggered via the search icon in input cards for finding and selecting public tickers. |
-| **Data Preview** | `<StockDataPreviewModal />` | Displays fetched financial data (TTM, AI-driven) and allows users to apply specific metrics back to the scenario. |
+| **Data Preview** | `<StockDataPreviewModal />` | Displays live price (Finnhub) and TTM financial data (Yahoo Finance) for review before applying metrics to the scenario. |
 | **Auth / Account** | `<AuthModal />` / `<AccountModal />` | Modals for login, signup, and user profile management. |
 | **Copy Scenario** | `<CopyScenarioModal />` | Advanced duplication modal allowing users to copy a scenario to a different valuation workspace. |
 | **Workspace Modals**| `WorkspaceModals.tsx` | A collection of utility modals for managing valuations (save, delete, rename), file upload/download, and guest session retention. |

@@ -2,21 +2,53 @@ import { Scenario, Results } from '../types';
 import { formatCurrency, formatPercent } from './helpers';
 
 export function getSimpleLabels(sc: Scenario) {
-  const mt = sc.simpleMetricType;
-  const metricName = mt === 'Net Income (Earnings)'
-    ? 'Net Income'
-    : mt === 'Custom'
-      ? (sc.simpleCustomMetric || 'Custom Metric')
-      : 'Free Cash Flow';
-  const isNI = mt === 'Net Income (Earnings)';
+  if (sc.simpleMetricType === 'Net Income (Earnings)') {
+    return {
+      metricName: 'Net Income',
+      labelCurrentPerShare: 'Current EPS',
+      labelGrowthRate: 'EPS Growth',
+      labelMargin: 'Net Income Margin',
+      labelProjectedFinal: 'Projected Final Earnings',
+      labelExitMultiple: sc.simpleProjectionMethod === 'Per Share' ? 'Exit Multiple (x EPS)' : 'Exit Multiple (x Net Income)',
+    };
+  }
+  if (sc.simpleMetricType === 'Operating Cash Flow') {
+    return {
+      metricName: 'OCF',
+      labelCurrentPerShare: 'Current OCF Per Share',
+      labelGrowthRate: 'OCF Growth',
+      labelMargin: 'OCF Margin',
+      labelProjectedFinal: 'Projected Final OCF',
+      labelExitMultiple: 'Exit Multiple (x OCF)',
+    };
+  }
+  if (sc.simpleMetricType === 'EBITDA') {
+    return {
+      metricName: 'EBITDA',
+      labelCurrentPerShare: 'Current EBITDA Per Share',
+      labelGrowthRate: 'EBITDA Growth',
+      labelMargin: 'EBITDA Margin',
+      labelProjectedFinal: 'Projected Final EBITDA',
+      labelExitMultiple: 'Exit Multiple (x EBITDA)',
+    };
+  }
+  if (sc.simpleMetricType === 'Book Value') {
+    return {
+      metricName: 'Book Value',
+      labelCurrentPerShare: 'Current Book Value Per Share',
+      labelGrowthRate: 'Book Value Growth',
+      labelMargin: '', // Not used
+      labelProjectedFinal: 'Projected Final Book Value',
+      labelExitMultiple: 'Exit Multiple (x Book Value)',
+    };
+  }
   return {
-    metricName,
-    labelCurrentPerShare: isNI ? 'Current Earnings Per Share' : `Current ${metricName} Per Share`,
-    labelGrowthRate: isNI ? 'Earnings Per Share Growth Rate' : `${metricName} Growth Rate`,
-    labelProjectedFinal: isNI ? 'Projected Final Earnings' : `Projected Final ${metricName}`,
-    labelExitMultiple: (isNI && sc.simpleProjectionMethod === 'Per Share')
-      ? 'Exit Multiple (x Earnings Per Share)'
-      : `Exit Multiple (x ${metricName})`,
+    metricName: 'FCF',
+    labelCurrentPerShare: 'Current FCF Per Share',
+    labelGrowthRate: 'FCF Growth',
+    labelMargin: 'FCF Margin',
+    labelProjectedFinal: 'Projected Final FCF',
+    labelExitMultiple: 'Exit Multiple (x FCF)',
   };
 }
 
@@ -46,17 +78,25 @@ export function buildSummaryText(sc: Scenario, res: Results, index: number) {
       metricPerShare = sc.niCurrentMetricPerShare;
       metricTotal = sc.niCurrentMetricTotal;
       metricMargin = sc.niFinalMargin;
-    } else if (sc.simpleMetricType === 'Custom') {
-      metricPerShare = sc.customCurrentMetricPerShare;
-      metricTotal = sc.customCurrentMetricTotal;
-      metricMargin = sc.customFinalMargin;
+    } else if (sc.simpleMetricType === 'Operating Cash Flow') {
+      metricPerShare = sc.ocfPerShare;
+      metricTotal = sc.operatingCashflow;
+      metricMargin = sc.ocfFinalMargin;
+    } else if (sc.simpleMetricType === 'EBITDA') {
+      metricPerShare = sc.ebitdaPerShare;
+      metricTotal = sc.ebitda;
+      metricMargin = sc.ebitdaFinalMargin;
+    } else if (sc.simpleMetricType === 'Book Value') {
+      metricPerShare = sc.bookValue;
     }
 
-    if (sc.simpleProjectionMethod === 'Per Share') {
+    const effectiveProjectionMethod = sc.simpleMetricType === 'Book Value' ? 'Per Share' : sc.simpleProjectionMethod;
+
+    if (effectiveProjectionMethod === 'Per Share') {
       methodInputs =
         `${lbl.labelCurrentPerShare}: ${formatCurrency(Number(metricPerShare) || 0)}\n` +
         `${lbl.labelGrowthRate}: ${sc.simpleMetricGrowthRate}%\n`;
-    } else if (sc.simpleProjectionMethod === 'Metric, Share Count') {
+    } else if (effectiveProjectionMethod === 'Metric, Share Count') {
       methodInputs =
         `Current ${lbl.metricName}: ${formatCurrency(Number(metricTotal) || 0)}${sc.inMillions ? ' M' : ''}\n` +
         `${lbl.metricName} Growth Rate: ${sc.simpleMetricGrowthRateTotal}%\n` +
@@ -79,17 +119,20 @@ export function buildSummaryText(sc: Scenario, res: Results, index: number) {
     } else if (sc.simpleMetricType === 'Net Income (Earnings)') {
       m1 = 'Net Income';
       m2 = 'Net Income';
-    } else if (sc.simpleMetricType === 'Custom') {
-      m1 = sc.simpleCustomMetric || 'Custom Metric';
-      m2 = sc.simpleCustomMetric || 'Custom Metric';
+    } else if (sc.simpleMetricType === 'Operating Cash Flow') {
+      m1 = 'OCF';
+      m2 = 'OCF';
+    } else if (sc.simpleMetricType === 'EBITDA') {
+      m1 = 'EBITDA';
+      m2 = 'EBITDA';
     }
 
     let metricsLabel = '';
-    if (sc.simpleProjectionMethod === 'Per Share') {
+    if (effectiveProjectionMethod === 'Per Share') {
       metricsLabel = `${lbl.metricName}, Per Share`;
-    } else if (sc.simpleProjectionMethod === 'Metric, Share Count') {
+    } else if (effectiveProjectionMethod === 'Metric, Share Count') {
       metricsLabel = `${lbl.metricName}, ${m1}, Share Count`;
-    } else if (sc.simpleProjectionMethod === 'Revenue, Metric Margin, Share Count') {
+    } else if (effectiveProjectionMethod === 'Revenue, Metric Margin, Share Count') {
       metricsLabel = `Revenue, ${m2} Margin, Share Count`;
     }
 

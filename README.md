@@ -28,14 +28,13 @@ FairValue Studio offers two distinct approaches:
 - **Advanced DCF (Detailed Forecasting)** – Ideal for detailed multi‑phase forecasting where growth rates change over time. It discounts every yearly cash flow and the terminal value separately. When you set the forecast years to 3 or more, a draggable **Growth Phases** track appears, letting you define up to 10 distinct growth stages.
 
 ### 2. Load Stock Data
-Instead of manually typing numbers, you can pull real‑time market data directly into your model:
+Instead of manually typing numbers, you can pull live market data directly into your model:
 
 - Click the **search icon** (magnifying glass) in the “Assumptions” card.
 - Type a ticker (e.g., `MSFT`) or company name.
-- Select the stock from the results to fetch its current price.
-- Click **“Apply Data”** to fill the “Buy Price” field.
-
-**✨ AI‑Powered Financial Data (Account Required)** – If you are logged in, you can click the **“Search Current Financial Data (AI)”** button inside the data preview modal. The AI will search through filings, earnings transcripts, and investor relations pages to retrieve Trailing Twelve Month (TTM) figures for revenue, free cash flow, net income, and shares outstanding. These numbers are automatically formatted and ready to use in your projections.
+- Select the stock from the results.
+- A preview modal will appear displaying the live price (via Finnhub) and Trailing Twelve Month (TTM) financials (via Yahoo Finance).
+- Toggle the data points you want to use and click **“Apply Data”** to instantly populate your scenario inputs.
 
 ### 3. Set Your Assumptions
 The “Assumptions” card lets you control the core inputs of your model:
@@ -98,8 +97,7 @@ This “pro tip” lets you get a qualitative sanity check from any AI assistant
 ## ✨ Key Features at a Glance
 
 - **Multi‑Scenario Modeling** – Compare up to 10 different assumption sets side‑by‑side.
-- **Live Stock Search** – Fetch real‑time prices and company details via Finnhub and RapidAPI.
-- **AI‑Driven Financial Data** – Retrieve TTM revenue, FCF, net income, and shares outstanding using OpenRouter’s deep‑search AI (Account required).
+- **Live Market Data** – Fetch real‑time stock prices via Finnhub and Trailing Twelve Month (TTM) financials directly from Yahoo Finance.
 - **Two Valuation Methods** – Basic DCF for quick estimates, Advanced DCF with draggable growth phases.
 - **Three Projection Strategies** – Per‑share, total FCF with share count, and revenue‑margin build.
 - **Cloud Sync & Auto‑Save** – Seamless saving across devices when logged in.
@@ -121,10 +119,10 @@ If you are using **guest mode**, your data is stored locally in your browser’s
 If you are **logged in**, your work is automatically synced to the cloud. You can reopen it on any device by signing into your account.
 
 ### Which stock exchanges are supported?
-The stock search works for equities listed on major exchanges worldwide (NASDAQ, NYSE, TSX, TSXV, LSE, ASX, etc.). AI financial data is most reliable for stocks on NASDAQ and NYSE.
+The stock search works for equities listed on major exchanges worldwide (NASDAQ, NYSE, TSX, TSXV, LSE, ASX, etc.). Financial data retrieval is most reliable for US-listed stocks.
 
-### Why doesn’t the AI data button appear for some stocks?
-The AI search requires an account and is disabled for ETFs, mutual funds, and certain asset types where TTM financials aren’t applicable. It also shows a warning for minor exchanges where data availability may be limited.
+### Why is some financial data missing for certain stocks?
+The application retrieves Trailing Twelve Month (TTM) data from Yahoo Finance. This data may be missing or incomplete for ETFs, mutual funds, newly listed IPOs, or minor international exchanges where full fundamental reporting is not readily available.
 
 ### How many scenarios can I have?
 Each valuation supports up to 10 scenarios. You can create, duplicate, and delete scenarios as needed. To reorder them, use the **vertical grip handle** inside the Scenarios dropdown.

@@ -153,6 +153,16 @@ function computeFields(sc: Scenario, data: UnifiedFundamentals): DataField[] {
     });
   }
 
+  // 12. Book Value
+  if (data.bookValue) {
+    fields.push({
+      key: 'bookValue',
+      label: 'Book Value',
+      value: round(data.bookValue),
+      formatted: formatDynamicDecimal(data.bookValue, true),
+    });
+  }
+
   return fields;
 }
 
@@ -563,37 +573,30 @@ export function AssumptionsCard({
               <select value={sc.simpleMetricType} onChange={e => onUpdate({ simpleMetricType: e.target.value })} className={SELECT_CLS}>
                 <option>Free Cash Flow</option>
                 <option>Net Income (Earnings)</option>
-                <option title="Name your own metric">Custom</option>
+                <option>Operating Cash Flow</option>
+                <option>EBITDA</option>
+                <option>Book Value</option>
               </select>
             </div>
-            {sc.simpleMetricType === 'Custom' && (
+            {sc.simpleMetricType !== 'Book Value' && (
               <div>
-                <label className="block text-sm font-medium text-slate-600 mb-1">Custom Metric Name</label>
-                <input
-                  type="text"
-                  value={sc.simpleCustomMetric}
-                  onChange={e => onUpdate({ simpleCustomMetric: e.target.value })}
-                  placeholder="e.g. EBITDA, Operating Cash Flow"
-                  className={`${INPUT_CLS} ${!sc.simpleCustomMetric ? BLANK_GLOW_CLS : ''}`}
-                />
+                {(() => {
+                  let m1 = 'Metric';
+                  let m2 = 'Metric';
+                  if (sc.simpleMetricType === 'Free Cash Flow') { m1 = 'Total FCF'; m2 = 'FCF'; }
+                  else if (sc.simpleMetricType === 'Net Income (Earnings)') { m1 = 'Net Income'; m2 = 'Net Income'; }
+                  else if (sc.simpleMetricType === 'Operating Cash Flow') { m1 = 'OCF'; m2 = 'OCF'; }
+                  else if (sc.simpleMetricType === 'EBITDA') { m1 = 'EBITDA'; m2 = 'EBITDA'; }
+                  return (
+                    <select value={sc.simpleProjectionMethod} onChange={e => onUpdate({ simpleProjectionMethod: e.target.value })} className={SELECT_CLS}>
+                      <option value="Per Share">Per Share</option>
+                      <option value="Metric, Share Count">{m1}, Share Count</option>
+                      <option value="Revenue, Metric Margin, Share Count">Revenue, {m2} Margin, Share Count</option>
+                    </select>
+                  );
+                })()}
               </div>
             )}
-            <div>
-              {(() => {
-                let m1 = 'Metric';
-                let m2 = 'Metric';
-                if (sc.simpleMetricType === 'Free Cash Flow') { m1 = 'Total FCF'; m2 = 'FCF'; }
-                else if (sc.simpleMetricType === 'Net Income (Earnings)') { m1 = 'Net Income'; m2 = 'Net Income'; }
-                else if (sc.simpleMetricType === 'Custom') { m1 = sc.simpleCustomMetric || 'Custom Metric'; m2 = sc.simpleCustomMetric || 'Custom Metric'; }
-                return (
-                  <select value={sc.simpleProjectionMethod} onChange={e => onUpdate({ simpleProjectionMethod: e.target.value })} className={SELECT_CLS}>
-                    <option value="Per Share">Per Share</option>
-                    <option value="Metric, Share Count">{m1}, Share Count</option>
-                    <option value="Revenue, Metric Margin, Share Count">Revenue, {m2} Margin, Share Count</option>
-                  </select>
-                );
-              })()}
-            </div>
           </div>
         )}
 
@@ -668,6 +671,20 @@ export function AssumptionsCard({
           />
         </div>
 
+        {/* Book Value */}
+        <div>
+          <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Book Value</label>
+          <NumericFormat
+            value={sc.bookValue}
+            onValueChange={v => onUpdate({ bookValue: v.floatValue === undefined ? '' : v.floatValue })}
+            className={highlightedKeys.has('bookValue')
+              ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
+              : INPUT_CLS
+            }
+            onFocus={() => onClearHighlight('bookValue')}
+          />
+        </div>
+
         {/* ── SIMPLE: Growth section ── */}
         {isSimple && lbl && (() => {
           let keyPerShare: keyof Scenario = 'currentMetricPerShare';
@@ -678,15 +695,23 @@ export function AssumptionsCard({
             keyPerShare = 'niCurrentMetricPerShare';
             keyTotal = 'niCurrentMetricTotal';
             keyMargin = 'niFinalMargin';
-          } else if (sc.simpleMetricType === 'Custom') {
-            keyPerShare = 'customCurrentMetricPerShare';
-            keyTotal = 'customCurrentMetricTotal';
-            keyMargin = 'customFinalMargin';
+          } else if (sc.simpleMetricType === 'Operating Cash Flow') {
+            keyPerShare = 'ocfPerShare';
+            keyTotal = 'operatingCashflow';
+            keyMargin = 'ocfFinalMargin';
+          } else if (sc.simpleMetricType === 'EBITDA') {
+            keyPerShare = 'ebitdaPerShare';
+            keyTotal = 'ebitda';
+            keyMargin = 'ebitdaFinalMargin';
+          } else if (sc.simpleMetricType === 'Book Value') {
+            keyPerShare = 'bookValue';
           }
+
+          const effectiveProjectionMethod = sc.simpleMetricType === 'Book Value' ? 'Per Share' : sc.simpleProjectionMethod;
 
           return (
             <div className="space-y-4">
-              {sc.simpleProjectionMethod === 'Per Share' && (
+              {effectiveProjectionMethod === 'Per Share' && (
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">{lbl.labelCurrentPerShare}</label>
@@ -716,7 +741,7 @@ export function AssumptionsCard({
                 </div>
               )}
 
-              {sc.simpleProjectionMethod === 'Metric, Share Count' && (
+              {effectiveProjectionMethod === 'Metric, Share Count' && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Values in Millions</span>
@@ -783,7 +808,7 @@ export function AssumptionsCard({
                 </div>
               )}
 
-              {sc.simpleProjectionMethod === 'Revenue, Metric Margin, Share Count' && (
+              {effectiveProjectionMethod === 'Revenue, Metric Margin, Share Count' && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Values in Millions</span>

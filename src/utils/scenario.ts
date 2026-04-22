@@ -21,7 +21,6 @@ export function createDefaultScenario(): Scenario {
     // ── Basic DCF fields (Growth assumptions only) ──
     simpleProjectionMethod: 'Per Share',
     simpleMetricType: 'Free Cash Flow',
-    simpleCustomMetric: '',
     simpleMetricGrowthRate: '',
     simpleMetricGrowthRateTotal: '',
     simpleRevenueGrowthRate: '',
@@ -32,9 +31,8 @@ export function createDefaultScenario(): Scenario {
     niCurrentMetricPerShare: '',
     niCurrentMetricTotal: '',
     niFinalMargin: '',
-    customCurrentMetricPerShare: '',
-    customCurrentMetricTotal: '',
-    customFinalMargin: '',
+    ebitdaFinalMargin: '',
+    ocfFinalMargin: '',
 
     // ── Advanced DCF fields (Growth assumptions only) ──
     splitYears: [],
@@ -53,6 +51,13 @@ export function createDefaultScenario(): Scenario {
     currentRevenue: '',
     currentShares: '',
     inMillions: true,
+
+    // ── Metrics ──
+    ebitda: '',
+    operatingCashflow: '',
+    ebitdaPerShare: '',
+    ocfPerShare: '',
+    bookValue: '',
 
     // ── UI state ──
     showResetConfirm: false,
@@ -138,10 +143,9 @@ export function isScenarioEmpty(sc: Scenario): boolean {
     sc.niCurrentMetricTotal !== '' ||
     sc.niFinalMargin !== '';
 
-  const hasCustomMetric =
-    sc.customCurrentMetricPerShare !== '' ||
-    sc.customCurrentMetricTotal !== '' ||
-    sc.customFinalMargin !== '';
+  const hasNewMargin =
+    sc.ebitdaFinalMargin !== '' ||
+    sc.ocfFinalMargin !== '';
 
   // Check growth rates (Advanced)
   const hasMetricGrowth = sc.metricGrowthRates.some(r => r !== '');
@@ -159,7 +163,7 @@ export function isScenarioEmpty(sc: Scenario): boolean {
     sc.simpleSharesGrowthRate !== '';
 
   return !hasName && !hasBuyPrice && !hasCurrentMetric && 
-         !hasNiMetric && !hasCustomMetric &&
+         !hasNiMetric && !hasNewMargin &&
          !hasMetricGrowth && !hasMetricGrowthTotal && 
          !hasRevenueGrowth && !hasFinalMargin && !hasSharesGrowth &&
          !hasSimpleGrowth;

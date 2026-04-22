@@ -110,11 +110,11 @@ export function Header(props: HeaderProps) {
           {isHowToUseExpanded && (
             <div className="p-4 border-t border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
               <ul className="list-disc pl-5 space-y-4 text-slate-600 dark:text-slate-400 mb-4">
-                <li><strong>Guest vs. Account:</strong> Use the app as a guest and save or load your data by manually downloading/uploading your valuations. Creating an account unlocks automatic cloud saves, real-time cross-device syncing, the ability to store and manage multiple valuations at once, and load current financial data (powered by AI search).</li>
+                <li><strong>Guest vs. Account:</strong> Use the app as a guest and save or load your data by manually downloading/uploading your valuations. Creating an account unlocks automatic cloud saves, real-time cross-device syncing, and the ability to store and manage multiple valuations at once.</li>
                 <li><strong>Choose a Method:</strong> Select "Basic DCF" for a quick estimate or "Advanced DCF" for detailed, multi-phase growth projections.</li>
                 <li><strong>Configure Phases (Advanced):</strong> Click the timeline track to add growth phases. Drag the dots to adjust the years, or double-click/tap to remove them.</li>
                 <li><strong>Enter Assumptions:</strong> Fill in your estimates for cash flows, growth rates, margins, and discount rates.</li>
-                <li><strong>Load Stock Data:</strong> Use the search icon to fetch live stock prices (or AI-driven TTM financials when logged in) directly into your assumptions.</li>
+                <li><strong>Load Stock Data:</strong> Use the search icon to fetch live stock prices and TTM financials directly into your assumptions.</li>
                 <li><strong>Multiple Scenarios:</strong> Add up to 10 different scenarios by clicking the (+) button to the right of the scenarios dropdown.</li>
                 <li><strong>Save & Load:</strong> Guest users can use the Download Valuation and Upload Valuation buttons to manually manage valuation files. Logged-in users have all their valuations and scenarios saved automatically to the cloud.</li>
                 <li><strong>Text Summary Pro Tip:</strong> After finishing your inputs, copy the text summary at the bottom and paste into an AI chatbot for deeper analysis, sanity checks, or qualitative insights.</li>

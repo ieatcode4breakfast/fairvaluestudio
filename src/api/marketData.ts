@@ -21,6 +21,7 @@ export interface UnifiedFundamentals {
     ocfPerShare?: number;
     ebitda?: number;
     ebitdaPerShare?: number;
+    bookValue?: number;
     sharesOutstanding?: number;
 }
 
@@ -58,6 +59,7 @@ function mapToUnified(yahoo: any, finnhubPrice: number | null): UnifiedFundament
         fcfPerShare: (fcf && shares) ? fcf / shares : null,
         ocfPerShare: (ocf && shares) ? ocf / shares : null,
         ebitdaPerShare: (ebitda && shares) ? ebitda / shares : null,
+        bookValue: v(stats.bookValue),
         
         // Base
         sharesOutstanding: shares

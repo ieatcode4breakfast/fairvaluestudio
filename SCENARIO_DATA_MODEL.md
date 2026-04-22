@@ -8,6 +8,11 @@ These metrics represent common company data and are shared across **all** DCF mo
 | UI Label | JSON Identifier | Sync Behavior |
 | :--- | :--- | :--- |
 | **Current Revenue** | `currentRevenue` | Global |
+| **EBITDA** | `ebitda` | Global |
+| **Operating Cash Flow** | `operatingCashflow` | Global |
+| **EBITDA Per Share** | `ebitdaPerShare` | Global |
+| **OCF Per Share** | `ocfPerShare` | Global |
+| **Book Value** | `bookValue` | Global |
 | **Shares** | `currentShares` | Global |
 | **Values in Millions** | `inMillions` | Global |
 | **Shares Growth (%)** | `simpleSharesGrowthRate` | Synced with Advanced Phase 1 (`sharesGrowthRates[0]`) |
@@ -38,12 +43,17 @@ These fields are used for alternative metric testing in Basic mode. Changes here
 | **Current Net Income (Total)** | `niCurrentMetricTotal` |
 | **Net Income Margin (%)** | `niFinalMargin` |
 
-### Custom Metric Selection
+### Operating Cash Flow Selection
 | UI Label | JSON Identifier |
 | :--- | :--- |
-| **Current Custom Per Share** | `customCurrentMetricPerShare` |
-| **Current Custom (Total)** | `customCurrentMetricTotal` |
-| **Custom Margin (%)** | `customFinalMargin` |
+| **OCF Margin (%)** | `ocfFinalMargin` |
+*(Current per share and total OCF values use the global shared metrics `ocfPerShare` and `operatingCashflow`)*
+
+### EBITDA Selection
+| UI Label | JSON Identifier |
+| :--- | :--- |
+| **EBITDA Margin (%)** | `ebitdaFinalMargin` |
+*(Current per share and total EBITDA values use the global shared metrics `ebitdaPerShare` and `ebitda`)*
 
 ---
 

@@ -14,7 +14,6 @@ export interface Scenario {
 
   simpleProjectionMethod: string;
   simpleMetricType: string;
-  simpleCustomMetric: string;
   simpleMetricGrowthRate: number | string | '';
   simpleMetricGrowthRateTotal: number | string | '';
   simpleRevenueGrowthRate: number | string | '';
@@ -25,9 +24,8 @@ export interface Scenario {
   niCurrentMetricPerShare: number | string | '';
   niCurrentMetricTotal: number | string | '';
   niFinalMargin: number | string | '';
-  customCurrentMetricPerShare: number | string | '';
-  customCurrentMetricTotal: number | string | '';
-  customFinalMargin: number | string | '';
+  ebitdaFinalMargin: number | string | '';
+  ocfFinalMargin: number | string | '';
 
   splitYears: number[];
   hoverYear: number | null;
@@ -48,6 +46,7 @@ export interface Scenario {
   operatingCashflow: number | string | '';
   ebitdaPerShare: number | string | '';
   ocfPerShare: number | string | '';
+  bookValue: number | string | '';
 
   showResetConfirm: boolean;
   showYearlyBreakdown: boolean;

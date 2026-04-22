@@ -41,13 +41,21 @@ export function computeSimple(sc: Scenario): Results {
     metricPerShare = sc.niCurrentMetricPerShare;
     metricTotal    = sc.niCurrentMetricTotal;
     metricMargin   = sc.niFinalMargin;
-  } else if (sc.simpleMetricType === 'Custom') {
-    metricPerShare = sc.customCurrentMetricPerShare;
-    metricTotal    = sc.customCurrentMetricTotal;
-    metricMargin   = sc.customFinalMargin;
+  } else if (sc.simpleMetricType === 'Operating Cash Flow') {
+    metricPerShare = sc.ocfPerShare;
+    metricTotal    = sc.operatingCashflow;
+    metricMargin   = sc.ocfFinalMargin;
+  } else if (sc.simpleMetricType === 'EBITDA') {
+    metricPerShare = sc.ebitdaPerShare;
+    metricTotal    = sc.ebitda;
+    metricMargin   = sc.ebitdaFinalMargin;
+  } else if (sc.simpleMetricType === 'Book Value') {
+    metricPerShare = sc.bookValue;
   }
 
-  if (sc.simpleProjectionMethod === 'Per Share') {
+  const effectiveProjectionMethod = sc.simpleMetricType === 'Book Value' ? 'Per Share' : sc.simpleProjectionMethod;
+
+  if (effectiveProjectionMethod === 'Per Share') {
     const valCurrent = Number(metricPerShare) || 0;
     const valGrowth  = Number(sc.simpleMetricGrowthRate)      || 0;
     finalMetricPerShare = valCurrent * Math.pow(1 + valGrowth / 100, valYears);
@@ -90,10 +98,10 @@ export function computeSimple(sc: Scenario): Results {
     const targetTV               = valBuyPrice * Math.pow(1 + r, valYears);
     const targetFinalMetricPS    = targetTV / effectiveMultiple;
 
-    if (sc.simpleProjectionMethod === 'Per Share' && baseCFPerShare > 0) {
+    if (effectiveProjectionMethod === 'Per Share' && baseCFPerShare > 0) {
       impliedGrowth = (Math.pow(targetFinalMetricPS / baseCFPerShare, 1 / valYears) - 1) * 100;
 
-    } else if (sc.simpleProjectionMethod === 'Metric, Share Count') {
+    } else if (effectiveProjectionMethod === 'Metric, Share Count') {
       const valShares  = Number(sc.currentShares) || 0;
       const valSGrowth = Number(sc.simpleSharesGrowthRate) || 0;
       const valTotal   = Number(sc.currentMetricTotal) || 0;
