@@ -7,8 +7,8 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
 } from 'recharts';
+import { SafeChartWrapper } from '../SafeChartWrapper';
 import { Scenario, Results } from '../../types';
 import { formatCurrency, formatCompactNumber } from '../../utils/helpers';
 import { ChevronDown } from '../Icons';
@@ -87,8 +87,8 @@ export function FreeCashflowChart({ sc, results, onUpdate }: FreeCashflowChartPr
       </div>
 
       <div className="p-5 lg:p-6">
-        <div className="h-[280px] sm:h-auto sm:aspect-[2.1/1]">
-          <ResponsiveContainer width="100%" height="100%" debounce={50}>
+        <div className="h-[280px] sm:h-auto sm:aspect-[2.1/1] min-w-0">
+          <SafeChartWrapper>
             <LineChart
               data={chartData}
               margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
@@ -173,7 +173,7 @@ export function FreeCashflowChart({ sc, results, onUpdate }: FreeCashflowChartPr
                 isAnimationActive={true}
               />
             </LineChart>
-          </ResponsiveContainer>
+          </SafeChartWrapper>
         </div>
         <div className="mt-4 text-xs text-slate-500 dark:text-slate-400 text-center">
           <p>Hover over points to see Cash Flow Per Share and its present value.</p>
