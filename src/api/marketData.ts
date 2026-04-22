@@ -1,6 +1,6 @@
 import { supabase } from '../lib/supabase';
 import * as finnhub from './finnhub';
-import { getFmpTTM } from './fmp';
+
 
 export interface StockSearchResult {
     symbol: string;

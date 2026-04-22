@@ -183,29 +183,6 @@ export const updateLastActiveValuation = async (userId: string, valuationId: str
   }
 };
 
-export const updateUsername = async (userId: string, newUsername: string): Promise<void> => {
-  const { error } = await supabase
-    .from('users')
-    .update({ username: newUsername })
-    .eq('id', userId);
-
-  if (error) {
-    if (error.code === '23505') {
-      throw new Error('Username already taken');
-    }
-    throw new Error(error.message);
-  }
-};
-
-export const updateEmail = async (newEmail: string): Promise<void> => {
-  const { error } = await supabase.auth.updateUser({ email: newEmail });
-  if (error) throw new Error(error.message);
-};
-
-export const updatePassword = async (newPassword: string): Promise<void> => {
-  const { error } = await supabase.auth.updateUser({ password: newPassword });
-  if (error) throw new Error(error.message);
-};
 
 export const getScenarioCount = async (valuationId: string): Promise<number> => {
   const { count, error } = await supabase

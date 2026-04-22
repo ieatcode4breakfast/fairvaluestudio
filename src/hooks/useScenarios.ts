@@ -5,7 +5,7 @@ import { MAX_SCENARIOS, TRANSIENT_KEYS } from '../utils/constants';
 import { genId } from '../utils/genId';
 import { User } from '../types';
 
-export const LOCAL_STORAGE_KEY = 'fairvalue_scenarios';
+const LOCAL_STORAGE_KEY = 'fairvalue_scenarios';
 
 export function loadInitialScenarios(): Scenario[] {
   try {
