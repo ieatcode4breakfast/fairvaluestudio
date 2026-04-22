@@ -70,7 +70,8 @@ export async function searchStocks(query: string): Promise<StockSearchResult[]> 
  * Unified fundamentals that uses a Supabase cache + Yahoo Finance Edge Function.
  */
 export async function getStockFundamentals(symbol: string): Promise<UnifiedFundamentals> {
-    const cleanSymbol = symbol.toUpperCase();
+    // Normalize: Replace dots with hyphens for Yahoo Finance (e.g., BRK.B -> BRK-B)
+    const cleanSymbol = symbol.toUpperCase().replace(/\./g, '-');
     console.log(`[UnifiedData] Checking cache for ${cleanSymbol}...`);
 
     try {
