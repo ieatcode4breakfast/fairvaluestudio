@@ -29,7 +29,7 @@ export async function searchStocks(query: string): Promise<StockSearchResult[]> 
 
     try {
         const response = await fetch(
-            `${BASE_URL}/search?q=${encodeURIComponent(query)}&token=${API_KEY}`
+            `${BASE_URL}/search?q=${encodeURIComponent(query)}&exchange=US&token=${API_KEY}`
         );
         if (!response.ok) {
             throw new Error(`Finnhub search failed: ${response.status}`);
@@ -48,7 +48,7 @@ export async function searchStocks(query: string): Promise<StockSearchResult[]> 
 export async function getStockPrice(symbol: string): Promise<number | null> {
     try {
         const response = await fetch(
-            `${BASE_URL}/quote?symbol=${symbol}&token=${API_KEY}`
+            `${BASE_URL}/quote?symbol=${symbol}&exchange=US&token=${API_KEY}`
         );
         if (!response.ok) {
             throw new Error(`Finnhub quote failed: ${response.status}`);
@@ -69,7 +69,7 @@ export async function getStockFundamentals(symbol: string): Promise<FinnhubFunda
     try {
         const [price, financials] = await Promise.all([
             getStockPrice(symbol),
-            fetch(`${BASE_URL}/stock/metric?symbol=${symbol}&metric=all&token=${API_KEY}`)
+            fetch(`${BASE_URL}/stock/metric?symbol=${symbol}&metric=all&exchange=US&token=${API_KEY}`)
                 .then(r => r.ok ? r.json() : null)
                 .catch(() => null)
         ]);
