@@ -14,19 +14,57 @@ export interface UnifiedFundamentals {
     price: number | null;
     revenue?: number;
     netIncome?: number;
-    operatingCashFlow?: number;
-    capitalExpenditure?: number;
-    freeCashFlow?: number;
-    ebitda?: number;
-    sharesOutstanding?: number;
-    marketCap?: number;
-    peRatio?: number;
     eps?: number;
-    reportingPeriod?: { year: number; quarter: string } | null;
+    freeCashFlow?: number;
+    fcfPerShare?: number;
+    operatingCashFlow?: number;
+    ocfPerShare?: number;
+    ebitda?: number;
+    ebitdaPerShare?: number;
+    sharesOutstanding?: number;
 }
 
 /**
- * Checks if the cache date is after the most recent 5 PM UTC.
+ * Maps raw Yahoo Finance data and Finnhub price to our UnifiedFundamentals interface.
+ */
+function mapToUnified(yahoo: any, finnhubPrice: number | null): UnifiedFundamentals {
+    const financial = yahoo.financialData || {};
+    const stats = yahoo.defaultKeyStatistics || {};
+    const summary = yahoo.summaryDetail || {};
+
+    // Yahoo data is often wrapped in objects like { raw: 123.45, fmt: "123.45" }
+    const v = (obj: any) => (obj && typeof obj === 'object' && 'raw' in obj) ? obj.raw : obj;
+
+    const shares = v(stats.sharesOutstanding) || v(summary.sharesOutstanding) || 0;
+    const ni = v(financial.netIncomeToCommon) || v(stats.netIncomeToCommon) || null;
+    const fcf = v(financial.freeCashflow) || null;
+    const ocf = v(financial.operatingCashflow) || null;
+    const ebitda = v(financial.ebitda) || null;
+
+    return {
+        // Price: Finnhub only (no fallback to Yahoo)
+        price: finnhubPrice,
+        
+        // Totals
+        revenue: v(financial.totalRevenue),
+        netIncome: ni,
+        freeCashFlow: fcf,
+        operatingCashFlow: ocf,
+        ebitda: ebitda,
+        
+        // Per Share
+        eps: v(stats.trailingEps) || (ni && shares ? ni / shares : null),
+        fcfPerShare: (fcf && shares) ? fcf / shares : null,
+        ocfPerShare: (ocf && shares) ? ocf / shares : null,
+        ebitdaPerShare: (ebitda && shares) ? ebitda / shares : null,
+        
+        // Base
+        sharesOutstanding: shares
+    };
+}
+
+/**
+ * Checks if the cache date is after the most recent 5 PM EST (22:00 UTC).
  */
 function isCacheFresh(updatedAtStr: string): boolean {
     const updatedAt = new Date(updatedAtStr);
@@ -67,88 +105,72 @@ export async function searchStocks(query: string): Promise<StockSearchResult[]> 
 }
 
 /**
- * Unified fundamentals that uses a Supabase cache + Yahoo Finance Edge Function.
+ * Unified fundamentals that always fetches live price from Finnhub,
+ * but uses a Supabase cache for Yahoo Finance financials.
  */
 export async function getStockFundamentals(symbol: string): Promise<UnifiedFundamentals> {
-    // Normalize: Replace dots with hyphens for Yahoo Finance (e.g., BRK.B -> BRK-B)
-    const cleanSymbol = symbol.toUpperCase().replace(/\./g, '-');
-    console.log(`[UnifiedData] Checking cache for ${cleanSymbol}...`);
+    const primarySymbol = symbol.toUpperCase();
+    const yahooSymbol = primarySymbol.replace(/\./g, '-');
+
+    // 1. Always start fetching the live price immediately
+    console.log(`[UnifiedData] Initiating live price fetch for ${primarySymbol}...`);
+    const pricePromise = finnhub.getStockPrice(primarySymbol).catch(() => null);
 
     try {
-        // 1. Check Supabase Cache
+        // 2. Check Cache for Yahoo Data
         const { data: cached, error: cacheError } = await supabase
             .from('stock_cache')
             .select('*')
-            .eq('symbol', cleanSymbol)
+            .eq('symbol', primarySymbol)
             .maybeSingle();
 
-        if (cacheError) {
-            console.warn(`[UnifiedData] Cache query error (Expected if table is missing or API is syncing):`, cacheError);
-        }
+        if (cacheError) console.warn(`[UnifiedData] Cache query error:`, cacheError);
 
-        if (cached && isCacheFresh(cached.updated_at)) {
-            console.log(`[UnifiedData] Cache HIT for ${cleanSymbol} (Updated: ${cached.updated_at})`);
-            return cached.data as UnifiedFundamentals;
-        }
-
-        console.log(`[UnifiedData] Cache MISS or STALE for ${cleanSymbol}. Fetching from Edge Function...`);
-
-        // 2. Fetch from get-ttm Edge Function (Yahoo Finance)
-        // Note: Using localhost for local dev, should use VITE_SUPABASE_URL in production
-        const functionUrl = import.meta.env.DEV 
-            ? 'http://localhost:54321/functions/v1/get-ttm'
-            : `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-ttm`;
-
-        const response = await fetch(functionUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // Supabase functions locally don't need auth if served with --no-verify-jwt
-                // but in production they need the anon key
-                'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-            },
-            body: JSON.stringify({ symbol: cleanSymbol })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Edge Function failed: ${response.statusText}`);
-        }
-
-        const raw = await response.json();
+        let rawYahoo: any;
         
-        // 3. Map Yahoo Finance Summary to UnifiedFundamentals
-        const financial = raw.financialData || {};
-        const stats = raw.defaultKeyStatistics || {};
-        const summary = raw.summaryDetail || {};
+        if (cached && isCacheFresh(cached.updated_at)) {
+            console.log(`[UnifiedData] Yahoo Cache HIT for ${primarySymbol}. Using cached financials.`);
+            rawYahoo = cached.data.yahoo;
+        } else {
+            console.log(`[UnifiedData] Yahoo Cache MISS or STALE for ${primarySymbol}. Fetching live financials...`);
+            
+            const functionUrl = import.meta.env.DEV 
+                ? 'http://localhost:54321/functions/v1/get-ttm'
+                : `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-ttm`;
 
-        const unified: UnifiedFundamentals = {
-            price: financial.currentPrice || summary.regularMarketPrice || null,
-            revenue: financial.totalRevenue,
-            freeCashFlow: financial.freeCashflow,
-            operatingCashFlow: financial.operatingCashflow,
-            ebitda: financial.ebitda,
-            sharesOutstanding: stats.sharesOutstanding || summary.sharesOutstanding,
-            marketCap: summary.marketCap,
-            peRatio: summary.trailingPE,
-            eps: stats.trailingEps,
-            reportingPeriod: null // Yahoo summary doesn't give a single clear period easily
-        };
-
-        // 4. Update Cache
-        const { error: upsertError } = await supabase
-            .from('stock_cache')
-            .upsert({
-                symbol: cleanSymbol,
-                data: unified,
-                updated_at: new Date().toISOString()
+            const edgeRes = await fetch(functionUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+                },
+                body: JSON.stringify({ symbol: yahooSymbol })
             });
 
-        if (upsertError) console.error(`[UnifiedData] Cache update failed:`, upsertError);
+            if (!edgeRes.ok) {
+                throw new Error(`Edge Function failed: ${edgeRes.statusText}`);
+            }
 
-        return unified;
+            rawYahoo = await edgeRes.json();
+            
+            // 3. Update Cache with new Yahoo data (async, don't wait)
+            supabase.from('stock_cache').upsert({
+                symbol: primarySymbol,
+                data: { yahoo: rawYahoo },
+                updated_at: new Date().toISOString()
+            }).then(({ error }) => {
+                if (error) console.error(`[UnifiedData] Cache update failed for ${primarySymbol}:`, error);
+            });
+        }
+
+        // 4. Combine live price with (cached or live) Yahoo data
+        const finnhubPrice = await pricePromise;
+        return mapToUnified(rawYahoo, finnhubPrice);
 
     } catch (error) {
-        console.error(`[UnifiedData] Unified fetch failed for ${cleanSymbol}:`, error);
-        return { price: null };
+        console.error(`[UnifiedData] Hybrid fetch failed for ${primarySymbol}:`, error);
+        // Fallback: at least try to return the live price if we have it
+        const fallbackPrice = await pricePromise;
+        return { price: fallbackPrice };
     }
 }

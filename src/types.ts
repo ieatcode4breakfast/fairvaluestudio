@@ -46,6 +46,8 @@ export interface Scenario {
 
   ebitda: number | string | '';
   operatingCashflow: number | string | '';
+  ebitdaPerShare: number | string | '';
+  ocfPerShare: number | string | '';
 
   showResetConfirm: boolean;
   showYearlyBreakdown: boolean;

@@ -47,17 +47,22 @@ export async function searchStocks(query: string): Promise<StockSearchResult[]> 
  */
 export async function getStockPrice(symbol: string): Promise<number | null> {
     try {
+        // The quote endpoint does not support the 'exchange' parameter. 
+        // Using it can cause the API to return 0 or empty data for certain symbols.
         const response = await fetch(
-            `${BASE_URL}/quote?symbol=${symbol}&exchange=US&token=${API_KEY}`
+            `${BASE_URL}/quote?symbol=${symbol}&token=${API_KEY}`
         );
         if (!response.ok) {
             throw new Error(`Finnhub quote failed: ${response.status}`);
         }
         const data = await response.json();
-        return data.c ?? null;
+        
+        // Finnhub returns 0 if the symbol is not found or has no price data.
+        // We treat 0 as null to trigger the fallback in marketData.ts.
+        return (data.c && data.c !== 0) ? data.c : null;
     } catch (error) {
         console.error('Failed to fetch stock price:', error);
-        throw error;
+        return null;
     }
 }
 

@@ -53,105 +53,103 @@ function computeFields(sc: Scenario, data: UnifiedFundamentals): DataField[] {
     });
   }
 
-  // 2. SEC Metrics (TTM)
+  // 2. Revenue
   if (data.revenue) {
     fields.push({
       key: 'currentRevenue',
-      label: 'Revenue (TTM)',
+      label: 'Revenue',
       value: s(data.revenue),
       formatted: formatDynamicDecimal(s(data.revenue), true),
     });
   }
 
+  // 3. Net Income
   if (data.netIncome) {
     fields.push({
       key: 'niCurrentMetricTotal',
-      label: 'Net Income (TTM)',
+      label: 'Net Income',
       value: s(data.netIncome),
       formatted: formatDynamicDecimal(s(data.netIncome), true),
     });
-
-    if (data.sharesOutstanding) {
-      const eps = data.netIncome / data.sharesOutstanding;
-      fields.push({
-        key: 'niCurrentMetricPerShare',
-        label: 'Earnings Per Share (TTM)',
-        value: round(eps),
-        formatted: formatDynamicDecimal(eps, true),
-      });
-    }
   }
 
+  // 4. Earnings Per Share
+  if (data.eps) {
+    fields.push({
+      key: 'niCurrentMetricPerShare',
+      label: 'Earnings Per Share',
+      value: round(data.eps),
+      formatted: formatDynamicDecimal(data.eps, true),
+    });
+  }
+
+  // 5. Free Cash Flow
   if (data.freeCashFlow) {
     fields.push({
       key: 'currentMetricTotal',
-      label: 'Free Cash Flow (TTM)',
+      label: 'Free Cash Flow',
       value: s(data.freeCashFlow),
       formatted: formatDynamicDecimal(s(data.freeCashFlow), true),
     });
-
-    if (data.sharesOutstanding) {
-      const fcfps = data.freeCashFlow / data.sharesOutstanding;
-      fields.push({
-        key: 'currentMetricPerShare',
-        label: 'FCF Per Share (TTM)',
-        value: round(fcfps),
-        formatted: formatDynamicDecimal(fcfps, true),
-      });
-    }
   }
 
+  // 6. Free Cash Flow Per Share
+  if (data.fcfPerShare) {
+    fields.push({
+      key: 'currentMetricPerShare',
+      label: 'Free Cash Flow Per Share',
+      value: round(data.fcfPerShare),
+      formatted: formatDynamicDecimal(data.fcfPerShare, true),
+    });
+  }
+
+  // 7. Operating Cash Flow
   if (data.operatingCashFlow) {
     fields.push({
       key: 'operatingCashflow',
-      label: 'Operating Cash Flow (TTM)',
+      label: 'Operating Cash Flow',
       value: s(data.operatingCashFlow),
       formatted: formatDynamicDecimal(s(data.operatingCashFlow), true),
     });
   }
 
+  // 8. Operating Cash Flow Per Share
+  if (data.ocfPerShare) {
+    fields.push({
+      key: 'ocfPerShare',
+      label: 'Operating Cash Flow Per Share',
+      value: round(data.ocfPerShare),
+      formatted: formatDynamicDecimal(data.ocfPerShare, true),
+    });
+  }
+
+  // 9. EBITDA
   if (data.ebitda) {
     fields.push({
       key: 'ebitda',
-      label: 'EBITDA (TTM)',
+      label: 'EBITDA',
       value: s(data.ebitda),
       formatted: formatDynamicDecimal(s(data.ebitda), true),
     });
   }
 
+  // 10. EBITDA Per Share
+  if (data.ebitdaPerShare) {
+    fields.push({
+      key: 'ebitdaPerShare',
+      label: 'EBITDA Per Share',
+      value: round(data.ebitdaPerShare),
+      formatted: formatDynamicDecimal(data.ebitdaPerShare, true),
+    });
+  }
+
+  // 11. Shares Outstanding
   if (data.sharesOutstanding) {
     fields.push({
       key: 'currentShares',
       label: 'Shares Outstanding',
       value: s(data.sharesOutstanding),
       formatted: formatDynamicDecimal(s(data.sharesOutstanding), true),
-    });
-  }
-
-  if (data.marketCap) {
-    fields.push({
-      key: 'marketCap',
-      label: 'Market Cap',
-      value: s(data.marketCap),
-      formatted: formatDynamicDecimal(s(data.marketCap), true),
-    });
-  }
-
-  if (data.peRatio) {
-    fields.push({
-      key: 'peRatio',
-      label: 'P/E Ratio (TTM)',
-      value: round(data.peRatio),
-      formatted: formatDynamicDecimal(data.peRatio, true),
-    });
-  }
-
-  if (data.eps) {
-    fields.push({
-      key: 'eps',
-      label: 'EPS (TTM)',
-      value: round(data.eps),
-      formatted: formatDynamicDecimal(data.eps, true),
     });
   }
 
@@ -452,14 +450,8 @@ export function AssumptionsCard({
 
     previewFields.forEach(field => {
       if (enabledKeys.includes(field.key)) {
-        // Map special Yahoo fields to existing scenario fields
-        if (field.key === 'eps') {
-          changes.niCurrentMetricPerShare = field.value;
-        } else if (field.key === 'peRatio') {
-          changes.exitMultiple = field.value;
-        } else if (['buyPrice', 'currentRevenue', 'niCurrentMetricTotal', 'currentMetricTotal', 'currentShares', 'ebitda', 'operatingCashflow'].includes(field.key)) {
-          (changes as any)[field.key] = field.value;
-        }
+        // Map keys to their corresponding Scenario fields
+        (changes as any)[field.key] = field.value;
       }
     });
     onUpdate(changes);
