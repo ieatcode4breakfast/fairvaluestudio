@@ -65,6 +65,24 @@ export async function getAIUsageStatus(userId: string): Promise<{ count: number,
 }
 
 /**
+ * Helper to parse AI-returned values with suffixes like "M" (Millions).
+ * Example: "716900.00M" -> 716900000000
+ */
+function parseAISuffixValue(val: string | number | undefined | null): number {
+    if (val === undefined || val === null) return 0;
+    if (typeof val === 'number') return val;
+    
+    const cleanVal = val.toString().trim().toUpperCase();
+    if (cleanVal.endsWith('M')) {
+        return parseFloat(cleanVal.replace('M', '')) * 1000000;
+    }
+    if (cleanVal.endsWith('B')) {
+        return parseFloat(cleanVal.replace('B', '')) * 1000000000;
+    }
+    return parseFloat(cleanVal) || 0;
+}
+
+/**
  * Fetches TTM financial data for a specific stock including per-share metrics.
  * @param ticker - The stock symbol (e.g., "AAPL")
  * @param companyName - The full name of the company (e.g., "Apple Inc.")
@@ -113,6 +131,7 @@ export async function fetchTTMData(
             .from('ai_search_cache')
             .select('*')
             .eq('ticker', uppercaseTicker)
+            .eq('company_name', companyName)
             .maybeSingle();
 
         if (cached && !cacheError && targetPeriod) {
@@ -240,13 +259,13 @@ export async function fetchTTMData(
         
         const parsedData = JSON.parse(content.trim());
 
-        const revenue = Number(parsedData.revenue);
-        const ebitda = Number(parsedData.ebitda || 0);
-        const freeCashFlow = Number(parsedData.freeCashFlow);
-        const operatingCashFlow = Number(parsedData.operatingCashFlow || 0);
-        const netIncome = Number(parsedData.netIncome);
-        const bookValue = Number(parsedData.bookValue || 0);
-        const shares = Number(parsedData.sharesOutstanding);
+        const revenue = parseAISuffixValue(parsedData.revenue);
+        const ebitda = parseAISuffixValue(parsedData.ebitda);
+        const freeCashFlow = parseAISuffixValue(parsedData.freeCashFlow);
+        const operatingCashFlow = parseAISuffixValue(parsedData.operatingCashFlow);
+        const netIncome = parseAISuffixValue(parsedData.netIncome);
+        const bookValue = parseAISuffixValue(parsedData.bookValue);
+        const shares = parseAISuffixValue(parsedData.sharesOutstanding);
         const fiscalYear = Number(parsedData.fiscalYear);
         const fiscalQuarter = Number(parsedData.fiscalQuarter);
 
@@ -304,7 +323,7 @@ export async function fetchTTMData(
             fiscal_year: fiscalYear,
             fiscal_quarter: fiscalQuarter,
             last_updated: serverDate.toISOString()
-        }).then(({ error }) => {
+        }, { onConflict: 'ticker,company_name' }).then(({ error }) => {
             if (error) console.error('[OpenRouter] Failed to update global cache:', error);
         });
 

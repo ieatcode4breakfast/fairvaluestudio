@@ -172,6 +172,7 @@ export function StockDataPreviewModal({
                                         </p>
                                         <p className="text-base font-semibold text-slate-900 dark:text-slate-100 mt-0.5">
                                             {field.formatted}
+                                            {inMillions && ['currentRevenue', 'currentMetricTotal', 'niCurrentMetricTotal', 'currentShares'].includes(field.key) && ' M'}
                                         </p>
                                     </div>
                                     <Toggle

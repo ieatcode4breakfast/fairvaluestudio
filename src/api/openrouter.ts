@@ -29,7 +29,7 @@ const API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
  */
 export async function getAIUsageStatus(userId: string): Promise<{ count: number, limit: number }> {
     const today = new Date().toISOString().split('T')[0];
-    
+
     // 1. Fetch usage count
     const { count, error: usageError } = await supabase
         .from('ai_search_logs')
@@ -52,10 +52,28 @@ export async function getAIUsageStatus(userId: string): Promise<{ count: number,
         console.error('[OpenRouter] Error fetching user limit:', userError);
     }
 
-    return { 
-        count: count || 0, 
+    return {
+        count: count || 0,
         limit: userData?.ai_search_limit ?? 5 // Default to 5 if not set or error
     };
+}
+
+/**
+ * Helper to parse AI-returned values with suffixes like "M" (Millions).
+ * Example: "716900.00M" -> 716900000000
+ */
+function parseAISuffixValue(val: string | number | undefined | null): number {
+    if (val === undefined || val === null) return 0;
+    if (typeof val === 'number') return val;
+    
+    const cleanVal = val.toString().trim().toUpperCase();
+    if (cleanVal.endsWith('M')) {
+        return parseFloat(cleanVal.replace('M', '')) * 1000000;
+    }
+    if (cleanVal.endsWith('B')) {
+        return parseFloat(cleanVal.replace('B', '')) * 1000000000;
+    }
+    return parseFloat(cleanVal) || 0;
 }
 
 /**
@@ -67,9 +85,9 @@ export async function getAIUsageStatus(userId: string): Promise<{ count: number,
  * @param targetPeriod - The most recent reporting period found on Finnhub
  */
 export async function fetchTTMData(
-    ticker: string, 
-    companyName: string, 
-    exchange?: string, 
+    ticker: string,
+    companyName: string,
+    exchange?: string,
     userId?: string,
     targetPeriod?: { year: number, quarter: number } | null
 ): Promise<TTMData> {
@@ -90,7 +108,7 @@ export async function fetchTTMData(
     } catch (err) {
         console.warn('[OpenRouter] Failed to fetch server time, falling back to local clock.');
     }
-    
+
     const currentDate = serverDate.toISOString().split('T')[0];
 
     // ── 0. Usage Limit Check ────────────────────────────────────────────────
@@ -107,19 +125,20 @@ export async function fetchTTMData(
             .from('ai_search_cache')
             .select('*')
             .eq('ticker', uppercaseTicker)
+            .eq('company_name', companyName)
             .maybeSingle();
 
         if (cached && !cacheError && targetPeriod) {
             // Check if our cache is up-to-date with Finnhub's reported period
             const cacheFiscalYear = Number(cached.fiscal_year);
             const cacheFiscalQuarter = Number(cached.fiscal_quarter);
-            
-            const isUpToDate = cacheFiscalYear > targetPeriod.year || 
-                              (cacheFiscalYear === targetPeriod.year && cacheFiscalQuarter >= targetPeriod.quarter);
+
+            const isUpToDate = cacheFiscalYear > targetPeriod.year ||
+                (cacheFiscalYear === targetPeriod.year && cacheFiscalQuarter >= targetPeriod.quarter);
 
             if (isUpToDate) {
                 console.log(`[OpenRouter] Cache HIT (${cacheFiscalYear} Q${cacheFiscalQuarter}) for ${uppercaseTicker}`);
-                
+
                 // Log the search even if it was a cache hit (for usage tracking)
                 if (userId) {
                     supabase.from('ai_search_logs').insert({
@@ -176,7 +195,7 @@ export async function fetchTTMData(
     - "revenue": Net revenue (TTM)
     - "freeCashFlow": Operating Cash Flow minus CAPEX (TTM)
     - "netIncome": GAAP Net Income (TTM)
-    - "sharesOutstanding": Total Diluted Shares Outstanding (Latest available)
+    - "sharesOutstanding": Total Diluted Shares Outstanding.
     - "currency": The reported currency (e.g., "USD")
     - "fiscalYear": The fiscal year this data belongs to (e.g., 2024). Use the company's specific fiscal calendar.
     - "fiscalQuarter": The fiscal quarter the TTM period ends on (1, 2, 3, or 4).
@@ -199,9 +218,9 @@ export async function fetchTTMData(
             body: JSON.stringify({
                 model: 'perplexity/sonar-pro-search',
                 messages: [
-                    { 
-                        role: 'system', 
-                        content: 'You are a professional financial data extractor. Use the most recent company filings. Return the Fiscal Year and Quarter accurately based on the company\'s specific reporting calendar.' 
+                    {
+                        role: 'system',
+                        content: 'You are a professional financial data extractor. Use the most recent company filings. Return the Fiscal Year and Quarter accurately based on the company\'s specific reporting calendar.'
                     },
                     { role: 'user', content: prompt }
                 ],
@@ -216,19 +235,19 @@ export async function fetchTTMData(
 
         const data = await response.json();
         let content = data.choices[0].message.content;
-        
+
         if (content.includes('```json')) {
             content = content.split('```json')[1].split('```')[0];
         } else if (content.includes('```')) {
             content = content.split('```')[1].split('```')[0];
         }
-        
+
         const parsedData = JSON.parse(content.trim());
 
-        const revenue = Number(parsedData.revenue);
-        const freeCashFlow = Number(parsedData.freeCashFlow);
-        const netIncome = Number(parsedData.netIncome);
-        const shares = Number(parsedData.sharesOutstanding);
+        const revenue = parseAISuffixValue(parsedData.revenue);
+        const freeCashFlow = parseAISuffixValue(parsedData.freeCashFlow);
+        const netIncome = parseAISuffixValue(parsedData.netIncome);
+        const shares = parseAISuffixValue(parsedData.sharesOutstanding);
         const fiscalYear = Number(parsedData.fiscalYear);
         const fiscalQuarter = Number(parsedData.fiscalQuarter);
 
@@ -248,7 +267,7 @@ export async function fetchTTMData(
         };
 
         // ── 3. Post-Fetch: Log Usage and Update Cache ────────────────────────
-        
+
         if (userId) {
             const usageData = data.usage || {};
             supabase.from('ai_search_logs').insert({
@@ -277,7 +296,7 @@ export async function fetchTTMData(
             fiscal_year: fiscalYear,
             fiscal_quarter: fiscalQuarter,
             last_updated: serverDate.toISOString()
-        }).then(({ error }) => {
+        }, { onConflict: 'ticker,company_name' }).then(({ error }) => {
             if (error) console.error('[OpenRouter] Failed to update global cache:', error);
         });
 
