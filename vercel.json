@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/sec-api/(.*)",
+      "destination": "/api/proxy?pathname=/api/proxy/sec-api/$1"
+    },
+    {
+      "source": "/sec-www/(.*)",
+      "destination": "/api/proxy?pathname=/api/proxy/sec-www/$1"
+    }
+  ]
+}
