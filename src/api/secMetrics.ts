@@ -6,7 +6,8 @@
 
 // CRITICAL: The SEC will block your request if this is not updated to your actual info.
 // CRITICAL: The SEC will block your request if this is not updated to your actual info.
-const USER_AGENT = "FairValueStudio/1.0 (https://fairvaluestudio.app; admin@fairvaluestudio.app)";
+const SEC_EMAIL = import.meta.env.VITE_SEC_API_EMAIL || "admin@fairvaluestudio.app";
+const USER_AGENT = `FairValueStudio/1.0 (https://fairvaluestudio.app; ${SEC_EMAIL})`;
 
 interface SecFactValue {
     start?: string;
