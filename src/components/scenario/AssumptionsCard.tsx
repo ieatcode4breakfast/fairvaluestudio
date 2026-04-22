@@ -101,12 +101,57 @@ function computeFields(sc: Scenario, data: UnifiedFundamentals): DataField[] {
     }
   }
 
+  if (data.operatingCashFlow) {
+    fields.push({
+      key: 'operatingCashflow',
+      label: 'Operating Cash Flow (TTM)',
+      value: s(data.operatingCashFlow),
+      formatted: formatDynamicDecimal(s(data.operatingCashFlow), true),
+    });
+  }
+
+  if (data.ebitda) {
+    fields.push({
+      key: 'ebitda',
+      label: 'EBITDA (TTM)',
+      value: s(data.ebitda),
+      formatted: formatDynamicDecimal(s(data.ebitda), true),
+    });
+  }
+
   if (data.sharesOutstanding) {
     fields.push({
       key: 'currentShares',
       label: 'Shares Outstanding',
       value: s(data.sharesOutstanding),
       formatted: formatDynamicDecimal(s(data.sharesOutstanding), true),
+    });
+  }
+
+  if (data.marketCap) {
+    fields.push({
+      key: 'marketCap',
+      label: 'Market Cap',
+      value: s(data.marketCap),
+      formatted: formatDynamicDecimal(s(data.marketCap), true),
+    });
+  }
+
+  if (data.peRatio) {
+    fields.push({
+      key: 'peRatio',
+      label: 'P/E Ratio (TTM)',
+      value: round(data.peRatio),
+      formatted: formatDynamicDecimal(data.peRatio, true),
+    });
+  }
+
+  if (data.eps) {
+    fields.push({
+      key: 'eps',
+      label: 'EPS (TTM)',
+      value: round(data.eps),
+      formatted: formatDynamicDecimal(data.eps, true),
     });
   }
 
@@ -402,13 +447,19 @@ export function AssumptionsCard({
     setShowPreview(true);
   };
 
-  // Called when the user hits Apply in the preview modal.
   const handleApply = (enabledKeys: string[]) => {
     const changes: Partial<Scenario> = {};
 
     previewFields.forEach(field => {
       if (enabledKeys.includes(field.key)) {
-        (changes as any)[field.key] = field.value;
+        // Map special Yahoo fields to existing scenario fields
+        if (field.key === 'eps') {
+          changes.niCurrentMetricPerShare = field.value;
+        } else if (field.key === 'peRatio') {
+          changes.exitMultiple = field.value;
+        } else if (['buyPrice', 'currentRevenue', 'niCurrentMetricTotal', 'currentMetricTotal', 'currentShares', 'ebitda', 'operatingCashflow'].includes(field.key)) {
+          (changes as any)[field.key] = field.value;
+        }
       }
     });
     onUpdate(changes);

@@ -44,6 +44,9 @@ export interface Scenario {
   currentShares: number | string | '';
   sharesGrowthRates: (number | string | '')[];
 
+  ebitda: number | string | '';
+  operatingCashflow: number | string | '';
+
   showResetConfirm: boolean;
   showYearlyBreakdown: boolean;
 }
