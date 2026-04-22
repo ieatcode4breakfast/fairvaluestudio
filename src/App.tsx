@@ -9,6 +9,7 @@ import { genId } from './utils/genId';
 
 // Custom Utils
 import { createDefaultScenario, migrateScenario, isScenarioEmpty, cloneScenario } from './utils/scenario';
+import { isScenarioIncomplete } from './utils/helpers';
 
 // Custom Hooks
 import { loadInitialScenarios, useScenarios } from './hooks/useScenarios';
@@ -139,10 +140,22 @@ export default function App() {
   const activeScenario = scenarios[activeIndex] || scenarios[0];
   const activeResults = allResults[activeIndex] || allResults[0];
 
-  const combinedSummary = useMemo(() =>
-    scenarios.map((sc, i) => buildSummaryText(sc, allResults[i], i)).join('\n\n---\n\n'),
-    [scenarios, allResults]
-  );
+  const combinedSummary = useMemo(() => {
+    const incomplete = scenarios
+      .map((sc, i) => ({ sc, i, isIncomplete: isScenarioIncomplete(sc) }))
+      .filter(item => item.isIncomplete);
+
+    if (incomplete.length > 0) {
+      return incomplete
+        .map(item => {
+          const name = item.sc.scenarioName.trim() || `Scenario ${item.i + 1}`;
+          return `${name} has incomplete inputs.`;
+        })
+        .join('\n');
+    }
+
+    return scenarios.map((sc, i) => buildSummaryText(sc, allResults[i], i)).join('\n\n---\n\n');
+  }, [scenarios, allResults]);
 
   // Process the pending guest action and load appropriate valuation
   const handleAuthSuccess = async (user: User) => {
