@@ -28,9 +28,10 @@ export interface UnifiedFundamentals {
  * Maps raw Yahoo Finance data and Finnhub price to our UnifiedFundamentals interface.
  */
 function mapToUnified(yahoo: any, finnhubPrice: number | null): UnifiedFundamentals {
-    const financial = yahoo.financialData || {};
-    const stats = yahoo.defaultKeyStatistics || {};
-    const summary = yahoo.summaryDetail || {};
+    const y = yahoo || {};
+    const financial = y.financialData || {};
+    const stats = y.defaultKeyStatistics || {};
+    const summary = y.summaryDetail || {};
 
     // Yahoo data is often wrapped in objects like { raw: 123.45, fmt: "123.45" }
     const v = (obj: any) => (obj && typeof obj === 'object' && 'raw' in obj) ? obj.raw : obj;
@@ -128,7 +129,7 @@ export async function getStockFundamentals(symbol: string): Promise<UnifiedFunda
 
         let rawYahoo: any;
         
-        if (cached && isCacheFresh(cached.updated_at)) {
+        if (cached && isCacheFresh(cached.updated_at) && cached.data?.yahoo) {
             console.log(`[UnifiedData] Yahoo Cache HIT for ${primarySymbol}. Using cached financials.`);
             rawYahoo = cached.data.yahoo;
         } else {
