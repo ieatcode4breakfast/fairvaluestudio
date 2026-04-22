@@ -129,11 +129,16 @@ export async function getSecFinancials(ticker: string): Promise<any> {
         const netIncomeTags = ["NetIncomeLoss", "ProfitLoss", "NetIncomeLossAvailableToCommonStockholdersBasic"];
         const ocfTags = ["NetCashProvidedByUsedInOperatingActivities"];
         const capExTags = ["PaymentsToAcquirePropertyPlantAndEquipment"];
+        const operatingIncomeTags = ["OperatingIncomeLoss"];
+        const daTags = ["DepreciationDepletionAndAmortization", "DepreciationAndAmortization"];
 
         const revenue = calculateTTM(facts, revenueTags);
         const netIncome = calculateTTM(facts, netIncomeTags);
         const ocf = calculateTTM(facts, ocfTags);
         const capEx = calculateTTM(facts, capExTags);
+        const operatingIncome = calculateTTM(facts, operatingIncomeTags);
+        const da = calculateTTM(facts, daTags);
+        const ebitda = operatingIncome + da;
 
 
         const refFact = getLatestValue(facts, revenueTags);
@@ -145,6 +150,8 @@ export async function getSecFinancials(ticker: string): Promise<any> {
         return {
             revenue,
             netIncome,
+            ebitda,
+            operatingIncome,
             operatingCashFlow: ocf,
             capitalExpenditure: capEx,
             freeCashFlow,
