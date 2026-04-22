@@ -672,18 +672,20 @@ export function AssumptionsCard({
         </div>
 
         {/* Book Value */}
-        <div>
-          <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Book Value</label>
-          <NumericFormat
-            value={sc.bookValue}
-            onValueChange={v => onUpdate({ bookValue: v.floatValue === undefined ? '' : v.floatValue })}
-            className={highlightedKeys.has('bookValue')
-              ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
-              : INPUT_CLS
-            }
-            onFocus={() => onClearHighlight('bookValue')}
-          />
-        </div>
+        {sc.dcfMethod === 'Basic DCF' && sc.simpleMetricType === 'Book Value' && (
+          <div>
+            <label className="block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Book Value</label>
+            <NumericFormat
+              value={sc.bookValue}
+              onValueChange={v => onUpdate({ bookValue: v.floatValue === undefined ? '' : v.floatValue })}
+              className={highlightedKeys.has('bookValue')
+                ? INPUT_CLS.replace('border-slate-200 dark:border-slate-700', 'border-indigo-400 dark:border-indigo-500')
+                : INPUT_CLS
+              }
+              onFocus={() => onClearHighlight('bookValue')}
+            />
+          </div>
+        )}
 
         {/* ── SIMPLE: Growth section ── */}
         {isSimple && lbl && (() => {

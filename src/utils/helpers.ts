@@ -67,38 +67,40 @@ export function isScenarioIncomplete(sc: import('../types').Scenario): boolean {
   if (sc.dcfMethod === 'Basic DCF') {
     // Metric-specific current value fields
     if (sc.simpleProjectionMethod === 'Per Share') {
-      const metricPerShare = sc.simpleMetricType === 'Net Income (Earnings)'
-        ? sc.niCurrentMetricPerShare
-        : sc.simpleMetricType === 'Custom'
-        ? sc.customCurrentMetricPerShare
-        : sc.currentMetricPerShare;
-      if (anyBlank(metricPerShare, sc.simpleMetricGrowthRate)) return true;
+      let val: any = sc.currentMetricPerShare;
+      if (sc.simpleMetricType === 'Net Income (Earnings)') val = sc.niCurrentMetricPerShare;
+      else if (sc.simpleMetricType === 'Operating Cash Flow') val = sc.ocfPerShare;
+      else if (sc.simpleMetricType === 'EBITDA') val = sc.ebitdaPerShare;
+      else if (sc.simpleMetricType === 'Book Value') val = sc.bookValue;
+
+      if (anyBlank(val, sc.simpleMetricGrowthRate)) return true;
     } else if (sc.simpleProjectionMethod === 'Metric, Share Count') {
-      const metricTotal = sc.simpleMetricType === 'Net Income (Earnings)'
-        ? sc.niCurrentMetricTotal
-        : sc.simpleMetricType === 'Custom'
-        ? sc.customCurrentMetricTotal
-        : sc.currentMetricTotal;
-      if (anyBlank(metricTotal, sc.simpleMetricGrowthRateTotal, sc.currentShares, sc.simpleSharesGrowthRate)) return true;
+      let val: any = sc.currentMetricTotal;
+      if (sc.simpleMetricType === 'Net Income (Earnings)') val = sc.niCurrentMetricTotal;
+      else if (sc.simpleMetricType === 'Operating Cash Flow') val = sc.operatingCashflow;
+      else if (sc.simpleMetricType === 'EBITDA') val = sc.ebitda;
+
+      if (anyBlank(val, sc.simpleMetricGrowthRateTotal, sc.currentShares, sc.simpleSharesGrowthRate)) return true;
     } else {
-      const metricMargin = sc.simpleMetricType === 'Net Income (Earnings)'
-        ? sc.niFinalMargin
-        : sc.simpleMetricType === 'Custom'
-        ? sc.customFinalMargin
-        : sc.simpleFinalMargin;
-      if (anyBlank(sc.currentRevenue, sc.simpleRevenueGrowthRate, metricMargin, sc.currentShares, sc.simpleSharesGrowthRate)) return true;
+      let valMargin: any = sc.simpleFinalMargin;
+      if (sc.simpleMetricType === 'Net Income (Earnings)') valMargin = sc.niFinalMargin;
+      else if (sc.simpleMetricType === 'Operating Cash Flow') valMargin = sc.ocfFinalMargin;
+      else if (sc.simpleMetricType === 'EBITDA') valMargin = sc.ebitdaFinalMargin;
+
+      if (anyBlank(sc.currentRevenue, sc.simpleRevenueGrowthRate, valMargin, sc.currentShares, sc.simpleSharesGrowthRate)) return true;
     }
   } else {
-    // Advanced DCF
+    // Advanced DCF - Only validate ACTIVE phases
+    const numPhases = sc.splitYears.length + 1;
     if (sc.projectionMethod === 'Per Share Method') {
       if (isBlank(sc.currentMetricPerShare)) return true;
-      if (sc.metricGrowthRates.some(isBlank)) return true;
+      if (sc.metricGrowthRates.slice(0, numPhases).some(isBlank)) return true;
     } else if (sc.projectionMethod === 'Total FCF, Share Count') {
       if (anyBlank(sc.currentMetricTotal, sc.currentShares)) return true;
-      if (sc.metricGrowthRatesTotal.some(isBlank) || sc.sharesGrowthRates.some(isBlank)) return true;
+      if (sc.metricGrowthRatesTotal.slice(0, numPhases).some(isBlank) || sc.sharesGrowthRates.slice(0, numPhases).some(isBlank)) return true;
     } else {
       if (anyBlank(sc.currentRevenue, sc.currentShares)) return true;
-      if (sc.revenueGrowthRates.some(isBlank) || sc.finalMargins.some(isBlank) || sc.sharesGrowthRates.some(isBlank)) return true;
+      if (sc.revenueGrowthRates.slice(0, numPhases).some(isBlank) || sc.finalMargins.slice(0, numPhases).some(isBlank) || sc.sharesGrowthRates.slice(0, numPhases).some(isBlank)) return true;
     }
   }
 
