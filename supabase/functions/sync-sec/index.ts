@@ -5,8 +5,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 // Define a shim for Deno to satisfy the IDE's TypeScript server
 declare const Deno: any;
 
-// SEC requires this. Replace with your info!
-const SEC_USER_AGENT = "FairValueStudio dwayneletran17@gmail.com";
+// SEC requires a User-Agent with contact info
+const SEC_USER_AGENT = `FairValueStudio ${Deno.env.get('SEC_API_EMAIL') || 'admin@fairvaluestudio.app'}`;
 
 Deno.serve(async (req: Request) => {
   try {
