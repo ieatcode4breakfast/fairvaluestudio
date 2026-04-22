@@ -57,7 +57,7 @@ function computeFields(sc: Scenario, data: UnifiedFundamentals): DataField[] {
   if (data.revenue) {
     fields.push({
       key: 'currentRevenue',
-      label: 'Revenue (SEC TTM)',
+      label: 'Revenue (TTM)',
       value: s(data.revenue),
       formatted: formatDynamicDecimal(s(data.revenue), true),
     });
@@ -66,38 +66,38 @@ function computeFields(sc: Scenario, data: UnifiedFundamentals): DataField[] {
   if (data.netIncome) {
     fields.push({
       key: 'niCurrentMetricTotal',
-      label: 'Net Income (SEC TTM)',
+      label: 'Net Income (TTM)',
       value: s(data.netIncome),
       formatted: formatDynamicDecimal(s(data.netIncome), true),
     });
-    
+
     if (data.sharesOutstanding) {
-        const eps = data.netIncome / data.sharesOutstanding;
-        fields.push({
-            key: 'niCurrentMetricPerShare',
-            label: 'Earnings Per Share (SEC TTM)',
-            value: round(eps),
-            formatted: formatDynamicDecimal(eps, true),
-        });
+      const eps = data.netIncome / data.sharesOutstanding;
+      fields.push({
+        key: 'niCurrentMetricPerShare',
+        label: 'Earnings Per Share (TTM)',
+        value: round(eps),
+        formatted: formatDynamicDecimal(eps, true),
+      });
     }
   }
 
   if (data.freeCashFlow) {
     fields.push({
       key: 'currentMetricTotal',
-      label: 'Free Cash Flow (SEC TTM)',
+      label: 'Free Cash Flow (TTM)',
       value: s(data.freeCashFlow),
       formatted: formatDynamicDecimal(s(data.freeCashFlow), true),
     });
 
     if (data.sharesOutstanding) {
-        const fcfps = data.freeCashFlow / data.sharesOutstanding;
-        fields.push({
-            key: 'currentMetricPerShare',
-            label: 'FCF Per Share (SEC TTM)',
-            value: round(fcfps),
-            formatted: formatDynamicDecimal(fcfps, true),
-        });
+      const fcfps = data.freeCashFlow / data.sharesOutstanding;
+      fields.push({
+        key: 'currentMetricPerShare',
+        label: 'FCF Per Share (TTM)',
+        value: round(fcfps),
+        formatted: formatDynamicDecimal(fcfps, true),
+      });
     }
   }
 
@@ -465,8 +465,8 @@ export function AssumptionsCard({
             }
           }}
           className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border cursor-pointer ${sc.showResetConfirm
-              ? 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200 dark:bg-red-900/40 dark:hover:bg-red-900/60 dark:text-red-300 dark:border-red-800'
-              : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-700 dark:text-slate-300 dark:border-slate-700'
+            ? 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200 dark:bg-red-900/40 dark:hover:bg-red-900/60 dark:text-red-300 dark:border-red-800'
+            : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-700 dark:text-slate-300 dark:border-slate-700'
             }`}
         >
           <RotateCcw className="w-4 h-4" />
@@ -476,8 +476,8 @@ export function AssumptionsCard({
           <button
             onClick={handleDeleteClick}
             className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border transition-colors cursor-pointer ${deleteConfirm
-                ? 'bg-red-600 hover:bg-red-700 text-white border-red-600'
-                : 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200 dark:bg-red-900/40 dark:hover:bg-red-900/60 dark:text-red-300 dark:border-red-800'
+              ? 'bg-red-600 hover:bg-red-700 text-white border-red-600'
+              : 'bg-red-50 hover:bg-red-100 text-red-600 border-red-200 dark:bg-red-900/40 dark:hover:bg-red-900/60 dark:text-red-300 dark:border-red-800'
               }`}
           >
             <Trash2 className="w-4 h-4" />

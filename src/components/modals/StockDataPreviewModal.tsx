@@ -61,10 +61,10 @@ export function StockDataPreviewModal({
                         </button>
                     </div>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
-                        Official SEC TTM data for{' '}
+                        Available financial data for {' '}
                         <span className="font-semibold text-slate-700 dark:text-slate-200">
                             {companyName} ({symbol})
-                        </span>.
+                        </span>. Please double-check for accuracy.
                     </p>
                 </div>
 

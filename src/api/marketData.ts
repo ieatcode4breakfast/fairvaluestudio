@@ -75,8 +75,8 @@ export async function getStockFundamentals(symbol: string): Promise<UnifiedFunda
         return {
             price,
             ...secData,
-            // Override SEC shares with Finnhub's more current sharesOutstanding
-            sharesOutstanding: profile?.shareOutstanding ? profile.shareOutstanding * 1000000 : secData?.sharesOutstanding
+            // Exclusively use Finnhub's more current sharesOutstanding
+            sharesOutstanding: profile?.shareOutstanding ? profile.shareOutstanding * 1000000 : 0
         };
     } catch (error) {
         console.error(`[UnifiedData] Unified fetch failed for ${symbol}:`, error);

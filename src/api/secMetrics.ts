@@ -6,7 +6,7 @@
 
 // CRITICAL: The SEC will block your request if this is not updated to your actual info.
 // CRITICAL: The SEC will block your request if this is not updated to your actual info.
-const USER_AGENT = "FairValueStudio/1.0 (https://fairvaluestudio.app; dwayneletran17@gmail.com)";
+const USER_AGENT = "FairValueStudio/1.0 (https://fairvaluestudio.app; admin@fairvaluestudio.app)";
 
 interface SecFactValue {
     start?: string;
@@ -59,7 +59,7 @@ function getLatestValue(facts: any, possibleTags: string[], unit: string = "USD"
     let allPoints: SecFactValue[] = [];
 
     for (const tag of possibleTags) {
-        const concept = facts["us-gaap"][tag] || facts["dei"][tag]; // Check us-gaap and dei (for shares)
+        const concept = facts["us-gaap"][tag] || facts["dei"][tag];
         if (concept && concept.units && concept.units[unit]) {
             allPoints = allPoints.concat(concept.units[unit]);
         }
@@ -128,14 +128,11 @@ export async function getSecFinancials(ticker: string): Promise<any> {
         const netIncomeTags = ["NetIncomeLoss", "ProfitLoss", "NetIncomeLossAvailableToCommonStockholdersBasic"];
         const ocfTags = ["NetCashProvidedByUsedInOperatingActivities"];
         const capExTags = ["PaymentsToAcquirePropertyPlantAndEquipment"];
-        const sharesTags = ["WeightedAverageNumberOfDilutedSharesOutstanding", "EntityCommonStockSharesOutstanding"];
 
         const revenue = calculateTTM(facts, revenueTags);
         const netIncome = calculateTTM(facts, netIncomeTags);
         const ocf = calculateTTM(facts, ocfTags);
         const capEx = calculateTTM(facts, capExTags);
-        const sharesFact = getLatestValue(facts, sharesTags, "shares");
-        const sharesOutstanding = sharesFact ? sharesFact.val : 0;
 
 
         const refFact = getLatestValue(facts, revenueTags);
@@ -150,7 +147,6 @@ export async function getSecFinancials(ticker: string): Promise<any> {
             operatingCashFlow: ocf,
             capitalExpenditure: capEx,
             freeCashFlow,
-            sharesOutstanding,
             reportingPeriod: { year: fiscalYear, quarter: fiscalQuarter }
         };
     } catch (error) {

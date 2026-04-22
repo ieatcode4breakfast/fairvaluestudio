@@ -90,7 +90,8 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/sec-api/, ''),
         headers: {
-          'Host': 'data.sec.gov'
+          'Host': 'data.sec.gov',
+          'User-Agent': 'FairValueStudio/1.0 (https://fairvaluestudio.app; admin@fairvaluestudio.app)'
         }
       },
       '/sec-www': {
@@ -98,7 +99,8 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/sec-www/, ''),
         headers: {
-          'Host': 'www.sec.gov'
+          'Host': 'www.sec.gov',
+          'User-Agent': 'FairValueStudio/1.0 (https://fairvaluestudio.app; admin@fairvaluestudio.app)'
         }
       }
     }
