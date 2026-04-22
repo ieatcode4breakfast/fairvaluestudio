@@ -34,10 +34,15 @@ interface AssumptionsCardProps {
 // Respects the current inMillions / simpleInMillions flag so labels and values
 // match exactly what is displayed in GrowthCard inputs.
 // ---------------------------------------------------------------------------
-function computeFields(_sc: Scenario, data: UnifiedFundamentals): DataField[] {
+function computeFields(sc: Scenario, data: UnifiedFundamentals): DataField[] {
   const fields: DataField[] = [];
+  const inMillions = sc.inMillions;
 
-  // ── Buy Price (always present if price was fetched) ──────────────────────
+  // Helper to format values based on millions flag
+  const round = (v: number) => parseFloat(formatDynamicDecimal(v));
+  const s = (v: number) => round(inMillions ? v / 1_000_000 : v);
+
+  // 1. Buy Price
   if (data.price !== null) {
     const roundedPrice = parseFloat(formatDynamicDecimal(data.price));
     fields.push({
@@ -45,6 +50,63 @@ function computeFields(_sc: Scenario, data: UnifiedFundamentals): DataField[] {
       label: 'Buy Price',
       value: roundedPrice,
       formatted: formatDynamicDecimal(roundedPrice, true),
+    });
+  }
+
+  // 2. SEC Metrics (TTM)
+  if (data.revenue) {
+    fields.push({
+      key: 'currentRevenue',
+      label: 'Revenue (SEC TTM)',
+      value: s(data.revenue),
+      formatted: formatDynamicDecimal(s(data.revenue), true),
+    });
+  }
+
+  if (data.netIncome) {
+    fields.push({
+      key: 'niCurrentMetricTotal',
+      label: 'Net Income (SEC TTM)',
+      value: s(data.netIncome),
+      formatted: formatDynamicDecimal(s(data.netIncome), true),
+    });
+    
+    if (data.sharesOutstanding) {
+        const eps = data.netIncome / data.sharesOutstanding;
+        fields.push({
+            key: 'niCurrentMetricPerShare',
+            label: 'Earnings Per Share (SEC TTM)',
+            value: round(eps),
+            formatted: formatDynamicDecimal(eps, true),
+        });
+    }
+  }
+
+  if (data.freeCashFlow) {
+    fields.push({
+      key: 'currentMetricTotal',
+      label: 'Free Cash Flow (SEC TTM)',
+      value: s(data.freeCashFlow),
+      formatted: formatDynamicDecimal(s(data.freeCashFlow), true),
+    });
+
+    if (data.sharesOutstanding) {
+        const fcfps = data.freeCashFlow / data.sharesOutstanding;
+        fields.push({
+            key: 'currentMetricPerShare',
+            label: 'FCF Per Share (SEC TTM)',
+            value: round(fcfps),
+            formatted: formatDynamicDecimal(fcfps, true),
+        });
+    }
+  }
+
+  if (data.sharesOutstanding) {
+    fields.push({
+      key: 'currentShares',
+      label: 'Shares Outstanding',
+      value: s(data.sharesOutstanding),
+      formatted: formatDynamicDecimal(s(data.sharesOutstanding), true),
     });
   }
 
@@ -326,9 +388,6 @@ export function AssumptionsCard({
   const [showPreview, setShowPreview] = useState(false);
   const [pendingSymbol, setPendingSymbol] = useState('');
   const [pendingCompanyName, setPendingCompanyName] = useState('');
-  const [pendingAssetType, setPendingAssetType] = useState<string | undefined>();
-  const [pendingExchange, setPendingExchange] = useState<string | undefined>();
-  const [pendingReportingPeriod, setPendingReportingPeriod] = useState<{ year: number; quarter: number } | null>(null);
   const [previewFields, setPreviewFields] = useState<DataField[]>([]);
 
   // Called when the user selects a ticker in StockSearchModal.
@@ -338,22 +397,16 @@ export function AssumptionsCard({
     const fields = computeFields(sc, data);
     setPendingSymbol(symbol);
     setPendingCompanyName(companyName);
-    setPendingAssetType(assetType);
-    setPendingExchange(exchange);
-    setPendingReportingPeriod(data.reportingPeriod || null);
     setPreviewFields(fields);
     setShowStockSearch(false);
     setShowPreview(true);
   };
 
   // Called when the user hits Apply in the preview modal.
-  const handleApply = (enabledKeys: string[], aiFields: DataField[] = []) => {
+  const handleApply = (enabledKeys: string[]) => {
     const changes: Partial<Scenario> = {};
 
-    // Merge standard preview fields and AI fields
-    const allFields = [...previewFields, ...aiFields];
-
-    allFields.forEach(field => {
+    previewFields.forEach(field => {
       if (enabledKeys.includes(field.key)) {
         (changes as any)[field.key] = field.value;
       }
@@ -373,9 +426,6 @@ export function AssumptionsCard({
     setPreviewFields([]);
     setPendingSymbol('');
     setPendingCompanyName('');
-    setPendingAssetType(undefined);
-    setPendingExchange(undefined);
-    setPendingReportingPeriod(null);
   };
 
   const handlePreviewCancel = () => {
@@ -1069,15 +1119,10 @@ export function AssumptionsCard({
         show={showPreview}
         symbol={pendingSymbol}
         companyName={pendingCompanyName}
-        assetType={pendingAssetType}
-        exchange={pendingExchange}
         inMillions={sc.inMillions}
         fields={previewFields}
-        reportingPeriod={pendingReportingPeriod}
         onApply={handleApply}
         onClose={handlePreviewCancel}
-        isGuest={!currentUser}
-        userId={currentUser?.id}
       />
     </div>
   );

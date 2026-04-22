@@ -83,4 +83,24 @@ export default defineConfig({
       '@': path.resolve(__dirname, '.'),
     },
   },
-});
+  server: {
+    proxy: {
+      '/sec-api': {
+        target: 'https://data.sec.gov',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/sec-api/, ''),
+        headers: {
+          'Host': 'data.sec.gov'
+        }
+      },
+      '/sec-www': {
+        target: 'https://www.sec.gov',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/sec-www/, ''),
+        headers: {
+          'Host': 'www.sec.gov'
+        }
+      }
+    }
+  }
+});

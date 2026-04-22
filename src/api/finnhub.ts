@@ -102,3 +102,21 @@ export async function getStockFundamentals(symbol: string): Promise<FinnhubFunda
         return { price: null, reportingPeriod: null };
     }
 }
+
+/**
+ * Fetch company profile data from Finnhub.
+ */
+export async function getCompanyProfile(symbol: string): Promise<any> {
+    try {
+        const response = await fetch(
+            `${BASE_URL}/stock/profile2?symbol=${symbol}&token=${API_KEY}`
+        );
+        if (!response.ok) {
+            throw new Error(`Finnhub profile failed: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch company profile:', error);
+        return null;
+    }
+}

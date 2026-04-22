@@ -40,15 +40,7 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
         timeoutRef.current = setTimeout(async () => {
             try {
                 const data = await searchStocks(query);
-                // Smart Filter: Keep results with no dots (US primary) or 1-char suffixes (US Share Classes like BRK.B)
-                // Nuke anything with 2+ char suffixes (.TO, .MX, .L, .AX, etc.)
-                const filtered = data.filter(stock => {
-                    if (!stock.symbol.includes('.')) return true;
-                    const parts = stock.symbol.split('.');
-                    const suffix = parts[parts.length - 1];
-                    return suffix.length === 1;
-                });
-                setResults(filtered);
+                setResults(data);
                 if (data.length === 0) {
                     setError('No stocks found. Try a different ticker or company name.');
                 }

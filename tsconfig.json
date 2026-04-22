@@ -25,5 +25,8 @@
     "types": [
       "vite/client"
     ]
-  }
+  },
+  "exclude": [
+    "supabase"
+  ]
 }
