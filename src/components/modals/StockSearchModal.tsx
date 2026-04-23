@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search } from '../Icons';
 import { useScrollLock } from '../../hooks/useScrollLock';
-import { useModalHistory } from '../../hooks/useModalHistory';
 import { searchStocks, StockSearchResult, getStockFundamentals, UnifiedFundamentals } from '../../api/marketData';
 
 interface StockSearchModalProps {
@@ -19,7 +18,6 @@ export function StockSearchModal({ show, onClose, onSelect }: StockSearchModalPr
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useScrollLock(show);
-    useModalHistory(show, onClose, 'StockSearchModal');
 
     // Debounced search effect
     useEffect(() => {

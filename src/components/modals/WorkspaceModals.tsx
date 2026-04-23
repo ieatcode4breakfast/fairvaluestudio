@@ -1,12 +1,8 @@
 import React from 'react';
 import { Check, InfoIcon } from '../Icons';
 import { ValuationMetadata, User } from '../../types';
-import { useScrollLock } from '../../hooks/useScrollLock';
-import { useModalHistory } from '../../hooks/useModalHistory';
 
 export function DownloadModal({ show, setShow, filename, setFilename, onDownload }: any) {
-  useScrollLock(show);
-  useModalHistory(show, () => setShow(false), 'DownloadModal');
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setShow(false); }}>
@@ -34,8 +30,6 @@ export function DownloadModal({ show, setShow, filename, setFilename, onDownload
 }
 
 export function UploadModal({ show, setShow, currentUser, onProceed }: any) {
-  useScrollLock(show);
-  useModalHistory(show, () => setShow(false), 'UploadModal');
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setShow(false); }}>
@@ -66,8 +60,6 @@ export function UploadModal({ show, setShow, currentUser, onProceed }: any) {
 }
 
 export function SaveAsModal({ show, setShow, name, setName, onSave }: any) {
-  useScrollLock(show);
-  useModalHistory(show, () => setShow(false), 'SaveAsModal');
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setShow(false); }}>
@@ -95,8 +87,6 @@ export function SaveAsModal({ show, setShow, name, setName, onSave }: any) {
 }
 
 export function NewValuationModal({ show, setShow, name, setName, isSaving, userValuations, onCreateClick }: any) {
-  useScrollLock(show);
-  useModalHistory(show, () => setShow(false), 'NewValuationModal');
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget && userValuations.length > 0) setShow(false); }}>
@@ -160,8 +150,6 @@ export function NewValuationModal({ show, setShow, name, setName, isSaving, user
 }
 
 export function DeleteModal({ show, setShow, onDelete }: any) {
-  useScrollLock(show);
-  useModalHistory(show, () => setShow(false), 'DeleteModal');
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setShow(false); }}>
@@ -190,8 +178,6 @@ export function DeleteModal({ show, setShow, onDelete }: any) {
 }
 
 export function RenameModal({ show, setShow, name, setName, onRename }: any) {
-  useScrollLock(show);
-  useModalHistory(show, () => setShow(false), 'RenameModal');
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setShow(false); }}>
@@ -219,8 +205,6 @@ export function RenameModal({ show, setShow, name, setName, onRename }: any) {
 }
 
 export function GenericConfirmModal({ show, setShow, title, description, confirmText, confirmClass, onConfirm }: any) {
-  useScrollLock(show);
-  useModalHistory(show, () => setShow(false), 'GenericConfirmModal');
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm" onMouseDown={(e) => { if (e.target === e.currentTarget) setShow(false); }}>
@@ -242,8 +226,6 @@ export function GenericConfirmModal({ show, setShow, title, description, confirm
 }
 
 export function SaveSuccessModal({ show, name }: any) {
-  useScrollLock(show);
-  useModalHistory(show, () => {}, 'SaveSuccessModal'); // Auto-closes, but history entry might be annoying. However, consistency is good.
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm pointer-events-auto">
@@ -259,8 +241,6 @@ export function SaveSuccessModal({ show, name }: any) {
 }
 
 export function SignupSuccessModal({ show }: any) {
-  useScrollLock(show);
-  useModalHistory(show, () => {}, 'SignupSuccessModal');
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm">
@@ -278,8 +258,6 @@ export function SignupSuccessModal({ show }: any) {
 }
 
 export function RetainGuestModal({ show, name, setName, isSaving, onRetain }: any) {
-  useScrollLock(show);
-  useModalHistory(show, () => onRetain(false), 'RetainGuestModal');
   if (!show) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 dark:bg-slate-900/70 p-4 backdrop-blur-sm">

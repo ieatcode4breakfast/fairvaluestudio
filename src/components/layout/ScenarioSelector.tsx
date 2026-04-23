@@ -4,7 +4,6 @@ import { PlusIcon, RotateCcw, GripVertical, ChevronDown } from '../Icons';
 import { Scenario } from '../../types';
 import { MAX_SCENARIOS } from '../../utils/constants';
 import { SELECT_CLS } from '../../utils/constants';
-import { useModalHistory } from '../../hooks/useModalHistory';
 
 interface ScenarioSelectorProps {
   scenarios: Scenario[];
@@ -57,8 +56,6 @@ function ScenarioSelectorItem({ sc, isActive, onSelect }: SelectorItemProps) {
 export function ScenarioSelector(props: ScenarioSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [tempOrder, setTempOrder] = useState<Scenario[]>([]);
-
-  useModalHistory(isOpen, () => setIsOpen(false), 'ScenarioSelector');
 
   const activeScenario = props.scenarios.find(s => s.id === props.activeScenarioId);
 

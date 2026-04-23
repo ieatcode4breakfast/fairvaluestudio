@@ -4,7 +4,6 @@ import { Calculator, DownloadIcon, UploadIcon, ChevronDown, ChevronUp } from '..
 import { ThemeToggle } from '../ThemeToggle';
 import { User, ValuationMetadata } from '../../types';
 import { SELECT_CLS } from '../../utils/constants';
-import { useModalHistory } from '../../hooks/useModalHistory';
 
 interface HeaderProps {
   currentUser: User | null;
@@ -37,8 +36,6 @@ export function Header(props: HeaderProps) {
   const [isHowToUseExpanded, setIsHowToUseExpanded] = useState(false);
   const [isIconOnly, setIsIconOnly] = useState(false);
   const [isValuationOpen, setIsValuationOpen] = useState(false);
-
-  useModalHistory(isValuationOpen, () => setIsValuationOpen(false), 'HeaderValuation');
 
   useEffect(() => {
     const check = () => setIsIconOnly(window.innerWidth < 1280); // xl breakpoint
