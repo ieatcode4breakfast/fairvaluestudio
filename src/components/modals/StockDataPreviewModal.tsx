@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Toggle } from '../Toggle';
 import { useScrollLock } from '../../hooks/useScrollLock';
+import { useModalHistory } from '../../hooks/useModalHistory';
 
 export interface DataField {
     key: string;
@@ -25,6 +26,7 @@ export function StockDataPreviewModal({
     const [enabled, setEnabled] = useState<Record<string, boolean>>({});
 
     useScrollLock(show);
+    useModalHistory(show, onClose, 'StockDataPreviewModal');
 
     // Reset toggles whenever the field list changes (new stock selected)
     useEffect(() => {

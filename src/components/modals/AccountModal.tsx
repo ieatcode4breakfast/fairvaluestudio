@@ -1,6 +1,7 @@
 import React from 'react';
 import { Eye, EyeOff } from '../Icons';
 import { useScrollLock } from '../../hooks/useScrollLock';
+import { useModalHistory } from '../../hooks/useModalHistory';
 
 interface AccountModalProps {
   showAccountModal: boolean;
@@ -30,6 +31,7 @@ interface AccountModalProps {
 
 export function AccountModal(props: AccountModalProps) {
   useScrollLock(props.showAccountModal);
+  useModalHistory(props.showAccountModal, () => props.setShowAccountModal(false), 'AccountModal');
 
   if (!props.showAccountModal) return null;
 

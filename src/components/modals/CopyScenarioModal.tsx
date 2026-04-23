@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Scenario, ValuationMetadata } from '../../types';
 import { Copy, ChevronLeft } from '../Icons';
 import { SELECT_CLS } from '../../utils/constants';
+import { useScrollLock } from '../../hooks/useScrollLock';
+import { useModalHistory } from '../../hooks/useModalHistory';
 
 interface CopyScenarioModalProps {
   show: boolean;
@@ -19,6 +21,9 @@ export function CopyScenarioModal({
   show, setShow, scenario, userValuations, loadedValuationId,
   isCopying, onCopyToThis, onCopyToOther, onNewValuation
 }: CopyScenarioModalProps) {
+  useScrollLock(show);
+  useModalHistory(show, () => setShow(false), 'CopyScenarioModal');
+
   const [mode, setMode] = useState<'choice' | 'select'>('choice');
   const [selectedValuationId, setSelectedValuationId] = useState('');
   const [error, setError] = useState('');
