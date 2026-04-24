@@ -22,6 +22,9 @@ export default defineConfig(({ mode }) => {
           name: 'FairValue Studio',
           short_name: 'FairValue Studio',
           description: 'A multi-scenario valuation tool',
+          display: 'standalone',
+          start_url: '/',
+          categories: ['finance', 'productivity'],
           theme_color: '#4f46e5',
           background_color: '#ffffff',
           icons: [
