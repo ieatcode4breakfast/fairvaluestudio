@@ -18,6 +18,7 @@ import { useValuations } from './hooks/useValuations';
 import { useAutoSaveSync } from './hooks/useAutoSaveSync';
 
 // Components
+import { Toast } from './components/Toast';
 import { ScenarioPanel } from './components/ScenarioPanel';
 import { ScenarioComparisonTable } from './components/ScenarioComparisonTable';
 import { Header } from './components/layout/Header';
@@ -47,7 +48,7 @@ export default function App() {
   const {
     scenarios, setScenarios, activeScenarioId, setActiveScenarioId, lastSavedState, setLastSavedState,
     currentCleaned, isDirty, updateScenario, addScenario, duplicateScenario, getCleanedScenariosString, deleteScenario,
-    onReorder, showReorderToast
+    onReorder
   } = useScenarios(currentUser);
 
   const {
@@ -59,7 +60,13 @@ export default function App() {
     currentUser, setCurrentUser, scenarios, setScenarios, setActiveScenarioId, setLastSavedState, setLoadedValuationId, handleLoadValuation, loadInitialScenarios
   );
 
-  useAutoSaveSync(loadedValuationId, currentUser, userValuations, scenarios, setScenarios, currentCleaned, isDirty, setLastSavedState, setIsSaving);
+  useAutoSaveSync(loadedValuationId, currentUser, userValuations, currentCleaned, isDirty, setLastSavedState, setIsSaving, () => {
+    setShowSyncToast(true);
+    setTimeout(() => setShowSyncToast(false), 2000);
+  }, () => {
+    setShowSyncErrorToast(true);
+    setTimeout(() => setShowSyncErrorToast(false), 2000);
+  });
   
   // Clear text selection when clicking non-selectable areas
   useEffect(() => {
@@ -130,6 +137,8 @@ export default function App() {
 
   // Summary State
   const [showCopySuccess, setShowCopySuccess] = useState(false);
+  const [showSyncToast, setShowSyncToast] = useState(false);
+  const [showSyncErrorToast, setShowSyncErrorToast] = useState(false);
 
   // Computed Values
   const allResults = useMemo(() =>
@@ -429,15 +438,10 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-sans selection:bg-indigo-100 dark:selection:bg-indigo-900 selection:text-indigo-900 dark:selection:text-indigo-100 pb-12 overflow-x-visible select-none">
 
-      {/* Reorder Toast Notification */}
-      <div
-        className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 pointer-events-none ${showReorderToast ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
-          }`}
-      >
-        <div className="bg-indigo-600 text-white px-4 py-2 rounded-full shadow-lg text-sm font-medium flex items-center gap-2">
-          <span>Scenarios reordered</span>
-        </div>
-      </div>
+      {/* Sync Success Toast */}
+      <Toast show={showSyncToast} message="Changes synced successfully" />
+      {/* Sync Error Toast */}
+      <Toast show={showSyncErrorToast} message="An error occurred, sync unsuccessful" variant="red" />
 
       <div className="max-w-6xl w-full mx-auto px-0 md:px-6 pt-6 md:pt-10">
         <Header

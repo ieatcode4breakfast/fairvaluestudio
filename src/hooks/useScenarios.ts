@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Scenario } from '../types';
 import { createDefaultScenario, cloneScenario, migrateScenario } from '../utils/scenario';
 import { MAX_SCENARIOS, TRANSIENT_KEYS } from '../utils/constants';
@@ -26,14 +26,6 @@ export function loadInitialScenarios(): Scenario[] {
 export function useScenarios(currentUser: User | null) {
   const [scenarios, setScenarios] = useState<Scenario[]>(loadInitialScenarios);
   const [activeScenarioId, setActiveScenarioId] = useState<number>(() => scenarios[0]?.id || 0);
-
-  const [draggedTabIndex, setDraggedTabIndex] = useState<number | null>(null);
-  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-  const [dragOverRowIndices, setDragOverRowIndices] = useState<number[]>([]);
-  const pendingIndexRef = useRef<number | null>(null);
-  const dragOverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [dropSuccessIndex, setDropSuccessIndex] = useState<number | null>(null);
-  const [showReorderToast, setShowReorderToast] = useState(false);
 
   // We expose this so that other hooks/components know what the clean stringified state is
   const getCleanedScenariosString = useCallback((scs: Scenario[]) => {
@@ -124,124 +116,6 @@ export function useScenarios(currentUser: User | null) {
     setActiveScenarioId(newSc.id);
   }, [scenarios]);
 
-  const handleDragStart = (e: React.DragEvent<HTMLButtonElement>, index: number) => {
-    setDraggedTabIndex(index);
-    if (e.dataTransfer) {
-      e.dataTransfer.effectAllowed = "move";
-    }
-  };
-
-  const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>, tabsContainerElement: HTMLDivElement | null) => {
-    e.preventDefault();
-    if (draggedTabIndex === null || !tabsContainerElement) return;
-
-    // Use relative container coordinates to ignore CSS transforms applied globally
-    const containerRect = tabsContainerElement.getBoundingClientRect();
-    const mouseX = e.clientX - containerRect.left;
-    const mouseY = e.clientY - containerRect.top;
-
-    const tabElements = Array.from(tabsContainerElement.querySelectorAll('button[data-tab-index]')) as HTMLButtonElement[];
-    if (tabElements.length === 0) return;
-
-    // 1. Identify all unique rows (offsetTop)
-    const uniqueRowTops = Array.from(new Set(tabElements.map(t => t.offsetTop))).sort((a, b) => a - b);
-    
-    // 2. Find the row closest to the current mouseY
-    const closestRowTop = uniqueRowTops.reduce((prev, curr) => 
-      Math.abs(curr - mouseY) < Math.abs(prev - mouseY) ? curr : prev
-    );
-
-    // 3. Filter tabs to only those on this specific row
-    const rowTabs = tabElements.filter(t => Math.abs(t.offsetTop - closestRowTop) < 5);
-
-    let closestIndex = dragOverIndex;
-    let minDistanceX = Number.POSITIVE_INFINITY;
-
-    // 4. Find the closest tab on this row based on mouseX
-    rowTabs.forEach((tab) => {
-      const indexAttr = tab.getAttribute('data-tab-index');
-      if (!indexAttr) return;
-
-      const index = parseInt(indexAttr, 10);
-      
-      // Still using offsetLeft (static) to ignore visual transformations (jitter fix)
-      const tabCenterX = tab.offsetLeft + tab.offsetWidth / 2;
-      const distanceX = Math.abs(mouseX - tabCenterX);
-
-      if (distanceX < minDistanceX) {
-        minDistanceX = distanceX;
-        closestIndex = index;
-      }
-    });
-
-    if (closestIndex !== null && closestIndex !== dragOverIndex) {
-      if (closestIndex !== pendingIndexRef.current) {
-        pendingIndexRef.current = closestIndex;
-        if (dragOverTimeoutRef.current) clearTimeout(dragOverTimeoutRef.current);
-        dragOverTimeoutRef.current = setTimeout(() => {
-          setDragOverIndex(closestIndex);
-
-          // Calculate Row Indices for shifting (only current target row)
-          const targetTab = tabElements.find(t => t.getAttribute('data-tab-index') === String(closestIndex));
-          if (targetTab) {
-            const targetTop = targetTab.offsetTop;
-            const sameRow: number[] = [];
-            tabElements.forEach(t => {
-              const idxAttr = t.getAttribute('data-tab-index');
-              if (idxAttr && Math.abs(t.offsetTop - targetTop) < 5) {
-                sameRow.push(parseInt(idxAttr, 10));
-              }
-            });
-            setDragOverRowIndices(sameRow);
-          }
-        }, 100);
-      }
-    } else if (closestIndex === null) {
-      pendingIndexRef.current = null;
-      if (dragOverTimeoutRef.current) clearTimeout(dragOverTimeoutRef.current);
-      setDragOverRowIndices([]);
-    }
-  }, [draggedTabIndex, dragOverIndex]);
-
-  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    if (dragOverTimeoutRef.current) clearTimeout(dragOverTimeoutRef.current);
-    pendingIndexRef.current = null;
-    setDragOverRowIndices([]);
-
-    if (draggedTabIndex === null || dragOverIndex === null || draggedTabIndex === dragOverIndex) {
-      setDragOverIndex(null);
-      setDraggedTabIndex(null);
-      return;
-    }
-
-    const newScenarios = [...scenarios];
-    const draggedItem = newScenarios[draggedTabIndex];
-    newScenarios.splice(draggedTabIndex, 1);
-    newScenarios.splice(dragOverIndex, 0, draggedItem);
-
-    setScenarios(newScenarios);
-    setActiveScenarioId(draggedItem.id);
-    setDraggedTabIndex(null);
-    setDragOverIndex(null);
-
-    setDropSuccessIndex(dragOverIndex);
-    setTimeout(() => setDropSuccessIndex(null), 800);
-
-    setShowReorderToast(true);
-    setTimeout(() => setShowReorderToast(false), 2000);
-  }, [scenarios, draggedTabIndex, dragOverIndex]);
-
-  const handleDragEnd = () => {
-    if (dragOverTimeoutRef.current) clearTimeout(dragOverTimeoutRef.current);
-    pendingIndexRef.current = null;
-    setDraggedTabIndex(null);
-    setDragOverIndex(null);
-    setDragOverRowIndices([]);
-    setDropSuccessIndex(null);
-    setShowReorderToast(false);
-  };
-
   const onReorder = (newOrder: Scenario[]) => {
     setScenarios(newOrder);
   };
@@ -263,18 +137,5 @@ export function useScenarios(currentUser: User | null) {
     addScenario,
     duplicateScenario,
     onReorder,
-
-    // Drag and drop states
-    draggedTabIndex,
-    dragOverIndex,
-    dragOverRowIndices,
-    dropSuccessIndex,
-    showReorderToast,
-
-    // Drag handlers
-    handleDragStart,
-    handleDragOver,
-    handleDrop,
-    handleDragEnd,
   };
 }
